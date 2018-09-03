@@ -7,14 +7,14 @@ namespace CoTy.Ambiance
 {
     public class AmScope
     {
-        private readonly Dictionary<CoSymbol, CoObject> definitions = new Dictionary<CoSymbol, CoObject>();
+        private readonly Dictionary<CoSymbol, Binding> definitions = new Dictionary<CoSymbol, Binding>();
 
         public AmScope(AmScope parent)
         {
             Parent = parent;
         }
 
-        public virtual void Define(CoSymbol symbol, CoObject @object)
+        public virtual void Define(CoSymbol symbol, CoTuple @object)
         {
             if (!TryDefine(symbol, @object))
             {
@@ -22,18 +22,18 @@ namespace CoTy.Ambiance
             }
         }
 
-        public virtual bool TryDefine(CoSymbol symbol, CoObject @object)
+        public virtual bool TryDefine(CoSymbol symbol, CoTuple value)
         {
             if (!this.definitions.ContainsKey(symbol))
             {
-                this.definitions.Add(symbol, @object);
+                this.definitions.Add(symbol, new Binding(symbol, value));
                 return true;
             }
 
             return false;
         }
 
-        public virtual CoObject Find(CoSymbol symbol)
+        public virtual CoTuple Find(CoSymbol symbol)
         {
             if (!TryFind(symbol, out var @object))
             {
@@ -43,17 +43,20 @@ namespace CoTy.Ambiance
             return @object;
         }
 
-        public virtual bool TryFind(CoSymbol symbol, out CoObject @object)
+        public virtual bool TryFind(CoSymbol symbol, out CoTuple value)
         {
-            if (!this.definitions.TryGetValue(symbol, out @object))
+            if (!this.definitions.TryGetValue(symbol, out var binding))
             {
                 if (Parent != null)
                 {
-                    return Parent.TryFind(symbol, out @object);
+                    return Parent.TryFind(symbol, out value);
                 }
+
+                value = null;
                 return false;
             }
 
+            value = binding.Value;
             return true;
         }
 

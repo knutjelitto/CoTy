@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Numerics;
 using System.Text;
 
 using CoTy.Objects;
@@ -9,7 +8,7 @@ using CoTy.Errors;
 
 namespace CoTy.Inputs
 {
-    public class Scanner : IEnumerable<CoObject>
+    public class Scanner : IEnumerable<CoTuple>
     {
         private readonly CharSource source;
 
@@ -18,7 +17,7 @@ namespace CoTy.Inputs
             this.source = source;
         }
 
-        public IEnumerator<CoObject> GetEnumerator()
+        public IEnumerator<CoTuple> GetEnumerator()
         {
             var current = new Cursor<char>(this.source);
 
@@ -36,6 +35,10 @@ namespace CoTy.Inputs
                         current = current.Next;
                         yield return CoSymbol.RightParent;
                         break;
+                    case '\'':
+                        current = current.Next;
+                        yield return CoSymbol.Quoter;
+                        break;
                     case '"':
                         yield return ScanString(ref current);
                         break;
@@ -48,11 +51,6 @@ namespace CoTy.Inputs
             }
         }
 
-        private bool IsDigit(char c)
-        {
-            return '0' <= c && c <= '9';
-        }
-
         private bool IsSkipable(char c)
         {
             return char.IsWhiteSpace(c) || char.IsControl(c);
@@ -60,7 +58,7 @@ namespace CoTy.Inputs
 
         private bool IsStructure(char c)
         {
-            return "()".Contains(c);
+            return "()\"".Contains(c);
         }
 
         private Cursor<char> Skip(Cursor<char> current)
@@ -116,9 +114,9 @@ namespace CoTy.Inputs
             return accu.ToString();
         }
 
-        private CoObject Classify(string grumble)
+        private CoTuple Classify(string grumble)
         {
-            if (BigInteger.TryParse(grumble, out var integer))
+            if (long.TryParse(grumble, out var integer))
             {
                 return new CoInteger(integer);
             }

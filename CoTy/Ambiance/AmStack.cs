@@ -8,32 +8,32 @@ namespace CoTy.Ambiance
 {
     public class AmStack
     {
-        private readonly Stack<CoObject> stack = new Stack<CoObject>();
+        private readonly Stack<CoTuple> stack = new Stack<CoTuple>();
 
-        public void Push(CoObject obj)
+        public void Push(CoTuple obj)
         {
-            stack.Push(obj);
+            this.stack.Push(obj);
         }
 
-        public dynamic Pop()
+        public CoTuple Pop()
         {
-            return stack.Pop();
+            return this.stack.Pop();
         }
 
-        public CoObject Peek()
+        public CoTuple Peek()
         {
-            return stack.Peek();
+            return this.stack.Peek();
         }
 
         public void Clear()
         {
-            stack.Clear();
+            this.stack.Clear();
         }
 
         public void Dump()
         {
-            var stack = string.Join(" ", this.stack.Reverse());
-            Console.WriteLine($"[{stack}]");
+            var text = string.Join(" ", this.stack.Reverse());
+            Console.WriteLine($"[{text}]");
         }
     }
 }

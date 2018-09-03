@@ -1,42 +1,32 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 using CoTy.Ambiance;
 
 namespace CoTy.Objects
 {
-    public class CoQuotation : CoObject<IEnumerable<CoObject>>
+    public partial class CoQuotation : CoTuple<IEnumerable<CoTuple>>
     {
-        public CoQuotation(params CoObject[] objs)
-            : this((IEnumerable<CoObject>)objs)
+        public CoQuotation(params CoTuple[] objs)
+            : this((IEnumerable<CoTuple>)objs)
         {
         }
 
-        public CoQuotation(IEnumerable<CoObject> objs)
+        public CoQuotation(IEnumerable<CoTuple> objs)
             : base(objs)
         {
         }
+
         public override void Eval(AmScope scope, AmStack stack)
         {
             var inner = new AmScope(scope);
 
-            foreach (var @object in this)
+            foreach (var value in this)
             {
-                @object.Apply(inner, stack);
+                value.Apply(inner, stack);
             }
         }
 
-        public CoQuotation Add(CoObject other)
-        {
-            return new CoQuotation(this.Concat(other));
-        }
-
-        public CoQuotation CoAdd(CoObject other)
-        {
-            return new CoQuotation(other.Concat(this));
-        }
-
-        public override IEnumerator<CoObject> GetEnumerator()
+        public override IEnumerator<CoTuple> GetEnumerator()
         {
             return Value.GetEnumerator();
         }

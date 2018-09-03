@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="AAA\Check.coty" />
+    <None Remove="AAA\startup.coty" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="AAA\Check.coty" />
+    <EmbeddedResource Include="AAA\startup.coty" />
   </ItemGroup>
 
 </Project>

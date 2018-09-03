@@ -27,16 +27,13 @@ namespace CoTy.Modules
 
         private void Reflect()
         {
-            Console.WriteLine($"reflecting {this.GetType().Name}");
             foreach (var method in GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Static))
             {
                 var info = method.GetCustomAttribute<BuiltinAttribute>();
                 if (info != null)
                 {
-                    Console.WriteLine($"{method.Name} -> {info.Name}");
-
                     var apply = (Action<AmScope, AmStack>)Delegate.CreateDelegate(typeof(Action<AmScope, AmStack>), method);
-                    var builtin = new Builtin(apply);
+                    var builtin = new CoBuiltin(apply);
                     Define(CoSymbol.Get(info.Name), builtin);
                     foreach (var alias in info.Aliases)
                     {

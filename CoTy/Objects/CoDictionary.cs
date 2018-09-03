@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace CoTy.Objects
 {
-    public class CoDictionary : CoObject<Dictionary<CoSymbol, CoObject>>
+    public class CoDictionary : CoTuple<Dictionary<CoSymbol, CoTuple>>
     {
         public CoDictionary()
-            : base(new Dictionary<CoSymbol, CoObject>())
+            : base(new Dictionary<CoSymbol, CoTuple>())
         {
         }
     }

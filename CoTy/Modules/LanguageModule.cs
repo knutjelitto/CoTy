@@ -9,7 +9,7 @@ namespace CoTy.Modules
         {
         }
 
-        [Builtin("define")]
+        [Builtin("define", ":")]
         private static void Define(AmScope scope, AmStack stack)
         {
             var toDefine = stack.Pop();
@@ -29,12 +29,21 @@ namespace CoTy.Modules
             scope.Define(symbol, definition);
         }
 
-        [Builtin("quote")]
+        [Builtin("quote", "'")]
         private static void Quote(AmScope scope, AmStack stack)
         {
             var @object = stack.Pop();
             var quotation = new CoQuotation(@object);
             stack.Push(quotation);
+        }
+
+        [Builtin("dequote")]
+        private static void DeQuote(AmScope scope, AmStack stack)
+        {
+            foreach (var value in stack.Pop())
+            {
+                stack.Push(value);
+            }
         }
 
         [Builtin("if")]

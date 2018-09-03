@@ -9,6 +9,12 @@ namespace CoTy.Modules
         {
         }
 
+        [Builtin("bool?")]
+        private static void IsBool(AmScope scope, AmStack stack)
+        {
+            stack.Push(CoBoolean.From(stack.Pop() is CoBoolean));
+        }
+
         [Builtin("true")]
         private static void True(AmScope scope, AmStack stack)
         {

@@ -4,13 +4,14 @@ using CoTy.Errors;
 
 namespace CoTy.Objects
 {
-    public class CoSymbol : CoObject<string>
+    public class CoSymbol : CoTuple<string>
     {
         private static readonly Dictionary<string, CoSymbol> symbols = new Dictionary<string, CoSymbol>();
 
         public static readonly CoSymbol True = Get("true");
         public static readonly CoSymbol False = Get("false");
         public static readonly CoSymbol End = Get("end");
+        public static readonly CoSymbol Quoter = Get("'");
         public static readonly CoSymbol LeftParent = Get("(");
         public static readonly CoSymbol RightParent = Get(")");
         public static readonly CoSymbol Define = Get("define");
@@ -38,8 +39,6 @@ namespace CoTy.Objects
             return symbol;
         }
 
-        public override int GetHashCode() => this.hashCode;
-
         public override void Apply(AmScope scope, AmStack stack)
         {
             if (!scope.TryFind(this, out var definition))
@@ -49,6 +48,18 @@ namespace CoTy.Objects
 
             definition.Eval(scope, stack);
         }
+
+        public static bool operator ==(CoSymbol sym1, CoSymbol sym2)
+        {
+            return sym1.Value == sym2.Value;
+        }
+
+        public static bool operator !=(CoSymbol sym1, CoSymbol sym2)
+        {
+            return sym1.Value != sym2.Value;
+        }
+
+        public override int GetHashCode() => this.hashCode;
 
         public override bool Equals(object obj)
         {

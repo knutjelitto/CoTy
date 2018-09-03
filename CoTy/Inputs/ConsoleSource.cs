@@ -4,8 +4,15 @@ using System.Collections.Generic;
 
 namespace CoTy.Inputs
 {
-    public class ConsoleSource : IEnumerable<char>
+    public class ConsoleInput : IEnumerable<char>
     {
+        private readonly Action beforePrompt;
+
+        public ConsoleInput(Action beforePrompt = null)
+        {
+            this.beforePrompt = beforePrompt ?? (() => { });
+        }
+
         public IEnumerator<char> GetEnumerator()
         {
             string line;
@@ -23,6 +30,7 @@ namespace CoTy.Inputs
         {
             if (!Console.IsInputRedirected)
             {
+                this.beforePrompt();
                 Console.Write("->");
             }
             return Console.ReadLine();

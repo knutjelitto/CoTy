@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.CSharp.RuntimeBinder;
+﻿using System.Collections.Generic;
 
 using CoTy.Ambiance;
 using CoTy.Errors;
@@ -7,53 +6,52 @@ using CoTy.Inputs;
 using CoTy.Modules;
 using System.Reflection;
 using System.IO;
+using CoTy.Objects;
 
 namespace CoTy
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        // ReSharper disable once UnusedParameter.Local
+        private static void Main(string[] args)
         {
-            var x = Read();
-            var console = new ConsoleSource();
-            var source = new CharSource(console);
-            var scanner = new Scanner(source);
-            var parser = new Parser(scanner);
+            var scope = MakeStandardScope();
+            var stack = new AmStack();
 
-            AmScope scope = null;
-            scope = new LanguageModule(scope);
+            new CoQuotation(MakeParser(Read())).Eval(new TestModule(scope), stack);
+            new CoQuotation(MakeParser(new ConsoleInput(stack.Dump))).Eval(scope, stack);
+        }
+
+        private static AmScope MakeStandardScope()
+        {
+            // ReSharper disable once JoinDeclarationAndInitializer
+            AmScope scope;
+            scope = new LanguageModule(null);
             scope = new StackModule(scope);
             scope = new BooleanModule(scope);
             scope = new OperatorModule(scope);
+            scope = new SequenceModule(scope);
             scope = new SystemModule(scope);
-            var stack = new AmStack();
 
-            foreach (var @object in parser)
-            {
-                try
-                {
-                    @object.Apply(scope, stack);
-                }
-                catch (ScopeException ex)
-                {
-                    Console.WriteLine($"{ex.Message}");
-                }
-                catch (RuntimeBinderException ex)
-                {
-                    Console.WriteLine($"{ex.Message}");
-                }
+            return scope;
+        }
 
-                stack.Dump();
-            }
+        private static Parser MakeParser(IEnumerable<char> input)
+        {
+            var source = new CharSource(input);
+            var scanner = new Scanner(source);
+            var parser = new Parser(scanner);
+
+            return parser;
         }
 
         private static string Read()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = "CoTy.AAA.Check.coty";
+            var resourceName = "CoTy.AAA.startup.coty";
 
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
+            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            using (var reader = new StreamReader(stream))
             {
                 return reader.ReadToEnd();
             }

@@ -1,27 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+
 using CoTy.Errors;
 using CoTy.Objects;
 
 namespace CoTy.Inputs
 {
-    public class Parser : IEnumerable<CoTuple>
+    public class ParserImple : IEnumerable<CoTuple>
     {
-        public readonly Scanner Scanner;
+        private readonly Parser parser;
 
-        public Parser(Scanner scanner)
+        private Cursor<CoTuple> current;
+        private Queue<CoTuple> queue;
+
+        public ParserImple(Parser parser)
         {
-            this.Scanner = scanner;
+            this.current = new Cursor<CoTuple>(new ObjectSource(this.parser.Scanner));
+            this.queue = new Queue<CoTuple>(2);
         }
 
         public IEnumerator<CoTuple> GetEnumerator()
         {
-            var current = new Cursor<CoTuple>(new ObjectSource(this.Scanner));
-            var queue = new Queue<CoTuple>(2);
-
-            while (current)
+            while (this.current)
             {
                 ParseObject(queue, ref current);
                 while (queue.TryDequeue(out var obj))
@@ -53,10 +53,6 @@ namespace CoTy.Inputs
                         throw new ParserException($"ill: dangling {CoSymbol.Quoter} at end of input");
                     }
                     ParseObject(queue, ref current);
-                    var quotation = new CoQuotation(queue.ToList());
-                    queue.Clear();
-                    queue.Enqueue(quotation);
-                    return;
                 }
                 if (symbol.Value.Length > 1)
                 {
@@ -65,6 +61,10 @@ namespace CoTy.Inputs
                         case ':':
                             queue.Enqueue(new CoString(symbol.Value.Substring(1)));
                             queue.Enqueue(CoSymbol.Define);
+                            current = current.Next;
+                            return;
+                        case '\'':
+                            queue.Enqueue(new CoQuotation(CoSymbol.Get(symbol.Value.Substring(1))));
                             current = current.Next;
                             return;
                     }
