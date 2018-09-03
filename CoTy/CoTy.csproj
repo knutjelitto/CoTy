@@ -6,4 +6,12 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="AAA\Check.coty" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="AAA\Check.coty" />
+  </ItemGroup>
+
 </Project>

@@ -7,8 +7,18 @@ namespace CoTy.Modules
     {
         public BooleanModule(AmScope parent) : base(parent)
         {
-            Define(CoSymbol.True, (sc, st) => st.Push(CoBoolean.True));
-            Define(CoSymbol.False, (sc, st) => st.Push(CoBoolean.False));
+        }
+
+        [Builtin("true")]
+        private static void True(AmScope scope, AmStack stack)
+        {
+            stack.Push(CoBoolean.True);
+        }
+
+        [Builtin("false")]
+        private static void False(AmScope scope, AmStack stack)
+        {
+            stack.Push(CoBoolean.False);
         }
     }
 }

@@ -49,8 +49,12 @@ namespace CoTy.Inputs
                     switch (symbol.Value[0])
                     {
                         case ':':
-                            queue.Enqueue(CoSymbol.Get(symbol.Value.Substring(1)));
+                            queue.Enqueue(new CoString(symbol.Value.Substring(1)));
                             queue.Enqueue(CoSymbol.Define);
+                            current = current.Next;
+                            return;
+                        case '\'':
+                            queue.Enqueue(new CoQuotation(CoSymbol.Get(symbol.Value.Substring(1))));
                             current = current.Next;
                             return;
                     }
@@ -75,7 +79,7 @@ namespace CoTy.Inputs
                 throw new ParserException("ill: unbalanced '(' in input");
             }
 
-            queue.Enqueue(new CoQuote(inner));
+            queue.Enqueue(new CoQuotation(inner));
             current = current.Next;
         }
 

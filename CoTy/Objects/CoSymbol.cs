@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CoTy.Ambiance;
+using CoTy.Errors;
 
 namespace CoTy.Objects
 {
@@ -41,8 +42,12 @@ namespace CoTy.Objects
 
         public override void Apply(AmScope scope, AmStack stack)
         {
-            var value = scope.Find(this);
-            value.Apply(scope, stack);
+            if (!scope.TryFind(this, out var definition))
+            {
+                throw new ScopeException($"ill: can't find definition for symbol `{this}´");
+            }
+
+            definition.Eval(scope, stack);
         }
 
         public override bool Equals(object obj)

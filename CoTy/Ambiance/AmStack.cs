@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using CoTy.Objects;
 
@@ -14,17 +15,25 @@ namespace CoTy.Ambiance
             stack.Push(obj);
         }
 
-        public CoObject Pop()
+        public dynamic Pop()
         {
             return stack.Pop();
         }
 
+        public CoObject Peek()
+        {
+            return stack.Peek();
+        }
+
+        public void Clear()
+        {
+            stack.Clear();
+        }
+
         public void Dump()
         {
-            foreach (var @object in this.stack)
-            {
-                Console.WriteLine(@object);
-            }
+            var stack = string.Join(" ", this.stack.Reverse());
+            Console.WriteLine($"[{stack}]");
         }
     }
 }

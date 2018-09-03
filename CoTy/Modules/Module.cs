@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
 
 using CoTy.Ambiance;
 using CoTy.Objects;
@@ -11,11 +10,40 @@ namespace CoTy.Modules
     {
         public Module(AmScope parent) : base(parent)
         {
+            Reflect();
         }
 
-        protected void Define(CoSymbol symbol, Action<AmScope, AmStack> apply)
+        protected class BuiltinAttribute : Attribute
         {
-            Define(symbol, new Builtin(apply));
+            public BuiltinAttribute(string name, params string[] aliases)
+            {
+                Name = name;
+                Aliases = aliases;
+            }
+
+            public string Name { get; }
+            public string[] Aliases { get; }
+        }
+
+        private void Reflect()
+        {
+            Console.WriteLine($"reflecting {this.GetType().Name}");
+            foreach (var method in GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Static))
+            {
+                var info = method.GetCustomAttribute<BuiltinAttribute>();
+                if (info != null)
+                {
+                    Console.WriteLine($"{method.Name} -> {info.Name}");
+
+                    var apply = (Action<AmScope, AmStack>)Delegate.CreateDelegate(typeof(Action<AmScope, AmStack>), method);
+                    var builtin = new Builtin(apply);
+                    Define(CoSymbol.Get(info.Name), builtin);
+                    foreach (var alias in info.Aliases)
+                    {
+                        Define(CoSymbol.Get(alias), builtin);
+                    }
+                }
+            }
         }
     }
 }

@@ -51,7 +51,9 @@ namespace CoTy.Ambiance
                 {
                     return Parent.TryFind(symbol, out @object);
                 }
+                return false;
             }
+
             return true;
         }
 

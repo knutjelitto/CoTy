@@ -1,6 +1,6 @@
 ﻿namespace CoTy.Objects
 {
-    public class CoBoolean : CoSelfish<bool>
+    public class CoBoolean : CoObject<bool>
     {
         public static readonly CoBoolean True = new CoBoolean(true);
         public static readonly CoBoolean False = new CoBoolean(false);
