@@ -4,14 +4,14 @@ using CoTy.Ambiance;
 
 namespace CoTy.Objects
 {
-    public partial class CoQuotation : CoTuple<IEnumerable<CoTuple>>
+    public partial class Quotation : CoTuple<IEnumerable<CoTuple>>
     {
-        public CoQuotation(params CoTuple[] objs)
+        public Quotation(params CoTuple[] objs)
             : this((IEnumerable<CoTuple>)objs)
         {
         }
 
-        public CoQuotation(IEnumerable<CoTuple> objs)
+        public Quotation(IEnumerable<CoTuple> objs)
             : base(objs)
         {
         }

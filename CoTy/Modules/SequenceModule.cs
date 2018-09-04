@@ -17,7 +17,7 @@ namespace CoTy.Modules
         {
             IEnumerable<CoTuple> Enumerate(CoTuple tuple)
             {
-                if (tuple is CoQuotation quotation)
+                if (tuple is Quotation quotation)
                 {
                     foreach (var inner in tuple)
                     {
@@ -33,7 +33,7 @@ namespace CoTy.Modules
                 }
             }
 
-            stack.Push(new CoQuotation(Enumerate(stack.Pop())));
+            stack.Push(new Quotation(Enumerate(stack.Pop())));
         }
 
         [Builtin("upto")]
@@ -44,7 +44,7 @@ namespace CoTy.Modules
 
             IEnumerable<CoTuple> Enumerate()
             {
-                while (from.LE(upto) is CoBoolean condition && condition)
+                while (from.LE(upto) is Bool condition && condition)
                 {
                     yield return from;
 
@@ -52,7 +52,7 @@ namespace CoTy.Modules
                 }
             }
 
-            stack.Push(new CoQuotation(Enumerate().ToList()));
+            stack.Push(new Quotation(Enumerate().ToList()));
         }
     }
 }

@@ -7,14 +7,14 @@ namespace CoTy.Ambiance
 {
     public class AmScope
     {
-        private readonly Dictionary<CoSymbol, Binding> definitions = new Dictionary<CoSymbol, Binding>();
+        private readonly Dictionary<Symbol, Binding> definitions = new Dictionary<Symbol, Binding>();
 
         public AmScope(AmScope parent)
         {
             Parent = parent;
         }
 
-        public virtual void Define(CoSymbol symbol, CoTuple @object)
+        public virtual void Define(Symbol symbol, CoTuple @object)
         {
             if (!TryDefine(symbol, @object))
             {
@@ -22,7 +22,7 @@ namespace CoTy.Ambiance
             }
         }
 
-        public virtual bool TryDefine(CoSymbol symbol, CoTuple value)
+        public virtual bool TryDefine(Symbol symbol, CoTuple value)
         {
             if (!this.definitions.ContainsKey(symbol))
             {
@@ -33,7 +33,7 @@ namespace CoTy.Ambiance
             return false;
         }
 
-        public virtual CoTuple Find(CoSymbol symbol)
+        public virtual CoTuple Find(Symbol symbol)
         {
             if (!TryFind(symbol, out var @object))
             {
@@ -43,7 +43,7 @@ namespace CoTy.Ambiance
             return @object;
         }
 
-        public virtual bool TryFind(CoSymbol symbol, out CoTuple value)
+        public virtual bool TryFind(Symbol symbol, out CoTuple value)
         {
             if (!this.definitions.TryGetValue(symbol, out var binding))
             {

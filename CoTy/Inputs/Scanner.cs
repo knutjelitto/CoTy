@@ -5,6 +5,7 @@ using System.Text;
 
 using CoTy.Objects;
 using CoTy.Errors;
+using System;
 
 namespace CoTy.Inputs
 {
@@ -29,15 +30,15 @@ namespace CoTy.Inputs
                 {
                     case '(':
                         current = current.Next;
-                        yield return CoSymbol.LeftParent;
+                        yield return Symbol.LeftParent;
                         break;
                     case ')':
                         current = current.Next;
-                        yield return CoSymbol.RightParent;
+                        yield return Symbol.RightParent;
                         break;
                     case '\'':
                         current = current.Next;
-                        yield return CoSymbol.Quoter;
+                        yield return Symbol.Quoter;
                         break;
                     case '"':
                         yield return ScanString(ref current);
@@ -58,19 +59,49 @@ namespace CoTy.Inputs
 
         private bool IsStructure(char c)
         {
-            return "()\"".Contains(c);
+            return "()\"\'".Contains(c);
+        }
+
+        private bool IsLineComment(Cursor<char> current)
+        {
+            return current == ';' && current.Next == ';';
         }
 
         private Cursor<char> Skip(Cursor<char> current)
         {
-            while (current && IsSkipable(current))
+            while (current)
+            {
+                while (current && IsSkipable(current))
+                {
+                    current = current.Next;
+                }
+
+                if (current && current == ';' && current.Next == ';')
+                {
+                    while (current && current != CharSource.NL)
+                    {
+                        current = current.Next;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return current;
+        }
+
+        private Cursor<char> SkipLineComment(Cursor<char> current)
+        {
+            while (current && current != CharSource.NL)
             {
                 current = current.Next;
             }
             return current;
         }
 
-        private CoString ScanString(ref Cursor<char> current)
+        private Chars ScanString(ref Cursor<char> current)
         { 
             Debug.Assert(current == '"');
 
@@ -95,7 +126,7 @@ namespace CoTy.Inputs
                 throw new ScannerException("EOT in string literal");
             }
             current = current.Next;
-            return new CoString(accu.ToString());
+            return new Chars(accu.ToString());
         }
 
         private string ScanGrumble(ref Cursor<char> current)
@@ -109,18 +140,18 @@ namespace CoTy.Inputs
                 accu.Append((char)current);
                 current = current.Next;
             }
-            while (current && !IsSkipable(current) && !IsStructure(current));
+            while (current && !IsSkipable(current) && !IsStructure(current) && !IsLineComment(current));
 
             return accu.ToString();
         }
 
         private CoTuple Classify(string grumble)
         {
-            if (long.TryParse(grumble, out var integer))
+            if (Integer.TryFrom(grumble, out var integer))
             {
-                return new CoInteger(integer);
+                return integer;
             }
-            return CoSymbol.Get(grumble);
+            return Symbol.Get(grumble);
         }
 
         IEnumerator IEnumerable.GetEnumerator()

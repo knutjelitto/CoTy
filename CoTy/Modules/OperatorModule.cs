@@ -9,57 +9,57 @@ namespace CoTy.Modules
         }
 
         [Builtin("==")]
-        private static void EQ(AmScope scope, AmStack stack)
+        private static void Equal(AmScope scope, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
 
-            stack.Push(i1.EQ(i2));
+            stack.Push(i1.Equal(i2));
         }
 
         [Builtin("!=")]
-        private static void NE(AmScope scope, AmStack stack)
+        private static void NotEqual(AmScope scope, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
 
-            stack.Push(i1.NE(i2));
+            stack.Push(i1.NotEqual(i2));
         }
 
         [Builtin("<")]
-        private static void LT(AmScope scope, AmStack stack)
+        private static void Less(AmScope scope, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
 
-            stack.Push(i1.LT(i2));
+            stack.Push(i1.Less(i2));
         }
 
         [Builtin("<=")]
-        private static void LE(AmScope scope, AmStack stack)
+        private static void LessEqual(AmScope scope, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
 
-            stack.Push(i1.LE(i2));
+            stack.Push(i1.LessOrEqual(i2));
         }
 
         [Builtin(">")]
-        private static void GT(AmScope scope, AmStack stack)
+        private static void Greater(AmScope scope, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
 
-            stack.Push(i1.GT(i2));
+            stack.Push(i1.Greater(i2));
         }
 
         [Builtin(">=")]
-        private static void GE(AmScope scope, AmStack stack)
+        private static void GreaterEqual(AmScope scope, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
 
-            stack.Push(i1.GE(i2));
+            stack.Push(i1.GreaterOrEqual(i2));
         }
 
         [Builtin("+")]

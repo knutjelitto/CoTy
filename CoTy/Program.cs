@@ -18,8 +18,8 @@ namespace CoTy
             var scope = MakeStandardScope();
             var stack = new AmStack();
 
-            new CoQuotation(MakeParser(Read())).Eval(new TestModule(scope), stack);
-            new CoQuotation(MakeParser(new ConsoleInput(stack.Dump))).Eval(scope, stack);
+            new Quotation(MakeParser(Read())).Eval(new TestModule(scope), stack);
+            new Quotation(MakeParser(new ConsoleInput(stack.Dump))).Eval(scope, stack);
         }
 
         private static AmScope MakeStandardScope()

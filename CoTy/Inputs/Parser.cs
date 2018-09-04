@@ -33,27 +33,27 @@ namespace CoTy.Inputs
 
         private void ParseObject(Queue<CoTuple> queue, ref Cursor<CoTuple> current)
         {
-            if (current.Item is CoSymbol symbol)
+            if (current.Item is Symbol symbol)
             {
-                if (symbol == CoSymbol.LeftParent)
+                if (symbol == Symbol.LeftParent)
                 {
                     ParseQuote(queue, ref current);
                     return;
                 }
-                if (symbol == CoSymbol.RightParent)
+                if (symbol == Symbol.RightParent)
                 {
                     throw new ParserException("ill: unbalanced ')' in input");
                 }
 
-                if (symbol == CoSymbol.Quoter)
+                if (symbol == Symbol.Quoter)
                 {
                     current = current.Next;
                     if (!current)
                     {
-                        throw new ParserException($"ill: dangling {CoSymbol.Quoter} at end of input");
+                        throw new ParserException($"ill: dangling {Symbol.Quoter} at end of input");
                     }
                     ParseObject(queue, ref current);
-                    var quotation = new CoQuotation(queue.ToList());
+                    var quotation = new Quotation(queue.ToList());
                     queue.Clear();
                     queue.Enqueue(quotation);
                     return;
@@ -63,8 +63,8 @@ namespace CoTy.Inputs
                     switch (symbol.Value[0])
                     {
                         case ':':
-                            queue.Enqueue(new CoString(symbol.Value.Substring(1)));
-                            queue.Enqueue(CoSymbol.Define);
+                            queue.Enqueue(new Chars(symbol.Value.Substring(1)));
+                            queue.Enqueue(Symbol.Define);
                             current = current.Next;
                             return;
                     }
@@ -80,7 +80,7 @@ namespace CoTy.Inputs
             current = current.Next;
             var inner = new Queue<CoTuple>();
 
-            while (current && current.Item != CoSymbol.RightParent)
+            while (current && current.Item != Symbol.RightParent)
             {
                 ParseObject(inner, ref current);
             }
@@ -89,7 +89,7 @@ namespace CoTy.Inputs
                 throw new ParserException("ill: unbalanced '(' in input");
             }
 
-            queue.Enqueue(new CoQuotation(inner));
+            queue.Enqueue(new Quotation(inner));
             current = current.Next;
         }
 

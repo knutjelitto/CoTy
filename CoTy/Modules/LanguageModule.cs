@@ -15,25 +15,32 @@ namespace CoTy.Modules
             var toDefine = stack.Pop();
             var definition = stack.Pop();
 
-            CoSymbol symbol;
+            Symbol symbol;
 
-            if (toDefine is CoString str)
+            if (toDefine is Chars str)
             {
-                symbol = CoSymbol.Get(str.Value);
+                symbol = Symbol.Get(str.Value);
             }
             else
             {
-                symbol = (CoSymbol)toDefine;
+                symbol = (Symbol)toDefine;
             }
 
             scope.Define(symbol, definition);
         }
 
-        [Builtin("quote", "'")]
+        [Builtin("eval")]
+        private static void Eval(AmScope scope, AmStack stack)
+        {
+            var value = stack.Pop();
+            value.Eval(scope, stack);
+        }
+
+        [Builtin("quote")]
         private static void Quote(AmScope scope, AmStack stack)
         {
             var @object = stack.Pop();
-            var quotation = new CoQuotation(@object);
+            var quotation = new Quotation(@object);
             stack.Push(quotation);
         }
 
@@ -56,13 +63,48 @@ namespace CoTy.Modules
             condition.Eval(scope, stack);
             var result = stack.Pop();
 
-            if (result is CoBoolean boolean && boolean.Value)
+            if (result is Bool boolean && boolean.Value)
             {
                 ifTrue.Eval(scope, stack);
             }
             else
             {
                 ifElse.Eval(scope, stack);
+            }
+        }
+
+        [Builtin("when", Arity = 2)]
+        private static void When(AmScope scope, AmStack stack)
+        {
+            var ifElse = stack.Pop();
+            var ifTrue = stack.Pop();
+            var condition = stack.Pop();
+
+            condition.Eval(scope, stack);
+            var result = stack.Pop();
+
+            if (result is Bool boolean && boolean.Value)
+            {
+                ifTrue.Eval(scope, stack);
+            }
+            else
+            {
+                ifElse.Eval(scope, stack);
+            }
+        }
+
+        [Builtin("unless", Arity = 2)]
+        private static void Unless(AmScope scope, AmStack stack)
+        {
+            var guarded = stack.Pop();
+            var condition = stack.Pop();
+
+            condition.Apply(scope, stack);
+            var result = stack.Pop();
+
+            if (result is Bool boolean && !boolean.Value)
+            {
+                guarded.Apply(scope, stack);
             }
         }
 

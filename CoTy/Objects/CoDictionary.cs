@@ -2,10 +2,10 @@
 
 namespace CoTy.Objects
 {
-    public class CoDictionary : CoTuple<Dictionary<CoSymbol, CoTuple>>
+    public class CoDictionary : CoTuple<Dictionary<Symbol, CoTuple>>
     {
         public CoDictionary()
-            : base(new Dictionary<CoSymbol, CoTuple>())
+            : base(new Dictionary<Symbol, CoTuple>())
         {
         }
     }

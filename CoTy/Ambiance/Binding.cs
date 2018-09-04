@@ -4,13 +4,13 @@ namespace CoTy.Ambiance
 {
     public class Binding
     {
-        public Binding(CoSymbol symbol, CoTuple value)
+        public Binding(Symbol symbol, CoTuple value)
         {
             Symbol = symbol;
             Value = value;
         }
 
-        public CoSymbol Symbol { get; }
+        public Symbol Symbol { get; }
         public CoTuple Value { get; }
     }
 }

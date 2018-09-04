@@ -11,6 +11,6 @@ namespace CoTy.Inputs
         {
         }
 
-        protected override CoTuple EndOfItems => CoSymbol.End;
+        protected override CoTuple EndOfItems => Symbol.End;
     }
 }

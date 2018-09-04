@@ -1,8 +1,8 @@
 ﻿namespace CoTy.Objects
 {
-    public partial class CoString : CoTuple<string>
+    public partial class Chars : CoTuple<string>
     {
-        public CoString(string value) : base(value)
+        public Chars(string value) : base(value)
         {
         }
 

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
+
 using CoTy.Ambiance;
 
 namespace CoTy.Objects
 {
-    public abstract class CoTuple : IEnumerable<CoTuple>
+    public abstract partial class CoTuple : IEnumerable<CoTuple>
     {
         public abstract void Apply(AmScope scope, AmStack stack);
         public abstract void Eval(AmScope scope, AmStack stack);

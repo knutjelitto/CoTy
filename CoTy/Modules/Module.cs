@@ -2,6 +2,7 @@
 using System.Reflection;
 
 using CoTy.Ambiance;
+using CoTy.Errors;
 using CoTy.Objects;
 
 namespace CoTy.Modules
@@ -23,6 +24,7 @@ namespace CoTy.Modules
 
             public string Name { get; }
             public string[] Aliases { get; }
+            public int Arity { get; set; } = -1;
         }
 
         private void Reflect()
@@ -32,12 +34,30 @@ namespace CoTy.Modules
                 var info = method.GetCustomAttribute<BuiltinAttribute>();
                 if (info != null)
                 {
-                    var apply = (Action<AmScope, AmStack>)Delegate.CreateDelegate(typeof(Action<AmScope, AmStack>), method);
-                    var builtin = new CoBuiltin(apply);
-                    Define(CoSymbol.Get(info.Name), builtin);
+                    Action<AmScope, AmStack> apply;
+
+                    var candidate = (Action<AmScope, AmStack>)Delegate.CreateDelegate(typeof(Action<AmScope, AmStack>), method);
+                    if (info.Arity >= 0)
+                    {
+                        var checkedApply = new Action<AmScope, AmStack>((scope, stack) =>
+                        {
+                            if (stack.Count < info.Arity)
+                            {
+                                throw new StackException($"ill: stack underflow - expected at least {info.Arity} arguments (got {stack.Count})");
+                            }
+                            candidate(scope, stack);
+                        });
+                        apply = checkedApply;
+                    }
+                    else
+                    {
+                        apply = candidate;
+                    }
+                    var builtin = new Builtin(apply);
+                    Define(Symbol.Get(info.Name), builtin);
                     foreach (var alias in info.Aliases)
                     {
-                        Define(CoSymbol.Get(alias), builtin);
+                        Define(Symbol.Get(alias), builtin);
                     }
                 }
             }

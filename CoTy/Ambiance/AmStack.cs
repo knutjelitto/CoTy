@@ -20,10 +20,17 @@ namespace CoTy.Ambiance
             return this.stack.Pop();
         }
 
+        public T Pop<T>() where T : CoTuple
+        {
+            return (T)this.stack.Pop();
+        }
+
         public CoTuple Peek()
         {
             return this.stack.Peek();
         }
+
+        public int Count => this.stack.Count;
 
         public void Clear()
         {

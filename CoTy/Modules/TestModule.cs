@@ -21,7 +21,7 @@ namespace CoTy.Modules
             actualQuot.Eval(scope, stack);
             var actual = (dynamic)stack.Pop();
 
-            var equals = (CoBoolean) actual.EQ(expected);
+            var equals = (Bool) actual.Equal(expected);
 
             if (!equals.Value)
             {
