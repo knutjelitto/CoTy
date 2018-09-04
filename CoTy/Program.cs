@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using CoTy.Ambiance;
 using CoTy.Errors;
@@ -15,25 +16,51 @@ namespace CoTy
         // ReSharper disable once UnusedParameter.Local
         private static void Main(string[] args)
         {
-            var scope = MakeStandardScope();
+            var rootActivation = new AmFrame(null, "activation");
+            var rootLexical = MakeRootFrame();
             var stack = new AmStack();
 
-            new Quotation(MakeParser(Read())).Eval(new TestModule(scope), stack);
-            new Quotation(MakeParser(new ConsoleInput(stack.Dump))).Eval(scope, stack);
+            Execute(MakeParser(Read("startup")), new AmScope(rootActivation, WithTest(rootLexical)), stack);
+            Execute(MakeParser(new ConsoleInput(stack.Dump)), new AmScope(rootActivation,  rootLexical), stack);
         }
 
-        private static AmScope MakeStandardScope()
+        private static void Execute(IEnumerable<Cobject> stream, AmScope scope, AmStack stack)
         {
-            // ReSharper disable once JoinDeclarationAndInitializer
-            AmScope scope;
-            scope = new LanguageModule(null);
-            scope = new StackModule(scope);
-            scope = new BooleanModule(scope);
-            scope = new OperatorModule(scope);
-            scope = new SequenceModule(scope);
-            scope = new SystemModule(scope);
+            foreach (var value in stream)
+            {
+                try
+                {
+                    value.Eval(scope, stack);
+                }
+                catch (ScopeException scopeEx)
+                {
+                    Console.WriteLine($"{scopeEx.Message}");
+                }
+            }
+        }
 
-            return scope;
+        private static AmFrame MakeRootFrame()
+        {
+            var root = new AmFrame(null, "root");
+
+            new LanguageModule().ImportInto(root);
+            new StackModule().ImportInto(root);
+            new BoolModule().ImportInto(root);
+            new OperatorModule().ImportInto(root);
+            new SequenceModule().ImportInto(root);
+            new SystemModule().ImportInto(root);
+            new DiagnosticsModule().ImportInto(root);
+
+            return root;
+        }
+
+        private static AmFrame WithTest(AmFrame rootLexical)
+        {
+            var withTest = new AmFrame(rootLexical, "with-test");
+
+            new TestModule().ImportInto(withTest);
+
+            return withTest;
         }
 
         private static Parser MakeParser(IEnumerable<char> input)
@@ -45,10 +72,10 @@ namespace CoTy
             return parser;
         }
 
-        private static string Read()
+        private static string Read(string name)
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = "CoTy.AAA.startup.coty";
+            var resourceName = $"CoTy.AAA.{name}.coty";
 
             using (var stream = assembly.GetManifestResourceStream(resourceName))
             using (var reader = new StreamReader(stream))

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CoTy.Objects
 {
-    public interface IComparable<T> where T : CoTuple
+    public interface IComparable<T> where T : Cobject
     {
         Bool Equal(T other);
     }

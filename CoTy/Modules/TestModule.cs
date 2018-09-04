@@ -6,10 +6,6 @@ namespace CoTy.Modules
 {
     public class TestModule : Module
     {
-        public TestModule(AmScope parent) : base(parent)
-        {
-        }
-
         [Builtin("assert")]
         private static void Assert(AmScope scope, AmStack stack)
         {

@@ -5,11 +5,7 @@ namespace CoTy.Modules
 {
     public class LanguageModule : Module
     {
-        public LanguageModule(AmScope parent) : base(parent)
-        {
-        }
-
-        [Builtin("define", ":")]
+        [Builtin("define")]
         private static void Define(AmScope scope, AmStack stack)
         {
             var toDefine = stack.Pop();
@@ -29,11 +25,11 @@ namespace CoTy.Modules
             scope.Define(symbol, definition);
         }
 
-        [Builtin("eval")]
-        private static void Eval(AmScope scope, AmStack stack)
+        [Builtin("exec")]
+        private static void Execute(AmScope scope, AmStack stack)
         {
             var value = stack.Pop();
-            value.Eval(scope, stack);
+            value.Execute(scope, stack);
         }
 
         [Builtin("quote")]
@@ -70,41 +66,6 @@ namespace CoTy.Modules
             else
             {
                 ifElse.Eval(scope, stack);
-            }
-        }
-
-        [Builtin("when", Arity = 2)]
-        private static void When(AmScope scope, AmStack stack)
-        {
-            var ifElse = stack.Pop();
-            var ifTrue = stack.Pop();
-            var condition = stack.Pop();
-
-            condition.Eval(scope, stack);
-            var result = stack.Pop();
-
-            if (result is Bool boolean && boolean.Value)
-            {
-                ifTrue.Eval(scope, stack);
-            }
-            else
-            {
-                ifElse.Eval(scope, stack);
-            }
-        }
-
-        [Builtin("unless", Arity = 2)]
-        private static void Unless(AmScope scope, AmStack stack)
-        {
-            var guarded = stack.Pop();
-            var condition = stack.Pop();
-
-            condition.Apply(scope, stack);
-            var result = stack.Pop();
-
-            if (result is Bool boolean && !boolean.Value)
-            {
-                guarded.Apply(scope, stack);
             }
         }
 

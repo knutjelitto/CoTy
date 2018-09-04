@@ -1,6 +1,6 @@
 ﻿namespace CoTy.Objects
 {
-    public abstract partial class CoTuple
+    public abstract partial class Cobject
     {
         public Bool NotEqual(dynamic other)
         {

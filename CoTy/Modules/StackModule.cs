@@ -5,10 +5,6 @@ namespace CoTy.Modules
 {
     public class StackModule : Module
     {
-        public StackModule(AmScope parent) : base(parent)
-        {
-        }
-
         [Builtin("clear-stack", "cs")]
         private static void ClearStack(AmScope scope, AmStack stack)
         {

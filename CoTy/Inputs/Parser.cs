@@ -1,13 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using CoTy.Errors;
 using CoTy.Objects;
 
 namespace CoTy.Inputs
 {
-    public class Parser : IEnumerable<CoTuple>
+    public class Parser : IEnumerable<Cobject>
     {
         public readonly Scanner Scanner;
 
@@ -16,10 +15,10 @@ namespace CoTy.Inputs
             this.Scanner = scanner;
         }
 
-        public IEnumerator<CoTuple> GetEnumerator()
+        public IEnumerator<Cobject> GetEnumerator()
         {
-            var current = new Cursor<CoTuple>(new ObjectSource(this.Scanner));
-            var queue = new Queue<CoTuple>(2);
+            var current = new Cursor<Cobject>(new ObjectSource(this.Scanner));
+            var queue = new Queue<Cobject>(2);
 
             while (current)
             {
@@ -31,21 +30,21 @@ namespace CoTy.Inputs
             }
         }
 
-        private void ParseObject(Queue<CoTuple> queue, ref Cursor<CoTuple> current)
+        private void ParseObject(Queue<Cobject> queue, ref Cursor<Cobject> current)
         {
             if (current.Item is Symbol symbol)
             {
-                if (symbol == Symbol.LeftParent)
+                if (Equals(symbol, Symbol.LeftParent))
                 {
-                    ParseQuote(queue, ref current);
+                    ParseQuotation(queue, ref current);
                     return;
                 }
-                if (symbol == Symbol.RightParent)
+                if (Equals(symbol, Symbol.RightParent))
                 {
                     throw new ParserException("ill: unbalanced ')' in input");
                 }
 
-                if (symbol == Symbol.Quoter)
+                if (Equals(symbol, Symbol.Quoter))
                 {
                     current = current.Next;
                     if (!current)
@@ -75,12 +74,12 @@ namespace CoTy.Inputs
             current = current.Next;
         }
 
-        private void ParseQuote(Queue<CoTuple> queue, ref Cursor<CoTuple> current)
+        private void ParseQuotation(Queue<Cobject> queue, ref Cursor<Cobject> current)
         {
             current = current.Next;
-            var inner = new Queue<CoTuple>();
+            var inner = new Queue<Cobject>();
 
-            while (current && current.Item != Symbol.RightParent)
+            while (current && !Equals(current.Item, Symbol.RightParent))
             {
                 ParseObject(inner, ref current);
             }

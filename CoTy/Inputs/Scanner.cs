@@ -9,7 +9,7 @@ using System;
 
 namespace CoTy.Inputs
 {
-    public class Scanner : IEnumerable<CoTuple>
+    public class Scanner : IEnumerable<Cobject>
     {
         private readonly CharSource source;
 
@@ -18,7 +18,7 @@ namespace CoTy.Inputs
             this.source = source;
         }
 
-        public IEnumerator<CoTuple> GetEnumerator()
+        public IEnumerator<Cobject> GetEnumerator()
         {
             var current = new Cursor<char>(this.source);
 
@@ -145,7 +145,7 @@ namespace CoTy.Inputs
             return accu.ToString();
         }
 
-        private CoTuple Classify(string grumble)
+        private Cobject Classify(string grumble)
         {
             if (Integer.TryFrom(grumble, out var integer))
             {

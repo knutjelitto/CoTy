@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
 using CoTy.Ambiance;
 using CoTy.Objects;
 
@@ -8,28 +7,21 @@ namespace CoTy.Modules
 {
     public class SequenceModule : Module
     {
-        public SequenceModule(AmScope parent) : base(parent)
-        {
-        }
-
         [Builtin("flatten")]
         private static void Flatten(AmScope scope, AmStack stack)
         {
-            IEnumerable<CoTuple> Enumerate(CoTuple tuple)
+            IEnumerable<Cobject> Enumerate(Cobject value)
             {
-                if (tuple is Quotation quotation)
+                if (value is Quotation)
                 {
-                    foreach (var inner in tuple)
+                    foreach (var inner in value.SelectMany(Enumerate))
                     {
-                        foreach (var inner2 in Enumerate(inner))
-                        {
-                            yield return inner2;
-                        }
+                        yield return inner;
                     }
                 }
                 else
                 {
-                    yield return tuple;
+                    yield return value;
                 }
             }
 
@@ -39,20 +31,23 @@ namespace CoTy.Modules
         [Builtin("upto")]
         private static void Upto(AmScope scope, AmStack stack)
         {
-            var upto = (dynamic)stack.Pop();
-            var from = (dynamic)stack.Pop();
-
-            IEnumerable<CoTuple> Enumerate()
+            IEnumerable<Cobject> Enumerate((dynamic from, dynamic upto) r)
             {
-                while (from.LE(upto) is Bool condition && condition)
+                while (r.from.LessOrEqual(r.upto) is Bool condition && condition)
                 {
-                    yield return from;
+                    yield return r.from;
 
-                    from = from.Succ();
+                    r.from = r.from.Succ();
                 }
             }
 
-            stack.Push(new Quotation(Enumerate().ToList()));
+            stack.Push(new Quotation(Enumerate(stack.Pop2()).ToList()));
+        }
+
+        [Builtin("count")]
+        private static void Count(AmScope scope, AmStack stack)
+        {
+            stack.Push(Integer.From(stack.Pop().Count()));
         }
     }
 }

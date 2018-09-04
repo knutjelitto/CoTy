@@ -7,11 +7,11 @@ using CoTy.Objects;
 
 namespace CoTy.Modules
 {
-    public class Module : AmScope
+    public class Module
     {
-        public Module(AmScope parent) : base(parent)
+        public void ImportInto(AmFrame scope)
         {
-            Reflect();
+            Reflect(scope);
         }
 
         protected class BuiltinAttribute : Attribute
@@ -27,37 +27,38 @@ namespace CoTy.Modules
             public int Arity { get; set; } = -1;
         }
 
-        private void Reflect()
+        private void Reflect(AmFrame goal)
         {
             foreach (var method in GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Static))
             {
                 var info = method.GetCustomAttribute<BuiltinAttribute>();
                 if (info != null)
                 {
-                    Action<AmScope, AmStack> apply;
+                    Action<AmScope, AmStack> eval;
 
-                    var candidate = (Action<AmScope, AmStack>)Delegate.CreateDelegate(typeof(Action<AmScope, AmStack>), method);
+                    var candidate = (Action<AmScope, AmStack>)Delegate.CreateDelegate(typeof(Action<AmScope, AmStack>), method, true);
                     if (info.Arity >= 0)
                     {
-                        var checkedApply = new Action<AmScope, AmStack>((scope, stack) =>
+                        var arity = info.Arity;
+                        var checkedEval = new Action<AmScope, AmStack>((scope, stack) =>
                         {
-                            if (stack.Count < info.Arity)
+                            if (stack.Count < arity)
                             {
-                                throw new StackException($"ill: stack underflow - expected at least {info.Arity} arguments (got {stack.Count})");
+                                throw new StackException($"ill: stack underflow - expected at least {arity} arguments (got {stack.Count})");
                             }
                             candidate(scope, stack);
                         });
-                        apply = checkedApply;
+                        eval = checkedEval;
                     }
                     else
                     {
-                        apply = candidate;
+                        eval = candidate;
                     }
-                    var builtin = new Builtin(apply);
-                    Define(Symbol.Get(info.Name), builtin);
+                    var builtin = new Builtin(eval);
+                    goal.Define(Symbol.Get(info.Name), builtin);
                     foreach (var alias in info.Aliases)
                     {
-                        Define(Symbol.Get(alias), builtin);
+                        goal.Define(Symbol.Get(alias), builtin);
                     }
                 }
             }

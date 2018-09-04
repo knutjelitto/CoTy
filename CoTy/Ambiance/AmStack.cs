@@ -8,24 +8,32 @@ namespace CoTy.Ambiance
 {
     public class AmStack
     {
-        private readonly Stack<CoTuple> stack = new Stack<CoTuple>();
+        private readonly Stack<Cobject> stack = new Stack<Cobject>();
 
-        public void Push(CoTuple obj)
+        public void Push(Cobject obj)
         {
             this.stack.Push(obj);
         }
 
-        public CoTuple Pop()
+        public Cobject Pop()
         {
             return this.stack.Pop();
         }
 
-        public T Pop<T>() where T : CoTuple
+        public (Cobject, Cobject) Pop2()
+        {
+            var v2 = this.stack.Pop();
+            var v1 = this.stack.Pop();
+
+            return (v1, v2);
+        }
+
+        public T Pop<T>() where T : Cobject
         {
             return (T)this.stack.Pop();
         }
 
-        public CoTuple Peek()
+        public Cobject Peek()
         {
             return this.stack.Peek();
         }

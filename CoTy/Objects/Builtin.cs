@@ -4,7 +4,7 @@ using CoTy.Ambiance;
 
 namespace CoTy.Objects
 {
-    public class Builtin : CoTuple<Action<AmScope, AmStack>>
+    public class Builtin : Cobject<Action<AmScope, AmStack>>
     {
         private readonly Action<AmScope, AmStack> eval;
 

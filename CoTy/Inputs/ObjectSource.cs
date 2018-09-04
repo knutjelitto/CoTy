@@ -4,13 +4,13 @@ using CoTy.Objects;
 
 namespace CoTy.Inputs
 {
-    public class ObjectSource : ItemSource<CoTuple>
+    public class ObjectSource : ItemSource<Cobject>
     {
-        public ObjectSource(IEnumerable<CoTuple> objectSource)
+        public ObjectSource(IEnumerable<Cobject> objectSource)
             : base(objectSource)
         {
         }
 
-        protected override CoTuple EndOfItems => Symbol.End;
+        protected override Cobject EndOfItems => Symbol.End;
     }
 }

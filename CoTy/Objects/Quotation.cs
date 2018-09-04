@@ -4,29 +4,28 @@ using CoTy.Ambiance;
 
 namespace CoTy.Objects
 {
-    public partial class Quotation : CoTuple<IEnumerable<CoTuple>>
+    public partial class Quotation : Cobject<IEnumerable<Cobject>>
     {
-        public Quotation(params CoTuple[] objs)
-            : this((IEnumerable<CoTuple>)objs)
+        public Quotation(params Cobject[] objs)
+            : this((IEnumerable<Cobject>)objs)
         {
         }
 
-        public Quotation(IEnumerable<CoTuple> objs)
+        public Quotation(IEnumerable<Cobject> objs)
             : base(objs)
         {
         }
-
-        public override void Eval(AmScope scope, AmStack stack)
+        public override void Execute(AmScope scope, AmStack stack)
         {
-            var inner = new AmScope(scope);
+            var inner = new AmScope(new AmFrame(scope.Activation, "activation"), scope.Lexical);
 
             foreach (var value in this)
             {
-                value.Apply(inner, stack);
+                value.Eval(inner, stack);
             }
         }
 
-        public override IEnumerator<CoTuple> GetEnumerator()
+        public override IEnumerator<Cobject> GetEnumerator()
         {
             return Value.GetEnumerator();
         }

@@ -7,10 +7,6 @@ namespace CoTy.Modules
 {
     public class SystemModule : Module
     {
-        public SystemModule(AmScope parent) : base(parent)
-        {
-        }
-
         [Builtin("exit")]
         private static void Exit(AmScope scope, AmStack stack)
         {

@@ -11,7 +11,7 @@ namespace CoTy.Objects
             return new Integer(Value + other.Value);
         }
 
-        public CoTuple Add(dynamic other)
+        public Cobject Add(dynamic other)
         {
             return other.CoAdd(this);
         }
@@ -21,7 +21,7 @@ namespace CoTy.Objects
             return new Integer(Value - other.Value);
         }
 
-        public CoTuple Sub(dynamic other)
+        public Cobject Sub(dynamic other)
         {
             return other.CoSub(this);
         }
@@ -31,7 +31,7 @@ namespace CoTy.Objects
             return new Integer(Value * other.Value);
         }
 
-        public CoTuple Mul(dynamic other)
+        public Cobject Mul(dynamic other)
         {
             return other.CoMul(this);
         }
@@ -41,7 +41,7 @@ namespace CoTy.Objects
             return new Integer(Value / other.Value);
         }
 
-        public CoTuple Div(dynamic other)
+        public Cobject Div(dynamic other)
         {
             return other.CoDiv(this);
         }

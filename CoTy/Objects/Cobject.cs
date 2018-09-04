@@ -5,12 +5,16 @@ using CoTy.Ambiance;
 
 namespace CoTy.Objects
 {
-    public abstract partial class CoTuple : IEnumerable<CoTuple>
+    public abstract partial class Cobject : IEnumerable<Cobject>
     {
-        public abstract void Apply(AmScope scope, AmStack stack);
         public abstract void Eval(AmScope scope, AmStack stack);
 
-        public abstract IEnumerator<CoTuple> GetEnumerator();
+        public virtual void Execute(AmScope scope, AmStack stack)
+        {
+            Eval(scope, stack);
+        }
+
+        public abstract IEnumerator<Cobject> GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator()
         {
@@ -18,25 +22,21 @@ namespace CoTy.Objects
         }
     }
 
-    public abstract class CoTuple<TClr> : CoTuple
+    public abstract class Cobject<TClr> : Cobject
     {
-        protected CoTuple(TClr value)
+        protected Cobject(TClr value)
         {
             Value = value;
         }
 
         public TClr Value { get; }
 
-        public override void Apply(AmScope scope, AmStack stack)
+        public override void Eval(AmScope scope, AmStack stack)
         {
             stack.Push(this);
         }
 
-        public override void Eval(AmScope scope, AmStack stack)
-        {
-        }
-
-        public override IEnumerator<CoTuple> GetEnumerator()
+        public override IEnumerator<Cobject> GetEnumerator()
         {
             yield return this;
         }

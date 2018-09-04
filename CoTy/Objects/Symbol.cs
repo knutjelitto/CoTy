@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+
 using CoTy.Ambiance;
-using CoTy.Errors;
 
 namespace CoTy.Objects
 {
-    public class Symbol : CoTuple<string>
+    public class Symbol : Cobject<string>
     {
         private static readonly Dictionary<string, Symbol> symbols = new Dictionary<string, Symbol>();
 
@@ -15,11 +15,6 @@ namespace CoTy.Objects
         public static readonly Symbol LeftParent = Get("(");
         public static readonly Symbol RightParent = Get(")");
         public static readonly Symbol Define = Get("define");
-
-        static Symbol()
-        {
-            symbols = new Dictionary<string, Symbol>();
-        }
 
         private readonly int hashCode;
 
@@ -39,21 +34,18 @@ namespace CoTy.Objects
             return symbol;
         }
 
-        public override void Apply(AmScope scope, AmStack stack)
+        public override void Eval(AmScope scope, AmStack stack)
         {
-            if (!scope.TryFind(this, out var definition))
-            {
-                throw new ScopeException($"ill: can't find definition for symbol `{this}´");
-            }
+            scope.Find(this, out var binding);
 
-            definition.Eval(scope, stack);
+            binding.Value.Execute(new AmScope(scope.Activation, binding.Lexical), stack);
         }
 
         public override int GetHashCode() => this.hashCode;
 
         public override bool Equals(object obj)
         {
-            return obj is Symbol other && this.Value == other.Value;
+            return ReferenceEquals(this, obj) || obj is Symbol other && Value == other.Value;
         }
 
         public override string ToString()

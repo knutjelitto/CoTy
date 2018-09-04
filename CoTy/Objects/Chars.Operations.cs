@@ -26,7 +26,7 @@
             return new Chars(this.Value + other.Value);
         }
 
-        public CoTuple Add(dynamic other)
+        public Cobject Add(dynamic other)
         {
             return other.CoAdd(this);
         }
