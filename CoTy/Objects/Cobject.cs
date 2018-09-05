@@ -7,7 +7,10 @@ namespace CoTy.Objects
 {
     public abstract partial class Cobject : IEnumerable<Cobject>
     {
-        public abstract void Eval(AmScope scope, AmStack stack);
+        public virtual void Eval(AmScope scope, AmStack stack)
+        {
+            stack.Push(this);
+        }
 
         public virtual void Execute(AmScope scope, AmStack stack)
         {
@@ -30,11 +33,6 @@ namespace CoTy.Objects
         }
 
         public TClr Value { get; }
-
-        public override void Eval(AmScope scope, AmStack stack)
-        {
-            stack.Push(this);
-        }
 
         public override IEnumerator<Cobject> GetEnumerator()
         {

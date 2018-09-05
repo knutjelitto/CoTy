@@ -24,7 +24,7 @@ namespace CoTy.Modules
 
             public string Name { get; }
             public string[] Aliases { get; }
-            public int Arity { get; set; } = -1;
+            public int InArity { get; set; } = -1;
         }
 
         private void Reflect(AmScope goal)
@@ -37,9 +37,9 @@ namespace CoTy.Modules
                     Action<AmScope, AmStack> eval;
 
                     var candidate = (Action<AmScope, AmStack>)Delegate.CreateDelegate(typeof(Action<AmScope, AmStack>), method, true);
-                    if (info.Arity >= 0)
+                    if (info.InArity >= 0)
                     {
-                        var arity = info.Arity;
+                        var arity = info.InArity;
                         var checkedEval = new Action<AmScope, AmStack>((scope, stack) =>
                         {
                             if (stack.Count < arity)
@@ -55,7 +55,7 @@ namespace CoTy.Modules
                         eval = candidate;
                     }
                     var builtin = new Builtin(eval);
-                    goal.Define(Symbol.Get(info.Name), builtin);
+                    goal.Define(Symbol.Get(info.Name), builtin, true, true);
                     foreach (var alias in info.Aliases)
                     {
                         goal.Define(Symbol.Get(alias), builtin);

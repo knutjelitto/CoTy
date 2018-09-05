@@ -1,100 +1,90 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using CoTy.Ambiance;
 using CoTy.Errors;
 using CoTy.Objects;
 
 namespace CoTy.Inputs
 {
-    public class Parser : IEnumerable<Cobject>
+    public class Parser
     {
-        public readonly Scanner Scanner;
+        private readonly Scanner Scanner;
 
         public Parser(Scanner scanner)
         {
             this.Scanner = scanner;
         }
 
-        public IEnumerator<Cobject> GetEnumerator()
+        public IEnumerable<Cobject> Parse(AmScope lexical)
         {
             var current = new Cursor<Cobject>(new ObjectSource(this.Scanner));
-            var queue = new Queue<Cobject>(2);
 
+            // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
             while (current)
             {
-                ParseObject(queue, ref current);
-                while (queue.TryDequeue(out var obj))
-                {
-                    yield return obj;
-                }
+                yield return ParseObject(lexical, current);
             }
         }
 
-        private void ParseObject(Queue<Cobject> queue, ref Cursor<Cobject> current)
+        private Cobject ParseObject(AmScope lexical, Cursor<Cobject> current)
         {
-            if (current.Item is Symbol symbol)
+            if (Equals(current.Item, Symbol.LeftParent))
             {
-                if (Equals(symbol, Symbol.LeftParent))
-                {
-                    ParseQuotation(queue, ref current);
-                    return;
-                }
-                if (Equals(symbol, Symbol.RightParent))
-                {
-                    throw new ParserException("ill: unbalanced ')' in input");
-                }
-
-                if (Equals(symbol, Symbol.Quoter))
-                {
-                    current = current.Next;
-                    if (!current)
-                    {
-                        throw new ParserException($"ill: dangling {Symbol.Quoter} at end of input");
-                    }
-                    ParseObject(queue, ref current);
-                    var quotation = new QuotationLiteral(queue.ToList());
-                    queue.Clear();
-                    queue.Enqueue(quotation);
-                    return;
-                }
-                if (symbol.Value.Length > 1)
-                {
-                    switch (symbol.Value[0])
-                    {
-                        case ':':
-                            queue.Enqueue(new Chars(symbol.Value.Substring(1)));
-                            queue.Enqueue(Symbol.Define);
-                            current = current.Next;
-                            return;
-                    }
-                }
+                return ParseQuotation(lexical, current);
             }
 
-            queue.Enqueue(current.Item);
-            current = current.Next;
+            if (Equals(current.Item, Symbol.RightParent))
+            {
+                throw new ParserException("ill: unbalanced ')' in input");
+            }
+
+            if (Equals(current.Item, Symbol.Quoter))
+            {
+                current.Advance();
+                if (!current)
+                {
+                    throw new ParserException($"ill: dangling {Symbol.Quoter} at end of input");
+                }
+
+                return new Quotation(lexical, ParseObject(lexical, current));
+            }
+
+            var @object = current.Item;
+            current.Advance();
+
+            return @object;
         }
 
-        private void ParseQuotation(Queue<Cobject> queue, ref Cursor<Cobject> current)
+        private Cobject ParseQuotation(AmScope lexical, Cursor<Cobject> current)
         {
-            current = current.Next;
-            var inner = new Queue<Cobject>();
+            Debug.Assert(Equals(current.Item, Symbol.LeftParent));
+            current.Advance();
 
-            while (current && !Equals(current.Item, Symbol.RightParent))
+            lexical = new AmScope(lexical, "lexical");
+
+            IEnumerable<Cobject> Loop(AmScope lex)
             {
-                ParseObject(inner, ref current);
+                while (current && !Equals(current.Item, Symbol.RightParent))
+                {
+                    foreach (var @object in ParseObject(lex, current))
+                    {
+                        yield return @object;
+                    }
+                }
             }
+
+            var quotation = new Quotation(lexical, Loop(lexical).ToList());
+
             if (!current)
             {
                 throw new ParserException("ill: unbalanced '(' in input");
             }
 
-            queue.Enqueue(new QuotationLiteral(inner));
-            current = current.Next;
-        }
+            Debug.Assert(Equals(current.Item, Symbol.RightParent));
+            current.Advance();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
+            return quotation;
         }
     }
 }

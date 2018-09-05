@@ -1,7 +1,5 @@
 ﻿// ReSharper disable UnusedMember.Global
 
-using Microsoft.Win32.SafeHandles;
-
 namespace CoTy.Objects
 {
     public partial class Integer

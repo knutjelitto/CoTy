@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+using System.Linq;
 using CoTy.Ambiance;
 
 namespace CoTy.Objects
@@ -17,18 +17,25 @@ namespace CoTy.Objects
             Lexical = lexical;
         }
 
+        private AmScope Lexical { get; }
+
+        public bool TryGetQuotedSymbol(out Symbol symbol)
+        {
+            if (this.SingleOrDefault() is Symbol soleSymbol)
+            {
+                symbol = soleSymbol;
+                return true;
+            }
+
+            symbol = null;
+            return false;
+        }
+
         public override void Execute(AmScope scope, AmStack stack)
         {
-            var inner = new AmScope(scope, "activation");
-
             foreach (var value in this)
             {
-                var toEval = value;
-                if (value is QuotationLiteral quotationLiteral)
-                {
-                    toEval = new Quotation(scope, quotationLiteral);
-                }
-                toEval.Eval(inner, stack);
+                value.Eval(Lexical, stack);
             }
         }
 
@@ -41,7 +48,5 @@ namespace CoTy.Objects
         {
             return "(" + string.Join(" ", Value) + ")";
         }
-
-        public AmScope Lexical { get; }
     }
 }

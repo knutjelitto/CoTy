@@ -8,21 +8,22 @@ using CoTy.Modules;
 using System.Reflection;
 using System.IO;
 using CoTy.Objects;
-using System.Linq;
 
 namespace CoTy
 {
-    internal class Program
+    internal static class Program
     {
         // ReSharper disable once UnusedParameter.Local
         private static void Main(string[] args)
         {
             var rootLexical = MakeRootFrame();
-            var rootActivation = new AmScope(rootLexical, "activation");
+            var withTest = WithTest(rootLexical);
+            var rootActivation = new AmScope(rootLexical, "prompt");
+            var testActivation = new AmScope(withTest, "test");
             var stack = new AmStack();
 
-            Execute(MakeParser(Read("startup")), new AmScope(WithTest(rootLexical), "test"), stack);
-            Execute(MakeParser(new ConsoleInput(stack.Dump)), new AmScope(rootLexical, "lexical"), stack);
+            Execute(MakeParser(Read("startup")).Parse(testActivation), testActivation, stack);
+            Execute(MakeParser(new ConsoleInput(stack.Dump)).Parse(rootActivation), rootActivation, stack);
         }
 
         private static void Execute(IEnumerable<Cobject> stream, AmScope scope, AmStack stack)
@@ -31,13 +32,7 @@ namespace CoTy
             {
                 try
                 {
-                    var toEval = value;
-
-                    if (value is QuotationLiteral quotationLiteral)
-                    {
-                        toEval = new Quotation(scope, quotationLiteral.ToList());
-                    }
-                    toEval.Eval(scope, stack);
+                    value.Eval(scope, stack);
                 }
                 catch (ScopeException scopeEx)
                 {
@@ -47,14 +42,19 @@ namespace CoTy
                 {
                     Console.WriteLine($"{stackEx.Message}");
                 }
+                catch (BinderException binderEx)
+                {
+                    Console.WriteLine($"{binderEx.Message}");
+                }
             }
         }
 
         private static AmScope MakeRootFrame()
         {
-            var root = new AmScope(null, "root");
+            var root = new AmScope(null, "bottom");
 
             new LanguageModule().ImportInto(root);
+            new BindingModule().ImportInto(root);
             new StackModule().ImportInto(root);
             new BoolModule().ImportInto(root);
             new OperatorModule().ImportInto(root);

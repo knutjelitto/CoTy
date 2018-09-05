@@ -1,29 +1,11 @@
 ﻿using CoTy.Ambiance;
 using CoTy.Objects;
 
+// ReSharper disable UnusedMember.Local
 namespace CoTy.Modules
 {
     public class LanguageModule : Module
     {
-        [Builtin("define")]
-        private static void Define(AmScope scope, AmStack stack)
-        {
-            var toDefine = stack.Pop();
-            var definition = stack.Pop();
-
-            Symbol symbol;
-
-            if (toDefine is Chars str)
-            {
-                symbol = Symbol.Get(str.Value);
-            }
-            else
-            {
-                symbol = (Symbol)toDefine;
-            }
-
-            scope.Define(symbol, definition);
-        }
 
         [Builtin("exec")]
         private static void Execute(AmScope scope, AmStack stack)

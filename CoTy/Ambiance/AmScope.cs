@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using CoTy.Errors;
 using CoTy.Objects;
 
 namespace CoTy.Ambiance
 {
-    public class AmScope : IDefine
+    public class AmScope
     {
         private readonly Dictionary<Symbol, Binding> definitions = new Dictionary<Symbol, Binding>();
 
@@ -14,7 +16,7 @@ namespace CoTy.Ambiance
             Name = name;
         }
 
-        public IEnumerable<Symbol> Symbols => this.definitions.Keys;
+        public IEnumerable<Symbol> Symbols => this.definitions.Keys.OrderBy(k => k.Value);
 
         public bool IsDefined(Symbol symbol)
         {
@@ -26,43 +28,79 @@ namespace CoTy.Ambiance
             return !this.definitions.ContainsKey(symbol);
         }
 
-        public void Define(Symbol symbol, Cobject cobject)
+        public void Define(Symbol symbol, Cobject value, bool isSealed = false, bool isOpaque = false)
         {
-            if (!TryDefine(symbol, cobject))
+            if (TryFind(symbol, out var binding))
             {
-                throw new ScopeException($"ill: can't define symbol `{symbol}´");
+                if (binding.Scope == this)
+                {
+                    throw new BinderException($"ill: symbol `{symbol}´ already defined in current scope");
+                }
+
+                if (binding.IsOpaque)
+                {
+                    throw new BinderException($"ill: symbol `{symbol}´ is marked as opaque and can't be redefined");
+                }
             }
+
+            binding = new Binding(this, symbol, value, isSealed, isOpaque);
+            this.definitions.Add(symbol, binding);
         }
 
-        private bool TryDefine(Symbol symbol, Cobject cobject)
+        public void Undefine(Symbol symbol)
         {
-            if (CanDefine(symbol))
+            var binding = Find(symbol);
+
+            if (binding.IsOpaque)
             {
-                this.definitions.Add(symbol, new Binding(symbol, cobject, this));
-                return true;
+                throw new BinderException($"ill: symbol `{symbol}´ is marked as opaque and can't be removed");
             }
 
-            return false;
-        }
-
-        public void Find(Symbol symbol, out Binding binding)
-        {
-            if (!TryFind(symbol, out binding))
+            if (binding.IsSealed)
             {
-                throw new ScopeException($"ill: can't find definition for symbol `{symbol}´");
+                throw new BinderException($"ill: symbol `{symbol}´ is marked as sealed and can't be removed");
             }
+
+            binding.Scope.definitions.Remove(symbol);
         }
 
-        public bool TryFind(Symbol symbol, out Binding value)
+        public void Update(Symbol symbol, Cobject value)
         {
-            if (!this.definitions.TryGetValue(symbol, out value))
+            var binding = Find(symbol);
+
+            if (binding.IsSealed)
+            {
+                throw new BinderException($"ill: symbol `{symbol}´ is marked as sealed and can't be updated");
+            }
+
+            binding.Value = value;
+        }
+
+        public void Get(Symbol symbol, out Cobject value)
+        {
+            value = Find(symbol).Value;
+        }
+
+        public Binding Find(Symbol symbol)
+        {
+            if (!TryFind(symbol, out var binding))
+            {
+                throw new BinderException($"ill: symbol `{symbol}´ isn't defined in any scope");
+            }
+
+            return binding;
+        }
+
+        private bool TryFind(Symbol symbol, out Binding binding)
+        {
+            if (!this.definitions.TryGetValue(symbol, out binding))
             {
                 if (Parent != null)
                 {
-                    return Parent.TryFind(symbol, out value);
+                    return Parent.TryFind(symbol, out binding);
                 }
 
-                value = null;
+                binding = null;
                 return false;
             }
 

@@ -1,4 +1,6 @@
-﻿namespace CoTy.Objects
+﻿// ReSharper disable UnusedMember.Global
+
+namespace CoTy.Objects
 {
     public abstract partial class Cobject
     {

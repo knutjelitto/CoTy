@@ -14,7 +14,7 @@ namespace CoTy.Objects
         public static readonly Symbol Quoter = Get("'");
         public static readonly Symbol LeftParent = Get("(");
         public static readonly Symbol RightParent = Get(")");
-        public static readonly Symbol Define = Get("define");
+        public static readonly Symbol Define = Get("def");
 
         private readonly int hashCode;
 
@@ -36,9 +36,9 @@ namespace CoTy.Objects
 
         public override void Eval(AmScope scope, AmStack stack)
         {
-            scope.Find(this, out var binding);
+            scope.Get(this, out var value);
 
-            binding.Value.Execute(scope, stack);
+            value.Execute(scope, stack);
         }
 
         public override int GetHashCode() => this.hashCode;

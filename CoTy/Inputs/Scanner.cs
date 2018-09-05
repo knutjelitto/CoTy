@@ -5,7 +5,7 @@ using System.Text;
 
 using CoTy.Objects;
 using CoTy.Errors;
-using System;
+using CoTy.Modules;
 
 namespace CoTy.Inputs
 {
@@ -43,6 +43,15 @@ namespace CoTy.Inputs
                     case '"':
                         yield return ScanString(ref current);
                         break;
+                    case ':':
+                        if (current.Next && IsRestrictedSymbolFirst(current.Next))
+                        {
+                            current = current.Next;
+                            yield return new Chars(ScanGrumble(ref current));
+                            yield return Symbol.Define;
+                            break;
+                        }
+                        goto default;
                     default:
                         yield return Classify(ScanGrumble(ref current));
                         break;
@@ -60,6 +69,11 @@ namespace CoTy.Inputs
         private bool IsStructure(char c)
         {
             return "()\"\'".Contains(c);
+        }
+
+        private bool IsRestrictedSymbolFirst(char c)
+        {
+            return c == '_' || char.IsLetter(c);
         }
 
         private bool IsLineComment(Cursor<char> current)
