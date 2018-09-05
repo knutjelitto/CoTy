@@ -35,8 +35,8 @@ namespace CoTy.Modules
         [Builtin("quote")]
         private static void Quote(AmScope scope, AmStack stack)
         {
-            var @object = stack.Pop();
-            var quotation = new Quotation(@object);
+            var value = stack.Pop();
+            var quotation = new Quotation(scope, value);
             stack.Push(quotation);
         }
 
@@ -56,16 +56,16 @@ namespace CoTy.Modules
             var ifTrue = stack.Pop();
             var condition = stack.Pop();
 
-            condition.Eval(scope, stack);
+            condition.Execute(scope, stack);
             var result = stack.Pop();
 
             if (result is Bool boolean && boolean.Value)
             {
-                ifTrue.Eval(scope, stack);
+                ifTrue.Execute(scope, stack);
             }
             else
             {
-                ifElse.Eval(scope, stack);
+                ifElse.Execute(scope, stack);
             }
         }
 
@@ -81,7 +81,7 @@ namespace CoTy.Modules
                 stack.Push(value);
                 if (!first)
                 {
-                    operation.Eval(scope, stack);
+                    operation.Execute(scope, stack);
                 }
                 else
                 {

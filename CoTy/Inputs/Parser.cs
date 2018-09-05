@@ -52,7 +52,7 @@ namespace CoTy.Inputs
                         throw new ParserException($"ill: dangling {Symbol.Quoter} at end of input");
                     }
                     ParseObject(queue, ref current);
-                    var quotation = new Quotation(queue.ToList());
+                    var quotation = new QuotationLiteral(queue.ToList());
                     queue.Clear();
                     queue.Enqueue(quotation);
                     return;
@@ -88,7 +88,7 @@ namespace CoTy.Inputs
                 throw new ParserException("ill: unbalanced '(' in input");
             }
 
-            queue.Enqueue(new Quotation(inner));
+            queue.Enqueue(new QuotationLiteral(inner));
             current = current.Next;
         }
 

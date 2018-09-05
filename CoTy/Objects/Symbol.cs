@@ -38,7 +38,7 @@ namespace CoTy.Objects
         {
             scope.Find(this, out var binding);
 
-            binding.Value.Execute(new AmScope(scope.Activation, binding.Lexical), stack);
+            binding.Value.Execute(scope, stack);
         }
 
         public override int GetHashCode() => this.hashCode;

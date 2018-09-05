@@ -4,7 +4,7 @@ namespace CoTy.Ambiance
 {
     public class Binding
     {
-        public Binding(Symbol symbol, Cobject value, AmFrame lexical)
+        public Binding(Symbol symbol, Cobject value, AmScope lexical)
         {
             Symbol = symbol;
             Value = value;
@@ -13,6 +13,6 @@ namespace CoTy.Ambiance
 
         public Symbol Symbol { get; }
         public Cobject Value { get; }
-        public AmFrame Lexical { get; }
+        public AmScope Lexical { get; }
     }
 }

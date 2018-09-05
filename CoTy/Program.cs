@@ -8,6 +8,7 @@ using CoTy.Modules;
 using System.Reflection;
 using System.IO;
 using CoTy.Objects;
+using System.Linq;
 
 namespace CoTy
 {
@@ -16,12 +17,12 @@ namespace CoTy
         // ReSharper disable once UnusedParameter.Local
         private static void Main(string[] args)
         {
-            var rootActivation = new AmFrame(null, "activation");
             var rootLexical = MakeRootFrame();
+            var rootActivation = new AmScope(rootLexical, "activation");
             var stack = new AmStack();
 
-            Execute(MakeParser(Read("startup")), new AmScope(rootActivation, WithTest(rootLexical)), stack);
-            Execute(MakeParser(new ConsoleInput(stack.Dump)), new AmScope(rootActivation,  rootLexical), stack);
+            Execute(MakeParser(Read("startup")), new AmScope(WithTest(rootLexical), "test"), stack);
+            Execute(MakeParser(new ConsoleInput(stack.Dump)), new AmScope(rootLexical, "lexical"), stack);
         }
 
         private static void Execute(IEnumerable<Cobject> stream, AmScope scope, AmStack stack)
@@ -30,18 +31,28 @@ namespace CoTy
             {
                 try
                 {
-                    value.Eval(scope, stack);
+                    var toEval = value;
+
+                    if (value is QuotationLiteral quotationLiteral)
+                    {
+                        toEval = new Quotation(scope, quotationLiteral.ToList());
+                    }
+                    toEval.Eval(scope, stack);
                 }
                 catch (ScopeException scopeEx)
                 {
                     Console.WriteLine($"{scopeEx.Message}");
                 }
+                catch (StackException stackEx)
+                {
+                    Console.WriteLine($"{stackEx.Message}");
+                }
             }
         }
 
-        private static AmFrame MakeRootFrame()
+        private static AmScope MakeRootFrame()
         {
-            var root = new AmFrame(null, "root");
+            var root = new AmScope(null, "root");
 
             new LanguageModule().ImportInto(root);
             new StackModule().ImportInto(root);
@@ -54,9 +65,9 @@ namespace CoTy
             return root;
         }
 
-        private static AmFrame WithTest(AmFrame rootLexical)
+        private static AmScope WithTest(AmScope rootLexical)
         {
-            var withTest = new AmFrame(rootLexical, "with-test");
+            var withTest = new AmScope(rootLexical, "with-test");
 
             new TestModule().ImportInto(withTest);
 

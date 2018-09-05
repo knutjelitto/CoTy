@@ -9,7 +9,7 @@ namespace CoTy.Modules
 {
     public class Module
     {
-        public void ImportInto(AmFrame scope)
+        public void ImportInto(AmScope scope)
         {
             Reflect(scope);
         }
@@ -27,7 +27,7 @@ namespace CoTy.Modules
             public int Arity { get; set; } = -1;
         }
 
-        private void Reflect(AmFrame goal)
+        private void Reflect(AmScope goal)
         {
             foreach (var method in GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Static))
             {

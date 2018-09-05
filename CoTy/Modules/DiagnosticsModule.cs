@@ -10,19 +10,12 @@ namespace CoTy.Modules
         [Builtin("ds")]
         private static void DumpScope(AmScope scope, AmStack stack)
         {
-            void Dump(string what, AmFrame frame)
+            while (scope != null)
             {
-                Console.WriteLine(what);
-                while (frame != null)
-                {
-                    var syms = frame.Name + "{" + string.Join(" ", frame.Symbols) + "}";
-                    Console.WriteLine(syms);
-                    frame = frame.Parent;
-                }
+                var syms = scope.Name + "{" + string.Join(" ", scope.Symbols) + "}";
+                Console.WriteLine(syms);
+                scope = scope.Parent;
             }
-
-            Dump("==activation==", scope.Activation);
-            Dump("==lexical=====", scope.Lexical);
         }
     }
 }

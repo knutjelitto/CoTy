@@ -7,27 +7,6 @@ namespace CoTy.Modules
 {
     public class SequenceModule : Module
     {
-        [Builtin("flatten")]
-        private static void Flatten(AmScope scope, AmStack stack)
-        {
-            IEnumerable<Cobject> Enumerate(Cobject value)
-            {
-                if (value is Quotation)
-                {
-                    foreach (var inner in value.SelectMany(Enumerate))
-                    {
-                        yield return inner;
-                    }
-                }
-                else
-                {
-                    yield return value;
-                }
-            }
-
-            stack.Push(new Quotation(Enumerate(stack.Pop())));
-        }
-
         [Builtin("upto")]
         private static void Upto(AmScope scope, AmStack stack)
         {
@@ -41,7 +20,7 @@ namespace CoTy.Modules
                 }
             }
 
-            stack.Push(new Quotation(Enumerate(stack.Pop2()).ToList()));
+            stack.Push(new Quotation(scope, Enumerate(stack.Pop2()).ToList()));
         }
 
         [Builtin("count")]

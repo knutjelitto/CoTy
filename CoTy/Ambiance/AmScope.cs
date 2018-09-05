@@ -1,30 +1,80 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
+﻿using System.Collections.Generic;
+using CoTy.Errors;
 using CoTy.Objects;
 
 namespace CoTy.Ambiance
 {
-    public struct AmScope
+    public class AmScope : IDefine
     {
-        public readonly AmFrame Activation;
-        public readonly AmFrame Lexical;
+        private readonly Dictionary<Symbol, Binding> definitions = new Dictionary<Symbol, Binding>();
 
-        public AmScope(AmFrame activation, AmFrame lexical)
+        public AmScope(AmScope parent, string name)
         {
-            this.Activation = activation;
-            this.Lexical = lexical;
+            Parent = parent;
+            Name = name;
         }
 
-        public void Define(Symbol symbol, Cobject value)
+        public IEnumerable<Symbol> Symbols => this.definitions.Keys;
+
+        public bool IsDefined(Symbol symbol)
         {
-            this.Activation.Define(symbol, value);
+            return TryFind(symbol, out var _);
+        }
+
+        public bool CanDefine(Symbol symbol)
+        {
+            return !this.definitions.ContainsKey(symbol);
+        }
+
+        public void Define(Symbol symbol, Cobject cobject)
+        {
+            if (!TryDefine(symbol, cobject))
+            {
+                throw new ScopeException($"ill: can't define symbol `{symbol}´");
+            }
+        }
+
+        private bool TryDefine(Symbol symbol, Cobject cobject)
+        {
+            if (CanDefine(symbol))
+            {
+                this.definitions.Add(symbol, new Binding(symbol, cobject, this));
+                return true;
+            }
+
+            return false;
         }
 
         public void Find(Symbol symbol, out Binding binding)
         {
-            this.Lexical.Find(symbol, out binding);
+            if (!TryFind(symbol, out binding))
+            {
+                throw new ScopeException($"ill: can't find definition for symbol `{symbol}´");
+            }
+        }
+
+        public bool TryFind(Symbol symbol, out Binding value)
+        {
+            if (!this.definitions.TryGetValue(symbol, out value))
+            {
+                if (Parent != null)
+                {
+                    return Parent.TryFind(symbol, out value);
+                }
+
+                value = null;
+                return false;
+            }
+
+            return true;
+        }
+
+        public AmScope Parent { get; }
+        public string Name { get; }
+
+        public override string ToString()
+        {
+            return Name + "{" + string.Join(" ", Symbols) + "}";
         }
     }
 }

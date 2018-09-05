@@ -6,22 +6,29 @@ namespace CoTy.Objects
 {
     public partial class Quotation : Cobject<IEnumerable<Cobject>>
     {
-        public Quotation(params Cobject[] objs)
-            : this((IEnumerable<Cobject>)objs)
+        public Quotation(AmScope lexical, params Cobject[] objs)
+            : this(lexical, (IEnumerable<Cobject>)objs)
         {
         }
 
-        public Quotation(IEnumerable<Cobject> objs)
+        public Quotation(AmScope lexical, IEnumerable<Cobject> objs)
             : base(objs)
         {
+            Lexical = lexical;
         }
+
         public override void Execute(AmScope scope, AmStack stack)
         {
-            var inner = new AmScope(new AmFrame(scope.Activation, "activation"), scope.Lexical);
+            var inner = new AmScope(scope, "activation");
 
             foreach (var value in this)
             {
-                value.Eval(inner, stack);
+                var toEval = value;
+                if (value is QuotationLiteral quotationLiteral)
+                {
+                    toEval = new Quotation(scope, quotationLiteral);
+                }
+                toEval.Eval(inner, stack);
             }
         }
 
@@ -34,5 +41,7 @@ namespace CoTy.Objects
         {
             return "(" + string.Join(" ", Value) + ")";
         }
+
+        public AmScope Lexical { get; }
     }
 }

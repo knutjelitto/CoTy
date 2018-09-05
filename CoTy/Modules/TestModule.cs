@@ -10,11 +10,11 @@ namespace CoTy.Modules
         private static void Assert(AmScope scope, AmStack stack)
         {
             var expectedQuot = stack.Pop();
-            expectedQuot.Eval(scope, stack);
+            expectedQuot.Execute(scope, stack);
             var expected = (dynamic) stack.Pop();
 
             var actualQuot = stack.Pop();
-            actualQuot.Eval(scope, stack);
+            actualQuot.Execute(scope, stack);
             var actual = (dynamic)stack.Pop();
 
             var equals = (Bool) actual.Equal(expected);

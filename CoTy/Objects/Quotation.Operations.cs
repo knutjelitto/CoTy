@@ -8,12 +8,12 @@ namespace CoTy.Objects
 
         public Quotation Add(Cobject other)
         {
-            return new Quotation(this.Concat(other));
+            return new Quotation(null, this.Concat(other));
         }
 
         public Quotation CoAdd(Cobject other)
         {
-            return new Quotation(other.Concat(this));
+            return new Quotation(null, other.Concat(this));
         }
     }
 }

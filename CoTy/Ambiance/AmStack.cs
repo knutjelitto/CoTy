@@ -47,8 +47,13 @@ namespace CoTy.Ambiance
 
         public void Dump()
         {
+            Console.WriteLine(this);
+        }
+
+        public override string ToString()
+        {
             var text = string.Join(" ", this.stack.Reverse());
-            Console.WriteLine($"[{text}]");
+            return $"[{text}]";
         }
     }
 }
