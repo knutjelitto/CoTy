@@ -24,39 +24,39 @@ namespace CoTy.Modules
         }
 
         [Builtin("def")]
-        private static void Define(AmScope scope, AmStack stack)
+        private static void Define(IContext context, AmStack stack)
         {
             var symbol = GetSymbol(stack.Pop());
             var value = stack.Pop();
 
 
-            scope.Define(symbol, value);
+            context.Define(symbol, value);
         }
 
         [Builtin("undef")]
-        private static void Undefine(AmScope scope, AmStack stack)
+        private static void Undefine(IContext context, AmStack stack)
         {
             var symbol = GetSymbol(stack.Pop());
 
-            scope.Undefine(symbol);
+            context.Undefine(symbol);
         }
 
         [Builtin("set")]
-        private static void Set(AmScope scope, AmStack stack)
+        private static void Set(IContext context, AmStack stack)
         {
             var symbol = GetSymbol(stack.Pop());
             var value = stack.Pop();
 
 
-            scope.Update(symbol, value);
+            context.Update(symbol, value);
         }
 
         [Builtin("def?")]
-        private static void DefinedPred(AmScope scope, AmStack stack)
+        private static void DefinedPred(IContext context, AmStack stack)
         {
             var symbol = GetSymbol(stack.Pop());
 
-            stack.Push(Bool.From(scope.IsDefined(symbol)));
+            stack.Push(Bool.From(context.IsDefined(symbol)));
         }
     }
 }

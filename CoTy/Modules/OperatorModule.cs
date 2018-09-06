@@ -5,7 +5,7 @@ namespace CoTy.Modules
     public class OperatorModule : Module
     {
         [Builtin("==", InArity = 2)]
-        private static void Equal(AmScope scope, AmStack stack)
+        private static void Equal(IContext context, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
@@ -14,7 +14,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("!=", InArity = 2)]
-        private static void NotEqual(AmScope scope, AmStack stack)
+        private static void NotEqual(IContext context, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
@@ -23,7 +23,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("<", InArity = 2)]
-        private static void Less(AmScope scope, AmStack stack)
+        private static void Less(IContext context, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
@@ -32,7 +32,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("<=", InArity = 2)]
-        private static void LessEqual(AmScope scope, AmStack stack)
+        private static void LessEqual(IContext context, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
@@ -41,7 +41,7 @@ namespace CoTy.Modules
         }
 
         [Builtin(">", InArity = 2)]
-        private static void Greater(AmScope scope, AmStack stack)
+        private static void Greater(IContext context, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
@@ -50,7 +50,7 @@ namespace CoTy.Modules
         }
 
         [Builtin(">=", InArity = 2)]
-        private static void GreaterEqual(AmScope scope, AmStack stack)
+        private static void GreaterEqual(IContext context, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
@@ -59,7 +59,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("+", InArity = 2)]
-        private static void Plus(AmScope scope, AmStack stack)
+        private static void Plus(IContext context, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
@@ -68,7 +68,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("-", InArity = 2)]
-        private static void Minus(AmScope scope, AmStack stack)
+        private static void Minus(IContext context, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
@@ -77,7 +77,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("*", InArity = 2)]
-        private static void Multiply(AmScope scope, AmStack stack)
+        private static void Multiply(IContext context, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
@@ -86,7 +86,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("/", InArity = 2)]
-        private static void Divide(AmScope scope, AmStack stack)
+        private static void Divide(IContext context, AmStack stack)
         {
             var i2 = (dynamic)stack.Pop();
             var i1 = (dynamic)stack.Pop();
@@ -95,7 +95,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("succ", InArity = 1)]
-        private static void Succ(AmScope scope, AmStack stack)
+        private static void Succ(IContext context, AmStack stack)
         {
             var value = (dynamic)stack.Pop();
 
@@ -103,7 +103,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("pred", InArity = 1)]
-        private static void Pred(AmScope scope, AmStack stack)
+        private static void Pred(IContext context, AmStack stack)
         {
             var value = (dynamic)stack.Pop();
 

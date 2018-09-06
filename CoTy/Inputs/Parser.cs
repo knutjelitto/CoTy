@@ -56,25 +56,22 @@ namespace CoTy.Inputs
             return @object;
         }
 
-        private Cobject ParseQuotation(AmScope lexical, Cursor<Cobject> current)
+        private Cobject ParseQuotation(AmScope lexicalScope, Cursor<Cobject> current)
         {
             Debug.Assert(Equals(current.Item, Symbol.LeftParent));
             current.Advance();
 
-            lexical = new AmScope(lexical, "lexical");
+            lexicalScope = new AmScope(lexicalScope, "lexical");
 
-            IEnumerable<Cobject> Loop(AmScope lex)
+            IEnumerable<Cobject> Loop(AmScope lexScope)
             {
                 while (current && !Equals(current.Item, Symbol.RightParent))
                 {
-                    foreach (var @object in ParseObject(lex, current))
-                    {
-                        yield return @object;
-                    }
+                    yield return ParseObject(lexScope, current);
                 }
             }
 
-            var quotation = new Quotation(lexical, Loop(lexical).ToList());
+            var quotation = new Quotation(lexicalScope, Loop(lexicalScope).ToList());
 
             if (!current)
             {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
+
 using CoTy.Errors;
 using CoTy.Objects;
 
@@ -26,6 +26,11 @@ namespace CoTy.Ambiance
         public bool CanDefine(Symbol symbol)
         {
             return !this.definitions.ContainsKey(symbol);
+        }
+
+        public bool CanUpdate(Symbol symbol)
+        {
+            return TryFind(symbol, out var binding) && !binding.IsSealed;
         }
 
         public void Define(Symbol symbol, Cobject value, bool isSealed = false, bool isOpaque = false)
@@ -91,7 +96,7 @@ namespace CoTy.Ambiance
             return binding;
         }
 
-        private bool TryFind(Symbol symbol, out Binding binding)
+        public bool TryFind(Symbol symbol, out Binding binding)
         {
             if (!this.definitions.TryGetValue(symbol, out binding))
             {

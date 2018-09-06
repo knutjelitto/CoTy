@@ -17,22 +17,23 @@ namespace CoTy
         private static void Main(string[] args)
         {
             var rootLexical = MakeRootFrame();
-            var withTest = WithTest(rootLexical);
-            var rootActivation = new AmScope(rootLexical, "prompt");
-            var testActivation = new AmScope(withTest, "test");
+            var testLexical = WithTest(rootLexical);
+            var rootActivation = new AmScope(null, "prompt");
+            var testActivation = new AmScope(null, "test");
             var stack = new AmStack();
 
-            Execute(MakeParser(Read("startup")).Parse(testActivation), testActivation, stack);
-            Execute(MakeParser(new ConsoleInput(stack.Dump)).Parse(rootActivation), rootActivation, stack);
+            Execute(MakeParser(Read("tests")).Parse(testLexical), new AmContext(testLexical, testActivation), stack);
+            Execute(MakeParser(Read("startup")).Parse(rootLexical), new AmContext(rootLexical, rootActivation), stack);
+            Execute(MakeParser(new ConsoleInput(stack.Dump)).Parse(rootLexical), new AmContext(rootLexical, rootActivation), stack);
         }
 
-        private static void Execute(IEnumerable<Cobject> stream, AmScope scope, AmStack stack)
+        private static void Execute(IEnumerable<Cobject> stream, IContext context, AmStack stack)
         {
             foreach (var value in stream)
             {
                 try
                 {
-                    value.Eval(scope, stack);
+                    value.Eval(context, stack);
                 }
                 catch (ScopeException scopeEx)
                 {

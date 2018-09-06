@@ -8,22 +8,22 @@ namespace CoTy.Modules
     {
 
         [Builtin("exec")]
-        private static void Execute(AmScope scope, AmStack stack)
+        private static void Execute(IContext context, AmStack stack)
         {
             var value = stack.Pop();
-            value.Execute(scope, stack);
+            value.Execute(context, stack);
         }
 
         [Builtin("quote")]
-        private static void Quote(AmScope scope, AmStack stack)
+        private static void Quote(IContext context, AmStack stack)
         {
             var value = stack.Pop();
-            var quotation = new Quotation(scope, value);
+            var quotation = new Quotation(context.Lexical, value);
             stack.Push(quotation);
         }
 
         [Builtin("dequote")]
-        private static void DeQuote(AmScope scope, AmStack stack)
+        private static void DeQuote(IContext context, AmStack stack)
         {
             foreach (var value in stack.Pop())
             {
@@ -32,27 +32,27 @@ namespace CoTy.Modules
         }
 
         [Builtin("if")]
-        private static void If(AmScope scope, AmStack stack)
+        private static void If(IContext context, AmStack stack)
         {
             var ifElse = stack.Pop();
             var ifTrue = stack.Pop();
             var condition = stack.Pop();
 
-            condition.Execute(scope, stack);
+            condition.Execute(context, stack);
             var result = stack.Pop();
 
             if (result is Bool boolean && boolean.Value)
             {
-                ifTrue.Execute(scope, stack);
+                ifTrue.Execute(context, stack);
             }
             else
             {
-                ifElse.Execute(scope, stack);
+                ifElse.Execute(context, stack);
             }
         }
 
         [Builtin("reduce")]
-        private static void Reduce(AmScope scope, AmStack stack)
+        private static void Reduce(IContext context, AmStack stack)
         {
             var operation = stack.Pop();
             var values = stack.Pop();
@@ -63,7 +63,7 @@ namespace CoTy.Modules
                 stack.Push(value);
                 if (!first)
                 {
-                    operation.Execute(scope, stack);
+                    operation.Execute(context, stack);
                 }
                 else
                 {

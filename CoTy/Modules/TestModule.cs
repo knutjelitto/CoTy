@@ -7,14 +7,14 @@ namespace CoTy.Modules
     public class TestModule : Module
     {
         [Builtin("assert")]
-        private static void Assert(AmScope scope, AmStack stack)
+        private static void Assert(IContext context, AmStack stack)
         {
             var expectedQuot = stack.Pop();
-            expectedQuot.Execute(scope, stack);
+            expectedQuot.Execute(context, stack);
             var expected = (dynamic) stack.Pop();
 
             var actualQuot = stack.Pop();
-            actualQuot.Execute(scope, stack);
+            actualQuot.Execute(context, stack);
             var actual = (dynamic)stack.Pop();
 
             var equals = (Bool) actual.Equal(expected);

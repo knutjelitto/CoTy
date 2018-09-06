@@ -7,14 +7,14 @@ namespace CoTy.Objects
 {
     public abstract partial class Cobject : IEnumerable<Cobject>
     {
-        public virtual void Eval(AmScope scope, AmStack stack)
+        public virtual void Eval(IContext context, AmStack stack)
         {
             stack.Push(this);
         }
 
-        public virtual void Execute(AmScope scope, AmStack stack)
+        public virtual void Execute(IContext context, AmStack stack)
         {
-            Eval(scope, stack);
+            Eval(context, stack);
         }
 
         public abstract IEnumerator<Cobject> GetEnumerator();

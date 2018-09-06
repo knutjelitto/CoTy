@@ -31,11 +31,12 @@ namespace CoTy.Objects
             return false;
         }
 
-        public override void Execute(AmScope scope, AmStack stack)
+        public override void Execute(IContext context, AmStack stack)
         {
+            context = context.WithLocal();
             foreach (var value in this)
             {
-                value.Eval(Lexical, stack);
+                value.Eval(context, stack);
             }
         }
 

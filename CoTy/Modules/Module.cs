@@ -34,19 +34,19 @@ namespace CoTy.Modules
                 var info = method.GetCustomAttribute<BuiltinAttribute>();
                 if (info != null)
                 {
-                    Action<AmScope, AmStack> eval;
+                    Action<IContext, AmStack> eval;
 
-                    var candidate = (Action<AmScope, AmStack>)Delegate.CreateDelegate(typeof(Action<AmScope, AmStack>), method, true);
+                    var candidate = (Action<IContext, AmStack>)Delegate.CreateDelegate(typeof(Action<IContext, AmStack>), method, true);
                     if (info.InArity >= 0)
                     {
                         var arity = info.InArity;
-                        var checkedEval = new Action<AmScope, AmStack>((scope, stack) =>
+                        var checkedEval = new Action<IContext, AmStack>((context, stack) =>
                         {
                             if (stack.Count < arity)
                             {
                                 throw new StackException($"ill: stack underflow - expected at least {arity} arguments (got {stack.Count})");
                             }
-                            candidate(scope, stack);
+                            candidate(context, stack);
                         });
                         eval = checkedEval;
                     }

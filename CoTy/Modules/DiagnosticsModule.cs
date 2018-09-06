@@ -8,13 +8,23 @@ namespace CoTy.Modules
     public class DiagnosticsModule : Module
     {
         [Builtin("ds")]
-        private static void DumpScope(AmScope scope, AmStack stack)
+        private static void DumpScope(IContext context, AmStack stack)
         {
-            while (scope != null)
+            Console.WriteLine("===lexical===");
+            var lexical = context.Lexical;
+            while (lexical != null)
             {
-                var syms = scope.Name + "{" + string.Join(" ", scope.Symbols) + "}";
+                var syms = lexical.Name + "{" + string.Join(" ", lexical.Symbols) + "}";
                 Console.WriteLine(syms);
-                scope = scope.Parent;
+                lexical = lexical.Parent;
+            }
+            Console.WriteLine("===local=====");
+            var local = context.Local;
+            while (local != null)
+            {
+                var syms = local.Name + "{" + string.Join(" ", local.Symbols) + "}";
+                Console.WriteLine(syms);
+                local = local.Parent;
             }
         }
     }

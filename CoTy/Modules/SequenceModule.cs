@@ -8,7 +8,7 @@ namespace CoTy.Modules
     public class SequenceModule : Module
     {
         [Builtin("upto")]
-        private static void Upto(AmScope scope, AmStack stack)
+        private static void Upto(IContext context, AmStack stack)
         {
             IEnumerable<Cobject> Enumerate((dynamic from, dynamic upto) r)
             {
@@ -20,11 +20,11 @@ namespace CoTy.Modules
                 }
             }
 
-            stack.Push(new Quotation(scope, Enumerate(stack.Pop2()).ToList()));
+            stack.Push(new Quotation(context.Lexical, Enumerate(stack.Pop2()).ToList()));
         }
 
         [Builtin("count")]
-        private static void Count(AmScope scope, AmStack stack)
+        private static void Count(IContext context, AmStack stack)
         {
             stack.Push(Integer.From(stack.Pop().Count()));
         }

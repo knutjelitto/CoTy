@@ -4,19 +4,19 @@ using CoTy.Ambiance;
 
 namespace CoTy.Objects
 {
-    public class Builtin : Cobject<Action<AmScope, AmStack>>
+    public class Builtin : Cobject<Action<IContext, AmStack>>
     {
-        private readonly Action<AmScope, AmStack> eval;
+        private readonly Action<IContext, AmStack> eval;
 
-        public Builtin(Action<AmScope, AmStack> eval)
+        public Builtin(Action<IContext, AmStack> eval)
             : base(eval)
         {
             this.eval = eval;
         }
 
-        public override void Eval(AmScope scope, AmStack stack)
+        public override void Eval(IContext context, AmStack stack)
         {
-            this.eval(scope, stack);
+            this.eval(context, stack);
         }
     }
 }

@@ -34,11 +34,11 @@ namespace CoTy.Objects
             return symbol;
         }
 
-        public override void Eval(AmScope scope, AmStack stack)
+        public override void Eval(IContext context, AmStack stack)
         {
-            scope.Get(this, out var value);
+            context.Get(this, out var value);
 
-            value.Execute(scope, stack);
+            value.Execute(context, stack);
         }
 
         public override int GetHashCode() => this.hashCode;
