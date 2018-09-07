@@ -5,7 +5,6 @@ using System.Text;
 
 using CoTy.Objects;
 using CoTy.Errors;
-using CoTy.Modules;
 
 namespace CoTy.Inputs
 {
@@ -26,7 +25,7 @@ namespace CoTy.Inputs
 
             while (current)
             {
-                switch (current)
+                switch (current.Item)
                 {
                     case '(':
                         current = current.Next;
@@ -44,10 +43,11 @@ namespace CoTy.Inputs
                         yield return ScanString(ref current);
                         break;
                     case ':':
-                        if (current.Next && IsRestrictedSymbolFirst(current.Next))
+                        if (MaybeRestrictedSymbol(current.Next))
                         {
-                            current = current.Next;
-                            yield return new Chars(ScanGrumble(ref current));
+                            current.Advance();
+                            ScanRestrictedSymbol(":", current, out var restrictedSymbol);
+                            yield return new QuotationLiteral(restrictedSymbol);
                             yield return Symbol.Define;
                             break;
                         }
@@ -76,23 +76,59 @@ namespace CoTy.Inputs
             return c == '_' || char.IsLetter(c);
         }
 
+        private bool IsRestrictedSymbolNext(char c)
+        {
+            return c == '_' || char.IsLetter(c) || char.IsDigit(c);
+        }
+
+        private bool MaybeRestrictedSymbol(Cursor<char> current)
+        {
+            return current && IsRestrictedSymbolFirst(current.Item);
+        }
+
+        private void ScanRestrictedSymbol(string intro, Cursor<char> current, out Symbol restrictedSymbol)
+        {
+            Debug.Assert(MaybeRestrictedSymbol(current));
+
+            var accu = new StringBuilder();
+
+            do
+            {
+                accu.Append(current.Item);
+                current.Advance();
+            }
+            while (current && IsRestrictedSymbolNext(current.Item));
+
+            if (MoreToScan(current))
+            {
+                throw new ScannerException($"exected simple symbol after `{intro}´");
+            }
+
+            restrictedSymbol = Symbol.Get(accu.ToString());
+        }
+
+        private bool MoreToScan(Cursor<char> current)
+        {
+            return current && !IsSkipable(current.Item) && !IsStructure(current.Item) && !IsLineComment(current);
+        }
+
         private bool IsLineComment(Cursor<char> current)
         {
-            return current == ';' && current.Next == ';';
+            return current.Item == ';' && current.Next.Item == ';';
         }
 
         private Cursor<char> Skip(Cursor<char> current)
         {
             while (current)
             {
-                while (current && IsSkipable(current))
+                while (current && IsSkipable(current.Item))
                 {
                     current = current.Next;
                 }
 
-                if (current && current == ';' && current.Next == ';')
+                if (current && current.Item == ';' && current.Next.Item == ';')
                 {
-                    while (current && current != CharSource.NL)
+                    while (current && current.Item != CharSource.NL)
                     {
                         current = current.Next;
                     }
@@ -108,7 +144,7 @@ namespace CoTy.Inputs
 
         private Cursor<char> SkipLineComment(Cursor<char> current)
         {
-            while (current && current != CharSource.NL)
+            while (current && current.Item != CharSource.NL)
             {
                 current = current.Next;
             }
@@ -117,25 +153,25 @@ namespace CoTy.Inputs
 
         private Chars ScanString(ref Cursor<char> current)
         { 
-            Debug.Assert(current == '"');
+            Debug.Assert(current.Item == '"');
 
             var accu = new StringBuilder();
 
             current = current.Next;
-            while (current && current != '"')
+            while (current && current.Item != '"')
             {
-                if (current == '\\' && current.Next == '"')
+                if (current.Item == '\\' && current.Next.Item == '"')
                 {
                     accu.Append('"');
                     current = current.Next;
                 }
                 else
                 {
-                    accu.Append((char)current);
+                    accu.Append(current.Item);
                 }
                 current = current.Next;
             }
-            if (current != '"')
+            if (current.Item != '"')
             {
                 throw new ScannerException("EOT in string literal");
             }
@@ -145,16 +181,16 @@ namespace CoTy.Inputs
 
         private string ScanGrumble(ref Cursor<char> current)
         {
-            Debug.Assert(current && !IsSkipable(current) && !IsStructure(current));
+            Debug.Assert(current && !IsSkipable(current.Item) && !IsStructure(current.Item));
 
             var accu = new StringBuilder();
 
             do
             {
-                accu.Append((char)current);
+                accu.Append(current.Item);
                 current = current.Next;
             }
-            while (current && !IsSkipable(current) && !IsStructure(current) && !IsLineComment(current));
+            while (MoreToScan(current));
 
             return accu.ToString();
         }

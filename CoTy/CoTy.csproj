@@ -7,13 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="AAA\startup.coty" />
-    <None Remove="AAA\tests.coty" />
+    <None Remove="Code\startup.coty" />
+    <None Remove="Code\tests.coty" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="AAA\startup.coty" />
-    <EmbeddedResource Include="AAA\tests.coty" />
+    <EmbeddedResource Include="Code\startup.coty" />
+    <EmbeddedResource Include="Code\tests.coty" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Types\" />
   </ItemGroup>
 
 </Project>

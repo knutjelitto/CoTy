@@ -6,7 +6,7 @@ using CoTy.Objects;
 
 namespace CoTy.Ambiance
 {
-    public class AmStack
+    public class AmStack : IStack
     {
         private readonly Stack<Cobject> stack = new Stack<Cobject>();
 
@@ -18,19 +18,6 @@ namespace CoTy.Ambiance
         public Cobject Pop()
         {
             return this.stack.Pop();
-        }
-
-        public (Cobject, Cobject) Pop2()
-        {
-            var v2 = this.stack.Pop();
-            var v1 = this.stack.Pop();
-
-            return (v1, v2);
-        }
-
-        public T Pop<T>() where T : Cobject
-        {
-            return (T)this.stack.Pop();
         }
 
         public Cobject Peek()

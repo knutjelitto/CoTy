@@ -5,13 +5,12 @@ namespace CoTy.Objects
 {
     public partial class Quotation
     {
-
-        public Quotation Add(Cobject other)
+        public Quotation Concatenate(Cobject other)
         {
             return new Quotation(null, this.Concat(other));
         }
 
-        public Quotation CoAdd(Cobject other)
+        public Quotation CoConcatenate(Cobject other)
         {
             return new Quotation(null, other.Concat(this));
         }

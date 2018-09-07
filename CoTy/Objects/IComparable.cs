@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CoTy.Objects
+﻿namespace CoTy.Objects
 {
-    public interface IComparable<T> where T : Cobject
+    public interface IComparable<in T> where T : Cobject
     {
-        Bool Equal(T other);
+        // ReSharper disable once UnusedMember.Global
+        Bool Equals(T other);
     }
 }

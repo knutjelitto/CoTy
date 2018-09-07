@@ -3,7 +3,7 @@ using CoTy.Ambiance;
 
 namespace CoTy.Objects
 {
-    public partial class QuotationLiteral : Cobject<IEnumerable<Cobject>>
+    public class QuotationLiteral : Cobject<IEnumerable<Cobject>>
     {
         public QuotationLiteral(params Cobject[] objs)
             : this((IEnumerable<Cobject>)objs)

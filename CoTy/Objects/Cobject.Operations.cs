@@ -1,12 +1,19 @@
 ﻿// ReSharper disable UnusedMember.Global
 
+using CoTy.Errors;
+
 namespace CoTy.Objects
 {
     public abstract partial class Cobject
     {
-        public Bool NotEqual(dynamic other)
+        public Bool NotEquals(dynamic other)
         {
-            return ((dynamic)this).Equal(other).Not();
+            return ((Bool)this.Equals(other)).Not();
+        }
+
+        public Bool Less(dynamic other)
+        {
+            throw new TypeMismatchException($"can't ordered compare `{this}´ with `{other}´");
         }
 
         public Bool NotLess(dynamic other)
@@ -16,17 +23,17 @@ namespace CoTy.Objects
 
         public Bool Greater(dynamic other)
         {
-            return NotEqual(other) && NotLess(other);
+            return NotEquals(other) && NotLess(other);
         }
 
-        public Bool LessOrEqual(dynamic other)
+        public Bool LessOrEquals(dynamic other)
         {
-            return ((dynamic)this).Less(other) || ((dynamic)this).Equal(other);
+            return ((dynamic)this).Less(other) || ((dynamic)this).Equals(other);
         }
 
-        public Bool GreaterOrEqual(dynamic other)
+        public Bool GreaterOrEquals(dynamic other)
         {
-            return ((dynamic)this).Greater(other) || ((dynamic)this).Equal(other);
+            return ((dynamic)this).Greater(other) || ((dynamic)this).Equals(other);
         }
     }
 }

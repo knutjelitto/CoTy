@@ -4,8 +4,9 @@ using System.Text;
 
 namespace CoTy.Objects
 {
-    public interface IOrdered<T> where T : Cobject
+    public interface IOrdered<in T> where T : Cobject
     {
+        // ReSharper disable once UnusedMember.Global
         Bool Less(T other);
     }
 }

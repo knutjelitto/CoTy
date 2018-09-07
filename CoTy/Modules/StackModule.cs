@@ -1,10 +1,16 @@
 ﻿using CoTy.Ambiance;
 using CoTy.Objects;
 
+// ReSharper disable UnusedMember.Local
+// ReSharper disable UnusedParameter.Local
 namespace CoTy.Modules
 {
     public class StackModule : Module
     {
+        public StackModule(AmScope parent) : base(parent, "stack")
+        {
+        }
+
         [Builtin("clear-stack", "cs")]
         private static void ClearStack(IContext context, AmStack stack)
         {

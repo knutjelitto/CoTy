@@ -1,10 +1,14 @@
-﻿namespace CoTy.Objects
+﻿// ReSharper disable UnusedMember.Global
+
+using System;
+
+namespace CoTy.Objects
 {
     public partial class Chars : IComparable<Chars>, IOrdered<Chars>
     {
         // equality
 
-        public Bool Equal(Chars other)
+        public Bool Equals(Chars other)
         {
             return Bool.From(Value == other.Value);
         }
@@ -13,22 +17,17 @@
 
         public Bool Less(Chars other)
         {
-            return Bool.From(Value.CompareTo(other.Value) < 0);
+            return Bool.From(string.Compare(Value, other.Value, StringComparison.Ordinal) < 0);
         }
 
-        public Chars Add(Chars other)
+        public Chars Concatenate(Chars other)
         {
-            return new Chars(this.Value + other.Value);
+            return new Chars(Value + other.Value);
         }
 
-        public Chars Add(Integer other)
+        public Cobject Concatenate(dynamic other)
         {
-            return new Chars(this.Value + other.Value);
-        }
-
-        public Cobject Add(dynamic other)
-        {
-            return other.CoAdd(this);
+            return other.CoConcatenate(this);
         }
     }
 }

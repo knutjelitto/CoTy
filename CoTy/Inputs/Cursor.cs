@@ -30,10 +30,12 @@
             return input.source.Has(input.index);
         }
 
+#if false
         public static implicit operator T(Cursor<T> input)
         {
             return input.source[input.index];
         }
+#endif
 
         public override string ToString()
         {

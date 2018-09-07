@@ -1,8 +1,10 @@
-﻿namespace CoTy.Objects
+﻿using System.Numerics;
+
+namespace CoTy.Objects
 {
-    public partial class Integer : Cobject<long>, IComparable<Integer>, IOrdered<Integer>
+    public partial class Integer : Cobject<BigInteger>, IComparable<Integer>, IOrdered<Integer>
     {
-        private Integer(long value) : base(value)
+        private Integer(BigInteger value) : base(value)
         {
         }
 
@@ -13,7 +15,7 @@
 
         public static bool TryFrom(string str, out Integer value)
         {
-            if (long.TryParse(str, out var parsed))
+            if (BigInteger.TryParse(str, out var parsed))
             {
                 value = new Integer(parsed);
                 return true;

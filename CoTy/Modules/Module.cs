@@ -7,11 +7,15 @@ using CoTy.Objects;
 
 namespace CoTy.Modules
 {
-    public class Module
+    public class Module : AmScope
     {
+        protected Module(AmScope parent, string name) : base(parent, name)
+        {
+            Reflect(this);
+        }
+
         public void ImportInto(AmScope scope)
         {
-            Reflect(scope);
         }
 
         protected class BuiltinAttribute : Attribute

@@ -2,10 +2,14 @@
 using CoTy.Objects;
 
 // ReSharper disable UnusedMember.Local
+// ReSharper disable UnusedParameter.Local
 namespace CoTy.Modules
 {
     public class LanguageModule : Module
     {
+        public LanguageModule(AmScope parent) : base(parent, "language")
+        {
+        }
 
         [Builtin("exec")]
         private static void Execute(IContext context, AmStack stack)
@@ -48,27 +52,6 @@ namespace CoTy.Modules
             else
             {
                 ifElse.Execute(context, stack);
-            }
-        }
-
-        [Builtin("reduce")]
-        private static void Reduce(IContext context, AmStack stack)
-        {
-            var operation = stack.Pop();
-            var values = stack.Pop();
-
-            var first = true;
-            foreach (var value in values)
-            {
-                stack.Push(value);
-                if (!first)
-                {
-                    operation.Execute(context, stack);
-                }
-                else
-                {
-                    first = false;
-                }
             }
         }
     }

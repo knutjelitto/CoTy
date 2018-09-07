@@ -46,12 +46,12 @@ namespace CoTy.Ambiance
             {
                 if (binding.Scope == this)
                 {
-                    throw new BinderException($"ill: symbol `{symbol}´ already defined in current scope");
+                    throw new BinderException($"`{symbol}´ already defined in current scope");
                 }
 
                 if (binding.IsOpaque)
                 {
-                    throw new BinderException($"ill: symbol `{symbol}´ is marked as opaque and can't be redefined");
+                    throw new BinderException($"`{symbol}´ is marked as opaque and can't be redefined");
                 }
             }
 
@@ -65,12 +65,12 @@ namespace CoTy.Ambiance
 
             if (binding.IsOpaque)
             {
-                throw new BinderException($"ill: symbol `{symbol}´ is marked as opaque and can't be removed");
+                throw new BinderException($"`{symbol}´ is marked as opaque and can't be removed");
             }
 
             if (binding.IsSealed)
             {
-                throw new BinderException($"ill: symbol `{symbol}´ is marked as sealed and can't be removed");
+                throw new BinderException($"`{symbol}´ is marked as sealed and can't be removed");
             }
 
             binding.Scope.definitions.Remove(symbol);
@@ -82,7 +82,7 @@ namespace CoTy.Ambiance
 
             if (binding.IsSealed)
             {
-                throw new BinderException($"ill: symbol `{symbol}´ is marked as sealed and can't be updated");
+                throw new BinderException($"`{symbol}´ is marked as sealed and can't be updated");
             }
 
             binding.Value = value;
@@ -97,7 +97,7 @@ namespace CoTy.Ambiance
         {
             if (!TryFind(symbol, out var binding))
             {
-                throw new BinderException($"ill: symbol `{symbol}´ isn't defined in any scope");
+                throw new BinderException($"`{symbol}´ isn't defined in any scope");
             }
 
             return binding;

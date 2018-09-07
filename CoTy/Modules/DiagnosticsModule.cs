@@ -3,10 +3,16 @@ using System.Threading;
 using CoTy.Ambiance;
 using CoTy.Objects;
 
+// ReSharper disable UnusedMember.Local
+// ReSharper disable UnusedParameter.Local
 namespace CoTy.Modules
 {
     public class DiagnosticsModule : Module
     {
+        public DiagnosticsModule(AmScope parent) : base(parent, "diagnostics")
+        {
+        }
+
         [Builtin("ds")]
         private static void DumpScope(IContext context, AmStack stack)
         {

@@ -1,10 +1,16 @@
 ﻿using CoTy.Ambiance;
 using CoTy.Objects;
 
+// ReSharper disable UnusedMember.Local
+// ReSharper disable UnusedParameter.Local
 namespace CoTy.Modules
 {
     public class BoolModule : Module
     {
+        public BoolModule(AmScope parent) : base(parent, "bool")
+        {
+        }
+
         [Builtin("bool?", InArity = 1)]
         private static void IsBool(IContext context, AmStack stack)
         {

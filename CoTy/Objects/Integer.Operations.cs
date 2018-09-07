@@ -56,7 +56,7 @@ namespace CoTy.Objects
 
         // equality
 
-        public Bool Equal(Integer other)
+        public Bool Equals(Integer other)
         {
             return Value == other.Value;
         }
