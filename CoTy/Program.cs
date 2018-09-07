@@ -18,13 +18,13 @@ namespace CoTy
         {
             var rootLexical = MakeRootFrame();
             var testLexical = WithTest(rootLexical);
-            var rootActivation = new AmScope(null, "prompt");
-            var testActivation = new AmScope(null, "test");
+            var rootActivation = new AmScope(rootLexical, "prompt");
+            var testActivation = new AmScope(testLexical, "test");
             var stack = new AmStack();
 
-            Execute(MakeParser(Read("tests")).Parse(testLexical), new AmContext(testLexical, testActivation), stack);
-            Execute(MakeParser(Read("startup")).Parse(rootLexical), new AmContext(rootLexical, rootActivation), stack);
-            Execute(MakeParser(new ConsoleInput(stack.Dump)).Parse(rootLexical), new AmContext(rootLexical, rootActivation), stack);
+            //Execute(MakeParser(Read("tests")).Parse(testLexical), testActivation, stack);
+            Execute(MakeParser(Read("startup")).Parse(rootLexical), rootActivation, stack);
+            Execute(MakeParser(new ConsoleInput(stack.Dump)).Parse(rootLexical), rootActivation, stack);
         }
 
         private static void Execute(IEnumerable<Cobject> stream, IContext context, AmStack stack)

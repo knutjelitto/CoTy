@@ -6,7 +6,7 @@ using CoTy.Objects;
 
 namespace CoTy.Ambiance
 {
-    public class AmScope
+    public class AmScope : IContext
     {
         private readonly Dictionary<Symbol, Binding> definitions = new Dictionary<Symbol, Binding>();
 
@@ -17,6 +17,13 @@ namespace CoTy.Ambiance
         }
 
         public IEnumerable<Symbol> Symbols => this.definitions.Keys.OrderBy(k => k.Value);
+
+        public AmScope Scope => this;
+
+        public IContext WithLocal()
+        {
+            return new AmScope(this, "local");
+        }
 
         public bool IsDefined(Symbol symbol)
         {

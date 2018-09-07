@@ -20,7 +20,7 @@ namespace CoTy.Modules
                 }
             }
 
-            stack.Push(new Quotation(context.Lexical, Enumerate(stack.Pop2()).ToList()));
+            stack.Push(new Quotation(context, Enumerate(stack.Pop2()).ToList()));
         }
 
         [Builtin("count")]

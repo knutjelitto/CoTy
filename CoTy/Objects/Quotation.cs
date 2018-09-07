@@ -6,18 +6,18 @@ namespace CoTy.Objects
 {
     public partial class Quotation : Cobject<IEnumerable<Cobject>>
     {
-        public Quotation(AmScope lexical, params Cobject[] objs)
+        public Quotation(IContext lexical, params Cobject[] objs)
             : this(lexical, (IEnumerable<Cobject>)objs)
         {
         }
 
-        public Quotation(AmScope lexical, IEnumerable<Cobject> objs)
+        public Quotation(IContext lexical, IEnumerable<Cobject> objs)
             : base(objs)
         {
             Lexical = lexical;
         }
 
-        private AmScope Lexical { get; }
+        private IContext Lexical { get; }
 
         public bool TryGetQuotedSymbol(out Symbol symbol)
         {
@@ -33,7 +33,7 @@ namespace CoTy.Objects
 
         public override void Execute(IContext context, AmStack stack)
         {
-            context = context.WithLocal();
+            context = Lexical.WithLocal();
             foreach (var value in this)
             {
                 value.Eval(context, stack);

@@ -7,7 +7,7 @@ using CoTy.Objects;
 
 namespace CoTy.Ambiance
 {
-    public struct AmContext : IContext
+    public struct AmContext
     {
         public AmContext(AmScope lexical, AmScope local)
         {
@@ -76,26 +76,6 @@ namespace CoTy.Ambiance
             {
                 Lexical.Update(symbol, value);
             }
-        }
-
-        public IContext WithLexical(AmScope lexicalContext)
-        {
-            return new AmContext(lexicalContext, Local);
-        }
-
-        public IContext WithLexical()
-        {
-            return WithLexical(new AmScope(Lexical, "lexical"));
-        }
-
-        public IContext WithLocal(AmScope localScope)
-        {
-            return new AmContext(Lexical, localScope);
-        }
-
-        public IContext WithLocal()
-        {
-            return WithLocal(new AmScope(null, "local"));
         }
     }
 }

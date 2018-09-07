@@ -47,7 +47,7 @@ namespace CoTy.Inputs
                     throw new ParserException($"ill: dangling {Symbol.Quoter} at end of input");
                 }
 
-                return new Quotation(lexical, ParseObject(lexical, current));
+                return new QuotationLiteral(ParseObject(lexical, current));
             }
 
             var @object = current.Item;
@@ -71,7 +71,7 @@ namespace CoTy.Inputs
                 }
             }
 
-            var quotation = new Quotation(lexicalScope, Loop(lexicalScope).ToList());
+            var quotation = new QuotationLiteral(Loop(lexicalScope).ToList());
 
             if (!current)
             {

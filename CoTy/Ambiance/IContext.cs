@@ -8,6 +8,7 @@ namespace CoTy.Ambiance
 {
     public interface IContext
     {
+#if false
         AmScope Local { get; }
         AmScope Lexical { get; }
 
@@ -16,6 +17,9 @@ namespace CoTy.Ambiance
 
         IContext WithLocal();
         IContext WithLexical();
+#endif
+        IContext WithLocal();
+        AmScope Scope { get; }
 
         bool IsDefined(Symbol symbol);
         bool CanDefine(Symbol symbol);

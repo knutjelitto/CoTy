@@ -10,6 +10,15 @@ namespace CoTy.Modules
         [Builtin("ds")]
         private static void DumpScope(IContext context, AmStack stack)
         {
+#if true
+            var scope = context.Scope;
+            while (scope != null)
+            {
+                var syms = scope.Name + "{" + string.Join(" ", scope.Symbols) + "}";
+                Console.WriteLine(syms);
+                scope = scope.Parent;
+            }
+#else
             Console.WriteLine("===lexical===");
             var lexical = context.Lexical;
             while (lexical != null)
@@ -26,6 +35,7 @@ namespace CoTy.Modules
                 Console.WriteLine(syms);
                 local = local.Parent;
             }
+#endif
         }
     }
 }

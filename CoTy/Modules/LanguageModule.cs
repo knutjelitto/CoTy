@@ -18,7 +18,7 @@ namespace CoTy.Modules
         private static void Quote(IContext context, AmStack stack)
         {
             var value = stack.Pop();
-            var quotation = new Quotation(context.Lexical, value);
+            var quotation = new Quotation(context, value);
             stack.Push(quotation);
         }
 
