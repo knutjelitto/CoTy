@@ -4,16 +4,27 @@ using System.Collections.Generic;
 
 namespace CoTy.Inputs
 {
-    public class ConsoleInput : IEnumerable<char>
+    public class ConsoleStream : ItemStream<char>
     {
         private readonly Action beforePrompt;
+        private int nesting = 0;
 
-        public ConsoleInput(Action beforePrompt = null)
+        public ConsoleStream(Action beforePrompt = null)
         {
             this.beforePrompt = beforePrompt ?? (() => { });
         }
 
-        public IEnumerator<char> GetEnumerator()
+        public override void OpenLevel()
+        {
+            this.nesting = this.nesting + 1;
+        }
+
+        public override void CloseLevel()
+        {
+            this.nesting = Math.Max(0, this.nesting - 1);
+        }
+
+        public override IEnumerator<char> GetEnumerator()
         {
             string line;
             while ((line = GetLine()) != null)
@@ -31,14 +42,9 @@ namespace CoTy.Inputs
             if (!Console.IsInputRedirected)
             {
                 this.beforePrompt();
-                Console.Write("->");
+                Console.Write($"{new string('-', this.nesting + 1)}>");
             }
             return Console.ReadLine();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
     }
 }

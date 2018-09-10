@@ -1,28 +1,29 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
 using CoTy.Ambiance;
 
 namespace CoTy.Objects
 {
-    public partial class Quotation : Cobject<IEnumerable<Cobject>>
+    public partial class Sequence : Cobject<IEnumerable<Cobject>, Sequence>
     {
-        public Quotation(IContext lexical, params Cobject[] objs)
-            : this(lexical, (IEnumerable<Cobject>)objs)
+        public Sequence(params Cobject[] objs)
+            : this((IEnumerable<Cobject>)objs)
         {
         }
 
-        public Quotation(IContext lexical, IEnumerable<Cobject> objs)
+        public Sequence(IEnumerable<Cobject> objs)
             : base(objs)
         {
-            Lexical = lexical;
         }
 
-        private IContext Lexical { get; }
+        public override void Close(AmScope context, AmStack stack)
+        {
+            stack.Push(new Closure(context, Value));
+        }
 
         public bool TryGetQuotedSymbol(out Symbol symbol)
         {
-            if (this.SingleOrDefault() is Symbol soleSymbol)
+            if (this.FirstOrDefault() is Symbol soleSymbol)
             {
                 symbol = soleSymbol;
                 return true;
@@ -30,15 +31,6 @@ namespace CoTy.Objects
 
             symbol = null;
             return false;
-        }
-
-        public override void Execute(IContext context, AmStack stack)
-        {
-            context = Lexical.WithLocal();
-            foreach (var value in this)
-            {
-                value.Eval(context, stack);
-            }
         }
 
         public override IEnumerator<Cobject> GetEnumerator()

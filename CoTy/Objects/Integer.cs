@@ -2,7 +2,7 @@
 
 namespace CoTy.Objects
 {
-    public partial class Integer : Cobject<BigInteger>, IOrdered<Integer>
+    public partial class Integer : Cobject<BigInteger, Integer>, IOrdered<Integer>
     {
         public static Integer Zero = new Integer(BigInteger.Zero);
         public static Integer One = new Integer(BigInteger.One);
@@ -25,16 +25,6 @@ namespace CoTy.Objects
             }
             value = null;
             return false;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is Integer other && Value.Equals(other.Value);
-        }
-
-        public override int GetHashCode()
-        {
-            return Value.GetHashCode();
         }
 
         public override string ToString()

@@ -1,4 +1,7 @@
-﻿using CoTy.Ambiance;
+﻿using System;
+using System.IO;
+
+using CoTy.Ambiance;
 using CoTy.Objects;
 
 // ReSharper disable UnusedMember.Local
@@ -11,23 +14,15 @@ namespace CoTy.Modules
         {
         }
 
-        [Builtin("exec")]
-        private static void Execute(IContext context, AmStack stack)
+        [Builtin("apply")]
+        private static void Apply(AmScope context, AmStack stack)
         {
             var value = stack.Pop();
-            value.Execute(context, stack);
-        }
-
-        [Builtin("quote")]
-        private static void Quote(IContext context, AmStack stack)
-        {
-            var value = stack.Pop();
-            var quotation = new Quotation(context, value);
-            stack.Push(quotation);
+            value.Apply(context, stack);
         }
 
         [Builtin("dequote")]
-        private static void DeQuote(IContext context, AmStack stack)
+        private static void DeQuote(AmScope context, AmStack stack)
         {
             foreach (var value in stack.Pop())
             {
@@ -36,43 +31,37 @@ namespace CoTy.Modules
         }
 
         [Builtin("if")]
-        private static void If(IContext context, AmStack stack)
+        private static void If(AmScope context, AmStack stack)
         {
             var ifElse = stack.Pop();
             var ifTrue = stack.Pop();
             var condition = stack.Pop();
 
-            condition.Execute(context, stack);
+            condition.Apply(context, stack);
             var result = stack.Pop();
 
             if (result is Bool boolean && boolean.Value)
             {
-                ifTrue.Execute(context, stack);
+                ifTrue.Apply(context, stack);
             }
             else
             {
-                ifElse.Execute(context, stack);
+                ifElse.Apply(context, stack);
             }
         }
 
-        [Builtin("try")]
-        private static void Try(IContext context, AmStack stack)
+        [Builtin("load-module", "lm", InArity = 1)]
+        private static void LoadModule(AmScope context, AmStack stack)
         {
-            var ifElse = stack.Pop();
-            var ifTrue = stack.Pop();
-            var condition = stack.Pop();
+            Module.Load(context, stack, ".comy");
+        }
 
-            condition.Execute(context, stack);
-            var result = stack.Pop();
+        [Builtin("curry", IsOpaque = false)]  // a quot1 ⇒ quot2
+        private static void Curry(AmScope context, AmStack stack)
+        {
+            var p = stack.Pop2();
 
-            if (result is Bool boolean && boolean.Value)
-            {
-                ifTrue.Execute(context, stack);
-            }
-            else
-            {
-                ifElse.Execute(context, stack);
-            }
+            stack.Push(new Closure(context, p.x, p.y, Symbol.ApplySym));
         }
     }
 }

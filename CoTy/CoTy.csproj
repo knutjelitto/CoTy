@@ -20,4 +20,10 @@
     <Folder Include="Types\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Modules\testing.comy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

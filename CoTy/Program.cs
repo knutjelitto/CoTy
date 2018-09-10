@@ -21,15 +21,15 @@ namespace CoTy
             var testActivation = new AmScope(testLexical, "test");
             var stack = new AmStack();
 
-            Execute(MakeParser(Read("tests")), testActivation, stack);
-            Execute(MakeParser(Read("startup")), rootActivation, stack);
+            Execute(MakeParser(new StringStream(Read("tests"))), testActivation, stack);
+            Execute(MakeParser(new StringStream(Read("startup"))), rootActivation, stack);
             while (true)
             {
-                Execute(MakeParser(new ConsoleInput(stack.Dump)), rootActivation, stack);
+                Execute(MakeParser(new ConsoleStream(stack.Dump)), rootActivation, stack);
             }
         }
 
-        private static bool Execute(IEnumerable<Cobject> stream, IContext context, AmStack stack)
+        private static void Execute(IEnumerable<Cobject> stream, AmScope context, AmStack stack)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace CoTy
                 { 
                     try
                     {
-                        value.Eval(context, stack);
+                        value.Close(context, stack);
                     }
                     catch (ScopeException scopeEx)
                     {
@@ -56,8 +56,6 @@ namespace CoTy
                         Console.WriteLine($"{typeEx.Message}");
                     }
                 }
-
-                return true;
             }
             catch (ScannerException scannerEx)
             {
@@ -67,8 +65,6 @@ namespace CoTy
             {
                 Console.WriteLine($"{parserEx.Message}");
             }
-
-            return false;
         }
 
         private static AmScope MakeRootFrame()
@@ -88,10 +84,10 @@ namespace CoTy
 
         private static AmScope WithTest(AmScope rootLexical)
         {
-            return new TestModule(rootLexical);
+            return new Testing(rootLexical);
         }
 
-        private static Parser MakeParser(IEnumerable<char> input)
+        private static Parser MakeParser(ItemStream<char> input)
         {
             var source = new CharSource(input);
             var scanner = new Scanner(source);

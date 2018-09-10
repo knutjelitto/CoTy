@@ -4,7 +4,7 @@ using CoTy.Ambiance;
 
 namespace CoTy.Objects
 {
-    public class Symbol : Cobject<string>
+    public class Symbol : Cobject<string, Symbol>
     {
         private static readonly Dictionary<string, Symbol> symbols = new Dictionary<string, Symbol>();
 
@@ -16,6 +16,7 @@ namespace CoTy.Objects
         public static readonly Symbol RightParent = Get(")");
         public static readonly Symbol Define = Get("def");
         public static readonly Symbol Set = Get("set");
+        public static readonly Symbol ApplySym = Get("apply");
 
         private readonly int hashCode;
 
@@ -35,11 +36,11 @@ namespace CoTy.Objects
             return symbol;
         }
 
-        public override void Eval(IContext context, AmStack stack)
+        public override void Close(AmScope context, AmStack stack)
         {
             context.Get(this, out var value);
 
-            value.Execute(context, stack);
+            value.Apply(context, stack);
         }
 
         public override int GetHashCode() => this.hashCode;

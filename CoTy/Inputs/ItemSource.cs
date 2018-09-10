@@ -4,19 +4,29 @@ namespace CoTy.Inputs
 {
     public abstract class ItemSource<TItem>
     {
-        private readonly IEnumerable<TItem> itemSource;
+        private readonly ItemStream<TItem> itemStream;
         private readonly IEnumerator<TItem> itemIterator;
         private readonly List<TItem> items = new List<TItem>();
         private bool done;
 
-        public ItemSource(IEnumerable<TItem> itemSource)
+        public ItemSource(ItemStream<TItem> itemStream)
         {
-            this.itemSource = itemSource;
-            this.itemIterator = this.itemSource.GetEnumerator();
+            this.itemStream = itemStream;
+            this.itemIterator = this.itemStream.GetEnumerator();
             this.done = false;
         }
 
         protected abstract TItem EndOfItems { get; }
+
+        public void OpenLevel()
+        {
+            this.itemStream.OpenLevel();
+        }
+
+        public void CloseLevel()
+        {
+            this.itemStream.CloseLevel();
+        }
 
         public TItem this[int index]
         {

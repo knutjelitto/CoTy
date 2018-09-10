@@ -4,25 +4,18 @@ using System;
 
 namespace CoTy.Objects
 {
-    public partial class Chars : IOrdered<Chars>
+    public partial class Characters
     {
-        // equality
-
-        public Bool Equals(Chars other)
-        {
-            return Bool.From(Value == other.Value);
-        }
-
         // ordering
 
-        public Bool Less(Chars other)
+        public Bool Less(Characters other)
         {
             return Bool.From(string.Compare(Value, other.Value, StringComparison.Ordinal) < 0);
         }
 
-        public Chars Concatenate(Chars other)
+        public Characters Concatenate(Characters other)
         {
-            return new Chars(Value + other.Value);
+            return new Characters(Value + other.Value);
         }
 
         public Cobject Concatenate(dynamic other)

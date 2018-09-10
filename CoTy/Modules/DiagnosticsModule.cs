@@ -14,7 +14,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("ds")]
-        private static void DumpScope(IContext context, AmStack stack)
+        private static void DumpScope(AmScope context, AmStack stack)
         {
 #if true
             var scope = context.Scope;
@@ -22,7 +22,7 @@ namespace CoTy.Modules
             {
                 var syms = scope.Name + "{" + string.Join(" ", scope.Symbols) + "}";
                 Console.WriteLine(syms);
-                scope = scope.Parent;
+                scope = (AmScope)scope.Parent;
             }
 #else
             Console.WriteLine("===lexical===");

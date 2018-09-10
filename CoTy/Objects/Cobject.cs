@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq.Expressions;
+
 using CoTy.Ambiance;
 using CoTy.Errors;
 
@@ -9,14 +9,14 @@ namespace CoTy.Objects
 {
     public abstract partial class Cobject : DynamicObject, IEnumerable<Cobject>
     {
-        public virtual void Eval(IContext context, AmStack stack)
+        public virtual void Close(AmScope context, AmStack stack)
         {
             stack.Push(this);
         }
 
-        public virtual void Execute(IContext context, AmStack stack)
+        public virtual void Apply(AmScope context, AmStack stack)
         {
-            Eval(context, stack);
+            Close(context, stack);
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
@@ -32,7 +32,8 @@ namespace CoTy.Objects
         }
     }
 
-    public abstract class Cobject<TClr> : Cobject
+    public abstract class Cobject<TClr, TCoty> : Cobject
+        where TCoty : Cobject<TClr, TCoty>
     {
         protected Cobject(TClr value)
         {
@@ -40,6 +41,16 @@ namespace CoTy.Objects
         }
 
         public TClr Value { get; }
+
+        public override bool Equals(object obj)
+        {
+            return obj is TCoty other && Value.Equals(other.Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
+        }
 
         public override IEnumerator<Cobject> GetEnumerator()
         {

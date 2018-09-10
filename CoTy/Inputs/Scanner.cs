@@ -8,7 +8,7 @@ using CoTy.Errors;
 
 namespace CoTy.Inputs
 {
-    public class Scanner : IEnumerable<Cobject>
+    public class Scanner : ItemStream<Cobject>
     {
         private readonly CharSource source;
 
@@ -17,7 +17,17 @@ namespace CoTy.Inputs
             this.source = source;
         }
 
-        public IEnumerator<Cobject> GetEnumerator()
+        public override void OpenLevel()
+        {
+            this.source.OpenLevel();
+        }
+
+        public override void CloseLevel()
+        {
+            this.source.CloseLevel();
+        }
+
+        public override IEnumerator<Cobject> GetEnumerator()
         {
             var current = new Cursor<char>(this.source);
 
@@ -47,7 +57,7 @@ namespace CoTy.Inputs
                         {
                             current.Advance();
                             ScanRestrictedSymbol(":", current, out var restrictedSymbol);
-                            yield return new QuotationLiteral(restrictedSymbol);
+                            yield return new Sequence(restrictedSymbol);
                             yield return Symbol.Define;
                             break;
                         }
@@ -57,7 +67,7 @@ namespace CoTy.Inputs
                         {
                             current.Advance();
                             ScanRestrictedSymbol("!", current, out var restrictedSymbol);
-                            yield return new QuotationLiteral(restrictedSymbol);
+                            yield return new Sequence(restrictedSymbol);
                             yield return Symbol.Set;
                             break;
                         }
@@ -161,7 +171,7 @@ namespace CoTy.Inputs
             return current;
         }
 
-        private Chars ScanString(ref Cursor<char> current)
+        private Characters ScanString(ref Cursor<char> current)
         { 
             Debug.Assert(current.Item == '"');
 
@@ -186,7 +196,7 @@ namespace CoTy.Inputs
                 throw new ScannerException("EOT in string literal");
             }
             current = current.Next;
-            return new Chars(accu.ToString());
+            return new Characters(accu.ToString());
         }
 
         private string ScanGrumble(ref Cursor<char> current)
@@ -212,11 +222,6 @@ namespace CoTy.Inputs
                 return integer;
             }
             return Symbol.Get(grumble);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
     }
 }

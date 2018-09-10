@@ -13,8 +13,24 @@ namespace CoTy.Modules
         {
         }
 
+        [Builtin("upup")]
+        private static void UpUp(AmScope context, AmStack stack)
+        {
+            IEnumerable<Cobject> Loop(dynamic from)
+            {
+                while (true)
+                {
+                    yield return from;
+
+                    from = from.Succ();
+                }
+            }
+
+            stack.Push(new Sequence(Loop(stack.Popd())));
+        }
+
         [Builtin("upto")]
-        private static void Upto(IContext context, AmStack stack)
+        private static void Upto(AmScope context, AmStack stack)
         {
             IEnumerable<Cobject> Enumerate((dynamic from, dynamic upto) r)
             {
@@ -26,17 +42,17 @@ namespace CoTy.Modules
                 }
             }
 
-            stack.Push(new Quotation(context, Enumerate(stack.Pop2()).ToList()));
+            stack.Push(new Closure(context, Enumerate(stack.Pop2()).ToList()));
         }
 
         [Builtin("count")]
-        private static void Count(IContext context, AmStack stack)
+        private static void Count(AmScope context, AmStack stack)
         {
             stack.Push(Integer.From(stack.Pop().Count()));
         }
 
         [Builtin("reduce")]
-        private static void Reduce(IContext context, AmStack stack)
+        private static void Reduce(AmScope context, AmStack stack)
         {
             var p = stack.Pop2();
 
@@ -46,7 +62,7 @@ namespace CoTy.Modules
                 stack.Push(value);
                 if (!first)
                 {
-                    p.y.Execute(context, stack);
+                    p.y.Apply(context, stack);
                 }
                 else
                 {
@@ -56,34 +72,34 @@ namespace CoTy.Modules
         }
 
         [Builtin("map")]
-        private static void Map(IContext context, AmStack stack)
+        private static void Map(AmScope context, AmStack stack)
         {
             var p = stack.Pop2();
 
             Cobject Eval(Cobject value)
             {
                 stack.Push(value);
-                p.y.Execute(context, stack);
+                p.y.Apply(context, stack);
                 return stack.Pop();
             }
 
-            stack.Push(new Quotation(context, p.x.Select(Eval)));
+            stack.Push(new Closure(context, p.x.Select(Eval)));
         }
 
         [Builtin("each")]
-        private static void Each(IContext context, AmStack stack)
+        private static void Each(AmScope context, AmStack stack)
         {
             var p = stack.Pop2();
 
             foreach (var value in p.x)
             {
                 stack.Push(value);
-                p.y.Execute(context, stack);
+                p.y.Apply(context, stack);
             }
         }
 
         [Builtin("times")]
-        private static void Times(IContext context, AmStack stack)
+        private static void Times(AmScope context, AmStack stack)
         {
             IEnumerable<Cobject> Loop(Cobject value, dynamic count)
             {
@@ -97,7 +113,7 @@ namespace CoTy.Modules
 
             var p = stack.Pop2();
 
-            stack.Push(new Quotation(context, Loop(p.x, p.y)));
+            stack.Push(new Closure(context, Loop(p.x, p.y)));
         }
     }
 }

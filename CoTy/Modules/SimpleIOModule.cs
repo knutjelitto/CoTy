@@ -14,23 +14,19 @@ namespace CoTy.Modules
         }
 
         [Builtin("print")]
-        private static void Print(IContext context, AmStack stack)
+        private static void Print(AmScope context, AmStack stack)
         {
-            var value = stack.Pop();
-
-            Console.Write($"{value}");
+            stack.Popd().Print();
         }
 
-        [Builtin("printnl")]
-        private static void PrintNl(IContext context, AmStack stack)
+        [Builtin("println")]
+        private static void Println(AmScope context, AmStack stack)
         {
-            var value = stack.Pop();
-
-            Console.WriteLine($"{value}");
+            stack.Popd().Println();
         }
 
         [Builtin("newline")]
-        private static void Newline(IContext context, AmStack stack)
+        private static void Newline(AmScope context, AmStack stack)
         {
             Console.WriteLine();
         }

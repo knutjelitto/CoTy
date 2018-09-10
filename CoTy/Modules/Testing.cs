@@ -6,16 +6,16 @@ using CoTy.Objects;
 // ReSharper disable UnusedParameter.Local
 namespace CoTy.Modules
 {
-    public class TestModule : Module
+    public class Testing : Module
     {
-        public TestModule(AmScope parent) : base(parent, "test")
+        public Testing(AmScope parent) : base(parent, "test")
         {
         }
 
-        private static void Outcome(dynamic expected, IContext context, AmStack stack)
+        private static void Outcome(dynamic expected, AmScope context, AmStack stack)
         {
             var actualQuot = stack.Pop();
-            actualQuot.Execute(context, stack);
+            actualQuot.Apply(context, stack);
             var actual = (dynamic)stack.Pop();
 
             var equals = (Bool)actual.Equals(expected);
@@ -27,27 +27,38 @@ namespace CoTy.Modules
         }
 
         [Builtin("assert")]
-        private static void Assert(IContext context, AmStack stack)
+        private static void Assert(AmScope context, AmStack stack)
         {
             var expectedQuot = stack.Pop();
-            expectedQuot.Execute(context, stack);
+            expectedQuot.Apply(context, stack);
             var expected = (dynamic) stack.Pop();
 
             Outcome(expected, context, stack);
         }
 
         [Builtin("assert-true")]
-        private static void IsTrue(IContext context, AmStack stack)
+        private static void IsTrue(AmScope context, AmStack stack)
         {
             var expected = Bool.True;
             Outcome(expected, context, stack);
         }
 
         [Builtin("assert-false")]
-        private static void IsFalse(IContext context, AmStack stack)
+        private static void IsFalse(AmScope context, AmStack stack)
         {
             var expected = Bool.False;
             Outcome(expected, context, stack);
+        }
+
+        [Builtin("test")]
+        private static void Test(AmScope context, AmStack stack)
+        {
+            var p = stack.Pop2();
+            Console.WriteLine($"{p.x}");
+            foreach (var quotation in p.y)
+            {
+                quotation.Close(context, stack);
+            }
         }
     }
 }

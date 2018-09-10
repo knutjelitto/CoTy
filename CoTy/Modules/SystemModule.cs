@@ -14,7 +14,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("exit")]
-        private static void Exit(IContext context, AmStack stack)
+        private static void Exit(AmScope context, AmStack stack)
         {
             Environment.Exit(12);
         }

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -8,7 +7,7 @@ using CoTy.Objects;
 
 namespace CoTy.Inputs
 {
-    public class Parser : IEnumerable<Cobject>
+    public class Parser : ItemStream<Cobject>
     {
         private readonly Scanner Scanner;
 
@@ -17,7 +16,7 @@ namespace CoTy.Inputs
             this.Scanner = scanner;
         }
 
-        public IEnumerator<Cobject> GetEnumerator()
+        public override IEnumerator<Cobject> GetEnumerator()
         {
             var current = new Cursor<Cobject>(new ObjectSource(this.Scanner));
 
@@ -48,7 +47,7 @@ namespace CoTy.Inputs
                     throw new ParserException($"dangling `{Symbol.Quoter}´ at end of input");
                 }
 
-                return new QuotationLiteral(ParseObject(current));
+                return new Sequence(ParseObject(current));
             }
 
             var @object = current.Item;
@@ -60,6 +59,7 @@ namespace CoTy.Inputs
         private Cobject ParseQuotation(Cursor<Cobject> current)
         {
             Debug.Assert(Equals(current.Item, Symbol.LeftParent));
+            this.Scanner.OpenLevel();
             current.Advance();
 
             IEnumerable<Cobject> Loop()
@@ -70,7 +70,7 @@ namespace CoTy.Inputs
                 }
             }
 
-            var quotation = new QuotationLiteral(Loop().ToList());
+            var quotation = new Sequence(Loop().ToList());
 
             if (!current)
             {
@@ -79,13 +79,9 @@ namespace CoTy.Inputs
 
             Debug.Assert(Equals(current.Item, Symbol.RightParent));
             current.Advance();
+            this.Scanner.CloseLevel();
 
             return quotation;
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
     }
 }

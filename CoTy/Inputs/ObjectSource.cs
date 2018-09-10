@@ -6,8 +6,8 @@ namespace CoTy.Inputs
 {
     public class ObjectSource : ItemSource<Cobject>
     {
-        public ObjectSource(IEnumerable<Cobject> objectSource)
-            : base(objectSource)
+        public ObjectSource(ItemStream<Cobject> objectStream)
+            : base(objectStream)
         {
         }
 

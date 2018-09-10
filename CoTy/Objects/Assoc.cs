@@ -2,7 +2,7 @@
 
 namespace CoTy.Objects
 {
-    public class Assoc : Cobject<Dictionary<Symbol, Cobject>>
+    public class Assoc : Cobject<Dictionary<Symbol, Cobject>, Assoc>
     {
         public Assoc()
             : base(new Dictionary<Symbol, Cobject>())

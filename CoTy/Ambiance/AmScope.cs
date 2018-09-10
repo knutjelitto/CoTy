@@ -6,7 +6,7 @@ using CoTy.Objects;
 
 namespace CoTy.Ambiance
 {
-    public class AmScope : IContext
+    public class AmScope
     {
         private readonly Dictionary<Symbol, Binding> definitions = new Dictionary<Symbol, Binding>();
 
@@ -20,9 +20,18 @@ namespace CoTy.Ambiance
 
         public AmScope Scope => this;
 
-        public IContext WithLocal()
+        public AmScope Pop(out AmScope popped)
         {
-            return new AmScope(this, "local");
+            var result = Parent;
+            Parent = null;
+            popped = this;
+            return result;
+        }
+
+        public AmScope Push(AmScope pushed)
+        {
+            pushed.Parent = this;
+            return pushed;
         }
 
         public bool IsDefined(Symbol symbol)
@@ -119,7 +128,7 @@ namespace CoTy.Ambiance
             return true;
         }
 
-        public AmScope Parent { get; }
+        public AmScope Parent { get; set; }
         public string Name { get; }
 
         public override string ToString()

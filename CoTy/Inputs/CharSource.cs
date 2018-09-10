@@ -7,8 +7,8 @@ namespace CoTy.Inputs
         private const char EOT = '\u0003';
         public const char NL = '\n';
 
-        public CharSource(IEnumerable<char> characterSource)
-            : base(characterSource)
+        public CharSource(ItemStream<char> characterStream)
+            : base(characterStream)
         {
         }
 

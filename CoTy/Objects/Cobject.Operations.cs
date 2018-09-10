@@ -1,5 +1,6 @@
 ﻿// ReSharper disable UnusedMember.Global
 
+using System;
 using CoTy.Errors;
 
 namespace CoTy.Objects
@@ -34,6 +35,17 @@ namespace CoTy.Objects
         public Bool GreaterOrEquals(dynamic other)
         {
             return ((dynamic)this).Greater(other) || ((dynamic)this).Equals(other);
+        }
+
+        public void Print()
+        {
+            Console.Write($"{this}");
+        }
+
+        public void Println()
+        {
+            Print();
+            Console.WriteLine();
         }
     }
 }

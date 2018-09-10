@@ -1,14 +1,14 @@
 ﻿namespace CoTy.Objects
 {
-    public partial class Chars : Cobject<string>
+    public partial class Characters : Cobject<string, Characters>, IOrdered<Characters>
     {
-        public Chars(string value) : base(value)
+        public Characters(string value) : base(value)
         {
         }
 
         public override bool Equals(object obj)
         {
-            return obj is Chars other && Value.Equals(other.Value);
+            return obj is Characters other && Value.Equals(other.Value);
         }
 
         public override int GetHashCode()
