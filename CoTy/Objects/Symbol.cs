@@ -15,6 +15,7 @@ namespace CoTy.Objects
         public static readonly Symbol LeftParent = Get("(");
         public static readonly Symbol RightParent = Get(")");
         public static readonly Symbol Define = Get("def");
+        public static readonly Symbol Set = Get("set");
 
         private readonly int hashCode;
 

@@ -52,6 +52,16 @@ namespace CoTy.Inputs
                             break;
                         }
                         goto default;
+                    case '!':
+                        if (MaybeRestrictedSymbol(current.Next))
+                        {
+                            current.Advance();
+                            ScanRestrictedSymbol("!", current, out var restrictedSymbol);
+                            yield return new QuotationLiteral(restrictedSymbol);
+                            yield return Symbol.Set;
+                            break;
+                        }
+                        goto default;
                     default:
                         yield return Classify(ScanGrumble(ref current));
                         break;

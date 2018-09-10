@@ -2,8 +2,11 @@
 
 namespace CoTy.Objects
 {
-    public partial class Integer : Cobject<BigInteger>, IComparable<Integer>, IOrdered<Integer>
+    public partial class Integer : Cobject<BigInteger>, IOrdered<Integer>
     {
+        public static Integer Zero = new Integer(BigInteger.Zero);
+        public static Integer One = new Integer(BigInteger.One);
+
         private Integer(BigInteger value) : base(value)
         {
         }

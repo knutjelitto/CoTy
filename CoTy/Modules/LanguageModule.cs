@@ -54,5 +54,25 @@ namespace CoTy.Modules
                 ifElse.Execute(context, stack);
             }
         }
+
+        [Builtin("try")]
+        private static void Try(IContext context, AmStack stack)
+        {
+            var ifElse = stack.Pop();
+            var ifTrue = stack.Pop();
+            var condition = stack.Pop();
+
+            condition.Execute(context, stack);
+            var result = stack.Pop();
+
+            if (result is Bool boolean && boolean.Value)
+            {
+                ifTrue.Execute(context, stack);
+            }
+            else
+            {
+                ifElse.Execute(context, stack);
+            }
+        }
     }
 }

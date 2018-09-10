@@ -67,7 +67,37 @@ namespace CoTy.Modules
                 return stack.Pop();
             }
 
-            stack.Push(new Quotation(context, p.x.Select(Eval))); 
+            stack.Push(new Quotation(context, p.x.Select(Eval)));
+        }
+
+        [Builtin("each")]
+        private static void Each(IContext context, AmStack stack)
+        {
+            var p = stack.Pop2();
+
+            foreach (var value in p.x)
+            {
+                stack.Push(value);
+                p.y.Execute(context, stack);
+            }
+        }
+
+        [Builtin("times")]
+        private static void Times(IContext context, AmStack stack)
+        {
+            IEnumerable<Cobject> Loop(Cobject value, dynamic count)
+            {
+                while (count.Greater(Integer.Zero))
+                {
+                    yield return value;
+
+                    count = count.Pred();
+                }
+            }
+
+            var p = stack.Pop2();
+
+            stack.Push(new Quotation(context, Loop(p.x, p.y)));
         }
     }
 }

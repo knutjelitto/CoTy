@@ -54,11 +54,11 @@ namespace CoTy.Objects
             return new Integer(Value - 1);
         }
 
-        // equality
+        // sequence
 
-        public Bool Equals(Integer other)
+        public Cobject Concatenate(dynamic other)
         {
-            return Value == other.Value;
+            return other.CoConcatenate(this);
         }
 
         // ordering

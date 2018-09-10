@@ -80,6 +80,7 @@ namespace CoTy
             root = new OperatorModule(root);
             root = new SequenceModule(root);
             root = new SystemModule(root);
+            root = new SimpleIOModule(root);
             root = new DiagnosticsModule(root);
 
             return root;

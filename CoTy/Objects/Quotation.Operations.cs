@@ -7,12 +7,12 @@ namespace CoTy.Objects
     {
         public Quotation Concatenate(Cobject other)
         {
-            return new Quotation(null, this.Concat(other));
+            return new Quotation(Lexical, this.Concat(other));
         }
 
         public Quotation CoConcatenate(Cobject other)
         {
-            return new Quotation(null, other.Concat(this));
+            return new Quotation(Lexical, other.Concat(this));
         }
     }
 }

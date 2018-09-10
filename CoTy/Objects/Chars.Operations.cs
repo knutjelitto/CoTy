@@ -4,7 +4,7 @@ using System;
 
 namespace CoTy.Objects
 {
-    public partial class Chars : IComparable<Chars>, IOrdered<Chars>
+    public partial class Chars : IOrdered<Chars>
     {
         // equality
 

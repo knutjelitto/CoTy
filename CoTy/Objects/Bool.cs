@@ -29,6 +29,16 @@
             return value ? True : False;
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is Bool other && Value.Equals(other.Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
+        }
+
         public override string ToString()
         {
             return Value ? Symbol.True.ToString() : Symbol.False.ToString();
