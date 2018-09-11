@@ -1,13 +1,40 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using CoTy.Ambiance;
+using System.Runtime.CompilerServices;
+
 using CoTy.Errors;
-using CoTy.Objects;
 
 namespace CoTy.Objects
 {
-    public class Context : Cobject<Dictionary<Symbol, Binding>, Context>
+    public class Context : Cobject<Dictionary<Symbol, Context.Binding>, Context>
     {
+        private class Ctx : Cobject<(Dictionary<Symbol, Binding> Dict, Stack Stack), Ctx>
+        {
+            public Ctx()
+                : this(new Dictionary<Symbol, Binding>(), new Stack())
+            {
+            }
+            private Ctx(Dictionary<Symbol, Binding> dict, Stack stack)
+                : base((dict, stack))
+            {
+            }
+
+            public Ctx WithStack(Stack stack)
+            {
+                return new Ctx(Value.Dict, stack);
+            }
+
+            public IEnumerable<object> Components()
+            {
+                var tuple = Value.ToTuple() as ITuple;
+                for (var i = 0; i < tuple.Length; ++i)
+                {
+                    yield return tuple[i];
+                }
+            }
+        }
+
         protected Context(Context parent, string name)
             : base(new Dictionary<Symbol, Binding>())
         {
@@ -55,7 +82,7 @@ namespace CoTy.Objects
         {
             if (TryFind(symbol, out var binding))
             {
-                if (binding.Scope == this)
+                if (Equals(binding.Scope, this))
                 {
                     throw new BinderException($"`{symbol}´ already defined in current scope");
                 }
@@ -66,7 +93,7 @@ namespace CoTy.Objects
                 }
             }
 
-            binding = new Binding(this, symbol, value, isSealed, isOpaque);
+            binding = new Binding(this, value, isSealed, isOpaque);
             Value.Add(symbol, binding);
         }
 
@@ -137,5 +164,22 @@ namespace CoTy.Objects
         {
             return Name + "{" + string.Join(" ", Symbols) + "}";
         }
+
+        public class Binding
+        {
+            public Binding(Context scope, Cobject value, bool isSealed, bool isOpaque)
+            {
+                Scope = scope;
+                Value = value;
+                IsSealed = isSealed;
+                IsOpaque = isOpaque;
+            }
+
+            public Context Scope { get; }
+            public Cobject Value { get; set; }
+            public bool IsSealed { get; }
+            public bool IsOpaque { get; }
+        }
+
     }
 }

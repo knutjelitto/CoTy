@@ -1,6 +1,5 @@
 ﻿using System;
 
-using CoTy.Ambiance;
 using CoTy.Objects;
 
 // ReSharper disable UnusedMember.Local
@@ -13,10 +12,12 @@ namespace CoTy.Modules
         {
         }
 
-        [Builtin("exit")]
-        private static void Exit(Context context, AmStack stack)
+        [Builtin("exit", InArity = 1)]
+        private static void Exit(Context context, Stack stack)
         {
-            Environment.Exit(12);
+            var exit = stack.Pop<Integer>();
+
+            Environment.Exit((int)exit.Value);
         }
     }
 }

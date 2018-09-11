@@ -1,5 +1,4 @@
-﻿using CoTy.Ambiance;
-using CoTy.Objects;
+﻿using CoTy.Objects;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
@@ -12,31 +11,31 @@ namespace CoTy.Modules
         }
 
         [Builtin("bool?", InArity = 1)]
-        private static void IsBool(Context context, AmStack stack)
+        private static void IsBool(Context context, Stack stack)
         {
             stack.Push(Bool.From(stack.Pop() is Bool));
         }
 
         [Builtin("true", InArity = 0)]
-        private static void True(Context context, AmStack stack)
+        private static void True(Context context, Stack stack)
         {
             stack.Push(Bool.True);
         }
 
         [Builtin("false", InArity = 0)]
-        private static void False(Context context, AmStack stack)
+        private static void False(Context context, Stack stack)
         {
             stack.Push(Bool.False);
         }
 
         [Builtin("not", InArity = 1)]
-        private static void Not(Context context, AmStack stack)
+        private static void Not(Context context, Stack stack)
         {
             stack.Push(stack.Pop<Bool>().Not());
         }
 
         [Builtin("and", InArity = 2)]
-        private static void And(Context context, AmStack stack)
+        private static void And(Context context, Stack stack)
         {
             var b2 = stack.Pop<Bool>();
             var b1 = stack.Pop<Bool>();
@@ -45,7 +44,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("or", InArity = 2)]
-        private static void Or(Context context, AmStack stack)
+        private static void Or(Context context, Stack stack)
         {
             var b2 = stack.Pop<Bool>();
             var b1 = stack.Pop<Bool>();

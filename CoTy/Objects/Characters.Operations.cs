@@ -13,14 +13,9 @@ namespace CoTy.Objects
             return Bool.From(string.Compare(Value, other.Value, StringComparison.Ordinal) < 0);
         }
 
-        public Characters Concatenate(Characters other)
+        public Cobject Concat(Characters chars1, Characters chars2)
         {
-            return new Characters(Value + other.Value);
-        }
-
-        public Cobject Concatenate(dynamic other)
-        {
-            return other.CoConcatenate(this);
+            return new Characters(chars1.Value + chars2.Value);
         }
     }
 }

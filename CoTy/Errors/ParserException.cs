@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace CoTy.Errors
+﻿namespace CoTy.Errors
 {
-    public class ParserException : ApplicationException
+    public class ParserException : CotyException
     {
         public ParserException(string message)
             : base(message)

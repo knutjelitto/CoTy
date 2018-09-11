@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace CoTy.Errors
+﻿namespace CoTy.Errors
 {
-    public class ScopeException : ApplicationException
+    public class ScopeException : CotyException
     {
         public ScopeException(string message)
             : base(message)

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CoTy.Ambiance;
+
 using CoTy.Objects;
 
 // ReSharper disable UnusedMember.Local
@@ -13,57 +13,60 @@ namespace CoTy.Modules
         {
         }
 
-        [Builtin("up")]
-        private static void Up(Context context, AmStack stack)
+        [Builtin("up", InArity = 1)]
+        private static void Up(Context context, Stack stack)
         {
-            stack.Push(Sequence.Up(stack.Popd()));
+            var from = stack.Popd();
+            
+            stack.Push(from.Up(from));
         }
 
-        [Builtin("upto")]
-        private static void Upto(Context context, AmStack stack)
+        [Builtin("upto", InArity = 2)]
+        private static void Upto(Context context, Stack stack)
         {
-            var p = stack.Pop2d();
+            var to = stack.Pop();
+            var from = stack.Popd();
 
-            stack.Push(Sequence.Upto(p.x, p.y));
+            stack.Push(from.Upto(from, to));
         }
 
-        [Builtin("take")]
-        private static void Take(Context context, AmStack stack)
+        [Builtin("take", InArity = 2)]
+        private static void Take(Context context, Stack stack)
         {
-            var p = stack.Pop2();
+            var count = stack.Pop();
+            var sequence = stack.Popd();
 
-            IEnumerable<Cobject> Loop()
-            {
-                var seq = p.x;
-                var cnt = (dynamic)p.y;
+            stack.Push(sequence.Take(sequence, count));
+        }
 
-                foreach (var value in seq)
-                {
-                    if (cnt.Greater(Integer.Zero))
-                    {
-                        yield return value;
+        [Builtin("skip", InArity = 2)]
+        private static void Skip(Context context, Stack stack)
+        {
+            var count = stack.Pop();
+            var sequence = stack.Popd();
 
-                        cnt = cnt.Pred();
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-            }
-
-            stack.Push(new Sequence(Loop()));
+            stack.Push(sequence.Skip(sequence, count));
         }
 
         [Builtin("count")]
-        private static void Count(Context context, AmStack stack)
+        private static void Count(Context context, Stack stack)
         {
-            stack.Push(Integer.From(stack.Pop().Count()));
+            var sequence = stack.Popd();
+
+            stack.Push(sequence.Count(sequence));
+        }
+
+        [Builtin("repeat", InArity = 2)]
+        private static void Repeat(Context context, Stack stack)
+        {
+            var count = stack.Pop();
+            var value = stack.Popd();
+
+            stack.Push(value.Repeat(value, count));
         }
 
         [Builtin("reduce")]
-        private static void Reduce(Context context, AmStack stack)
+        private static void Reduce(Context context, Stack stack)
         {
             var p = stack.Pop2();
 
@@ -83,7 +86,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("map")]
-        private static void Map(Context context, AmStack stack)
+        private static void Map(Context context, Stack stack)
         {
             var p = stack.Pop2();
 
@@ -94,11 +97,11 @@ namespace CoTy.Modules
                 return stack.Pop();
             }
 
-            stack.Push(new Closure(context, p.x.Select(Eval)));
+            stack.Push(new Sequence(p.x.Select(Eval)));
         }
 
         [Builtin("each")]
-        private static void Each(Context context, AmStack stack)
+        private static void Each(Context context, Stack stack)
         {
             var p = stack.Pop2();
 
@@ -107,24 +110,6 @@ namespace CoTy.Modules
                 stack.Push(value);
                 p.y.Apply(context, stack);
             }
-        }
-
-        [Builtin("times")]
-        private static void Times(Context context, AmStack stack)
-        {
-            IEnumerable<Cobject> Loop(Cobject value, dynamic count)
-            {
-                while (count.Greater(Integer.Zero))
-                {
-                    yield return value;
-
-                    count = count.Pred();
-                }
-            }
-
-            var p = stack.Pop2();
-
-            stack.Push(new Closure(context, Loop(p.x, p.y)));
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CoTy.Ambiance;
 
 // ReSharper disable RedundantAssignment
 namespace CoTy.Objects
@@ -19,7 +18,7 @@ namespace CoTy.Objects
 
         private Context Lexical { get; }
 
-        public override void Apply(Context context, AmStack stack)
+        public override void Apply(Context context, Stack stack)
         {
             var localContext = Lexical.Push("local");
             foreach (var value in this)

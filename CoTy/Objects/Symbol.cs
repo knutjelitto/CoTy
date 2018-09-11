@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 
-using CoTy.Ambiance;
-
 namespace CoTy.Objects
 {
     public class Symbol : Cobject<string, Symbol>
@@ -36,7 +34,7 @@ namespace CoTy.Objects
             return symbol;
         }
 
-        public override void Close(Context context, AmStack stack)
+        public override void Close(Context context, Stack stack)
         {
             context.Get(this, out var value);
 

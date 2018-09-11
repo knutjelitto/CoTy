@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace CoTy.Errors
+﻿namespace CoTy.Errors
 {
-    public class StackException : ApplicationException
+    public class StackException : CotyException
     {
         public StackException(int expected, int actual)
             : this($"stack underflow - expected at least {expected} arguments (got {actual})")

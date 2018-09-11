@@ -1,6 +1,4 @@
-﻿using CoTy.Ambiance;
-using CoTy.Errors;
-using CoTy.Objects;
+﻿using CoTy.Objects;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
@@ -13,7 +11,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("def")]
-        private static void Define(Context context, AmStack stack)
+        private static void Define(Context context, Stack stack)
         {
             var symbol = GetSymbol(stack.Pop());
             var value = stack.Pop();
@@ -22,7 +20,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("undef")]
-        private static void Undefine(Context context, AmStack stack)
+        private static void Undefine(Context context, Stack stack)
         {
             var symbol = GetSymbol(stack.Pop());
 
@@ -30,7 +28,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("set")]
-        private static void Set(Context context, AmStack stack)
+        private static void Set(Context context, Stack stack)
         {
             var symbol = GetSymbol(stack.Pop());
             var value = stack.Pop();
@@ -40,7 +38,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("def?")]
-        private static void DefinedPred(Context context, AmStack stack)
+        private static void DefinedPred(Context context, Stack stack)
         {
             if (TryGetSymbol(stack.Pop(), out var symbol))
             {
@@ -50,7 +48,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("value")]
-        private static void GetValue(Context context, AmStack stack)
+        private static void GetValue(Context context, Stack stack)
         {
             var symbol = GetSymbol(stack.Pop());
 

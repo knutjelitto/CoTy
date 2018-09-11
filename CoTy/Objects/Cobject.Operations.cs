@@ -1,6 +1,7 @@
 ﻿// ReSharper disable UnusedMember.Global
 
 using System;
+using System.Collections.Generic;
 using CoTy.Errors;
 
 namespace CoTy.Objects

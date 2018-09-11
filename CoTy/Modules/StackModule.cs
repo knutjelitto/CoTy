@@ -1,5 +1,4 @@
-﻿using CoTy.Ambiance;
-using CoTy.Objects;
+﻿using CoTy.Objects;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
@@ -11,33 +10,33 @@ namespace CoTy.Modules
         {
         }
 
-        [Builtin("clear-stack", "cs")]
-        private static void ClearStack(Context context, AmStack stack)
+        [Builtin("clear-stack", "cs", InArity = 0)]
+        private static void ClearStack(Context context, Stack stack)
         {
             stack.Clear();
         }
 
-        [Builtin("get-stack", "gs")]
-        private static void GetStack(Context context, AmStack stack)
+        [Builtin("get-stack", "gs", InArity = 0)]
+        private static void GetStack(Context context, Stack stack)
         {
             var quot = stack.Get();
             stack.Push(quot);
         }
 
-        [Builtin("drop")]
-        private static void Drop(Context context, AmStack stack)
+        [Builtin("drop", InArity = 1)]
+        private static void Drop(Context context, Stack stack)
         {
             stack.Pop();
         }
 
-        [Builtin("dup")]
-        private static void Dup(Context context, AmStack stack)
+        [Builtin("dup", InArity = 1)]
+        private static void Dup(Context context, Stack stack)
         {
             stack.Push(stack.Peek());
         }
 
-        [Builtin("swap")]
-        private static void Swap(Context context, AmStack stack)
+        [Builtin("swap", InArity = 2)]
+        private static void Swap(Context context, Stack stack)
         {
             var x2 = stack.Pop();
             var x1 = stack.Pop();

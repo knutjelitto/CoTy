@@ -1,6 +1,5 @@
 ﻿using System;
 
-using CoTy.Ambiance;
 using CoTy.Objects;
 
 // ReSharper disable UnusedMember.Local
@@ -13,20 +12,20 @@ namespace CoTy.Modules
         {
         }
 
-        [Builtin("print")]
-        private static void Print(Context context, AmStack stack)
+        [Builtin("print", InArity = 1)]
+        private static void Print(Context context, Stack stack)
         {
             stack.Popd().Print();
         }
 
-        [Builtin("println")]
-        private static void Println(Context context, AmStack stack)
+        [Builtin("println", InArity = 1)]
+        private static void Println(Context context, Stack stack)
         {
             stack.Popd().Println();
         }
 
-        [Builtin("newline")]
-        private static void Newline(Context context, AmStack stack)
+        [Builtin("newline", InArity = 0)]
+        private static void Newline(Context context, Stack stack)
         {
             Console.WriteLine();
         }

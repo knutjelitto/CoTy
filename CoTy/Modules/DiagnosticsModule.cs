@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using CoTy.Ambiance;
 using CoTy.Objects;
 
 // ReSharper disable UnusedMember.Local
@@ -14,7 +12,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("ds")]
-        private static void DumpScope(Context context, AmStack stack)
+        private static void DumpScope(Context context, Stack stack)
         {
 #if true
             var scope = context.Scope;

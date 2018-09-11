@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace CoTy.Errors
+﻿namespace CoTy.Errors
 {
-    public class ScannerException : ApplicationException
+    public class ScannerException : CotyException
     {
         public ScannerException(string message)
             : base(message)

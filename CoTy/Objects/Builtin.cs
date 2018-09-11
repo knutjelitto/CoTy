@@ -1,20 +1,18 @@
 ﻿using System;
 
-using CoTy.Ambiance;
-
 namespace CoTy.Objects
 {
-    public class Builtin : Cobject<Action<Context, AmStack>, Builtin>
+    public class Builtin : Cobject<Action<Context, Stack>, Builtin>
     {
-        private readonly Action<Context, AmStack> eval;
+        private readonly Action<Context, Stack> eval;
 
-        public Builtin(Action<Context, AmStack> eval)
+        public Builtin(Action<Context, Stack> eval)
             : base(eval)
         {
             this.eval = eval;
         }
 
-        public override void Close(Context context, AmStack stack)
+        public override void Close(Context context, Stack stack)
         {
             this.eval(context, stack);
         }

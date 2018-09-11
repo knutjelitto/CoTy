@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 
-using CoTy.Ambiance;
 using CoTy.Errors;
 using CoTy.Inputs;
 using CoTy.Objects;
@@ -18,14 +16,14 @@ namespace CoTy.Modules
         }
 
         [Builtin("apply")]
-        private static void DoApply(Context context, AmStack stack)
+        private static void DoApply(Context context, Stack stack)
         {
             var value = stack.Pop();
             value.Apply(context, stack);
         }
 
         [Builtin("dequote")]
-        private static void DeQuote(Context context, AmStack stack)
+        private static void DeQuote(Context context, Stack stack)
         {
             foreach (var value in stack.Pop())
             {
@@ -34,7 +32,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("if")]
-        private static void If(Context context, AmStack stack)
+        private static void If(Context context, Stack stack)
         {
             var ifElse = stack.Pop();
             var ifTrue = stack.Pop();
@@ -54,7 +52,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("curry", IsOpaque = false)]  // a quot1 ⇒ quot2
-        private static void Curry(Context context, AmStack stack)
+        private static void Curry(Context context, Stack stack)
         {
             var p = stack.Pop2();
 
@@ -62,7 +60,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("load", InArity = 1)]
-        private static void Load(Context context, AmStack stack)
+        private static void Load(Context context, Stack stack)
         {
             var symbol = GetSymbol(stack.Pop());
             var path = Path.Combine(Environment.CurrentDirectory, "Modules", symbol.ToString());
@@ -72,10 +70,12 @@ namespace CoTy.Modules
                 path = Path.ChangeExtension(Path.Combine(Environment.CurrentDirectory, "Modules", symbol.ToString()), ".coty");
             }
 
+            path = path.Replace("/", "\\");
+
             var content = File.ReadAllText(path);
 
             var localContext =  context.Push("load");
-            var localStack = new AmStack();
+            var localStack = new Stack();
 
             Execute(MakeParser(new StringStream(content)), localContext, localStack);
 
@@ -84,7 +84,7 @@ namespace CoTy.Modules
             context.Define(symbol, localContext);
         }
 
-        private static Parser MakeParser(ItemStream<char> input)
+        public static Parser MakeParser(ItemStream<char> input)
         {
             var source = new CharSource(input);
             var scanner = new Scanner(source);
@@ -93,7 +93,17 @@ namespace CoTy.Modules
             return parser;
         }
 
-        private static void Execute(IEnumerable<Cobject> stream, Context context, AmStack stack)
+        public static void Execute(string stream, Context context, Stack stack)
+        {
+            Execute(new StringStream(stream), context, stack);
+        }
+
+        public static void Execute(ItemStream<char> charStream, Context context, Stack stack)
+        {
+            Execute(MakeParser(charStream), context, stack);
+        }
+
+        public static void Execute(ItemStream<Cobject> stream, Context context, Stack stack)
         {
             try
             {
@@ -103,35 +113,16 @@ namespace CoTy.Modules
                     {
                         value.Close(context, stack);
                     }
-                    catch (ScopeException scopeEx)
+                    catch (CotyException cotyException)
                     {
-                        Console.WriteLine($"{scopeEx.Message}");
-                    }
-                    catch (StackException stackEx)
-                    {
-                        Console.WriteLine($"{stackEx.Message}");
-                    }
-                    catch (BinderException binderEx)
-                    {
-                        Console.WriteLine($"{binderEx.Message}");
-                    }
-                    catch (TypeMismatchException typeEx)
-                    {
-                        Console.WriteLine($"{typeEx.Message}");
+                        Console.WriteLine($"{cotyException.Message}");
                     }
                 }
             }
-            catch (ScannerException scannerEx)
+            catch (CotyException cotyException)
             {
-                Console.WriteLine($"{scannerEx.Message}");
-            }
-            catch (ParserException parserEx)
-            {
-                Console.WriteLine($"{parserEx.Message}");
+                Console.WriteLine($"{cotyException.Message}");
             }
         }
-
-
-
     }
 }

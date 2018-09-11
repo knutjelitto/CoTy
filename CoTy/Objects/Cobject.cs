@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using System.Dynamic;
 
-using CoTy.Ambiance;
 using CoTy.Errors;
 
 namespace CoTy.Objects
 {
     public abstract partial class Cobject : DynamicObject, IEnumerable<Cobject>
     {
-        public virtual void Close(Context context, AmStack stack)
+        public virtual void Close(Context context, Stack stack)
         {
             stack.Push(this);
         }
 
-        public virtual void Apply(Context context, AmStack stack)
+        public virtual void Apply(Context context, Stack stack)
         {
             Close(context, stack);
         }

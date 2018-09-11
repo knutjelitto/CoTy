@@ -1,5 +1,4 @@
 ﻿using System;
-using CoTy.Ambiance;
 using CoTy.Objects;
 
 // ReSharper disable UnusedMember.Local
@@ -12,7 +11,7 @@ namespace CoTy.Modules
         {
         }
 
-        private static void Outcome(dynamic expected, Context context, AmStack stack)
+        private static void Outcome(dynamic expected, Context context, Stack stack)
         {
             var actualQuot = stack.Pop();
             actualQuot.Apply(context, stack);
@@ -27,7 +26,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("assert")]
-        private static void Assert(Context context, AmStack stack)
+        private static void Assert(Context context, Stack stack)
         {
             var expectedQuot = stack.Pop();
             expectedQuot.Apply(context, stack);
@@ -37,21 +36,21 @@ namespace CoTy.Modules
         }
 
         [Builtin("assert-true")]
-        private static void IsTrue(Context context, AmStack stack)
+        private static void IsTrue(Context context, Stack stack)
         {
             var expected = Bool.True;
             Outcome(expected, context, stack);
         }
 
         [Builtin("assert-false")]
-        private static void IsFalse(Context context, AmStack stack)
+        private static void IsFalse(Context context, Stack stack)
         {
             var expected = Bool.False;
             Outcome(expected, context, stack);
         }
 
         [Builtin("test")]
-        private static void Test(Context context, AmStack stack)
+        private static void Test(Context context, Stack stack)
         {
             var p = stack.Pop2();
             Console.WriteLine($"{p.x}");

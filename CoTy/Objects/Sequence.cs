@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CoTy.Ambiance;
 
 namespace CoTy.Objects
 {
@@ -16,7 +15,7 @@ namespace CoTy.Objects
         {
         }
 
-        public override void Close(Context context, AmStack stack)
+        public override void Close(Context context, Stack stack)
         {
             stack.Push(new Closure(context, Value));
         }

@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace CoTy.Errors
+﻿namespace CoTy.Errors
 {
-    public class BinderException : ApplicationException
+    public class BinderException : CotyException
     {
         public BinderException(string message)
             : base(message)

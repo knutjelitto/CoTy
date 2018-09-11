@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using CoTy.Ambiance;
 using CoTy.Errors;
-using CoTy.Inputs;
 using CoTy.Objects;
 
 namespace CoTy.Modules
@@ -51,13 +47,13 @@ namespace CoTy.Modules
                 var info = method.GetCustomAttribute<BuiltinAttribute>();
                 if (info != null)
                 {
-                    Action<Context, AmStack> eval;
+                    Action<Context, Stack> eval;
 
-                    var candidate = (Action<Context, AmStack>)Delegate.CreateDelegate(typeof(Action<Context, AmStack>), method, true);
+                    var candidate = (Action<Context, Stack>)Delegate.CreateDelegate(typeof(Action<Context, Stack>), method, true);
                     if (info.InArity >= 0)
                     {
                         var arity = info.InArity;
-                        var checkedEval = new Action<Context, AmStack>((context, stack) =>
+                        var checkedEval = new Action<Context, Stack>((context, stack) =>
                         {
                             if (stack.Count < arity)
                             {

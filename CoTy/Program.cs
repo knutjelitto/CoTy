@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 
-using CoTy.Ambiance;
-using CoTy.Errors;
 using CoTy.Inputs;
 using CoTy.Modules;
 using CoTy.Objects;
@@ -15,55 +11,19 @@ namespace CoTy
         // ReSharper disable once UnusedParameter.Local
         private static void Main(string[] args)
         {
+            Woo.Doo();
+
             var rootLexical = MakeRootFrame();
             var testLexical = WithTest(rootLexical);
             var rootActivation = rootLexical.Push("prompt");
             var testActivation = testLexical.Push("test");
-            var stack = new AmStack();
+            var stack = new Stack();
 
-            Execute(MakeParser(new StringStream(Read("tests"))), testActivation, stack);
-            Execute(MakeParser(new StringStream(Read("startup"))), rootActivation, stack);
+            LanguageModule.Execute(ReadResource("startup"), rootActivation, stack);
+            LanguageModule.Execute(ReadResource("tests"), testActivation, stack);
             while (true)
             {
-                Execute(MakeParser(new ConsoleStream(stack.Dump)), rootActivation, stack);
-            }
-        }
-
-        private static void Execute(IEnumerable<Cobject> stream, Context context, AmStack stack)
-        {
-            try
-            {
-                foreach (var value in stream)
-                { 
-                    try
-                    {
-                        value.Close(context, stack);
-                    }
-                    catch (ScopeException scopeEx)
-                    {
-                        Console.WriteLine($"{scopeEx.Message}");
-                    }
-                    catch (StackException stackEx)
-                    {
-                        Console.WriteLine($"{stackEx.Message}");
-                    }
-                    catch (BinderException binderEx)
-                    {
-                        Console.WriteLine($"{binderEx.Message}");
-                    }
-                    catch (TypeMismatchException typeEx)
-                    {
-                        Console.WriteLine($"{typeEx.Message}");
-                    }
-                }
-            }
-            catch (ScannerException scannerEx)
-            {
-                Console.WriteLine($"{scannerEx.Message}");
-            }
-            catch (ParserException parserEx)
-            {
-                Console.WriteLine($"{parserEx.Message}");
+                LanguageModule.Execute(new ConsoleStream(stack.Dump), rootActivation, stack);
             }
         }
 
@@ -89,16 +49,7 @@ namespace CoTy
             return Module.Reflect(typeof(TestingModule), context);
         }
 
-        private static Parser MakeParser(ItemStream<char> input)
-        {
-            var source = new CharSource(input);
-            var scanner = new Scanner(source);
-            var parser = new Parser(scanner);
-
-            return parser;
-        }
-
-        private static string Read(string name)
+        private static string ReadResource(string name)
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var resourceName = $"CoTy.Code.{name}.coty";

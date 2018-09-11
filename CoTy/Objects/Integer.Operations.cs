@@ -54,12 +54,6 @@ namespace CoTy.Objects
             return new Integer(Value - 1);
         }
 
-        // sequence
-
-        public Cobject Concatenate(dynamic other)
-        {
-            return other.CoConcatenate(this);
-        }
 
         // ordering
 
