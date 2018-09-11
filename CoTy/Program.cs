@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+
 using CoTy.Ambiance;
 using CoTy.Errors;
 using CoTy.Inputs;
 using CoTy.Modules;
-using System.Reflection;
-using System.IO;
 using CoTy.Objects;
 
 namespace CoTy
@@ -17,8 +17,8 @@ namespace CoTy
         {
             var rootLexical = MakeRootFrame();
             var testLexical = WithTest(rootLexical);
-            var rootActivation = new AmScope(rootLexical, "prompt");
-            var testActivation = new AmScope(testLexical, "test");
+            var rootActivation = rootLexical.Push("prompt");
+            var testActivation = testLexical.Push("test");
             var stack = new AmStack();
 
             Execute(MakeParser(new StringStream(Read("tests"))), testActivation, stack);
@@ -29,7 +29,7 @@ namespace CoTy
             }
         }
 
-        private static void Execute(IEnumerable<Cobject> stream, AmScope context, AmStack stack)
+        private static void Execute(IEnumerable<Cobject> stream, Context context, AmStack stack)
         {
             try
             {
@@ -67,24 +67,26 @@ namespace CoTy
             }
         }
 
-        private static AmScope MakeRootFrame()
+        private static Context MakeRootFrame()
         {
-            AmScope root = new LanguageModule(null);
-            root = new BindingModule(root);
-            root = new StackModule(root);
-            root = new BoolModule(root);
-            root = new OperatorModule(root);
-            root = new SequenceModule(root);
-            root = new SystemModule(root);
-            root = new SimpleIOModule(root);
-            root = new DiagnosticsModule(root);
+            var context = Context.Root("language");
+            context = Module.Reflect(typeof(LanguageModule), context);
+            context = Module.Reflect(typeof(BindingModule), context.Push("binding"));
+            context = Module.Reflect(typeof(StackModule), context.Push("stack"));
+            context = Module.Reflect(typeof(BoolModule), context.Push("bool"));
+            context = Module.Reflect(typeof(OperatorModule), context.Push("operator"));
+            context = Module.Reflect(typeof(SequenceModule), context.Push("sequence"));
+            context = Module.Reflect(typeof(SystemModule), context.Push("system"));
+            context = Module.Reflect(typeof(SimpleIOModule), context.Push("simple-io"));
+            context = Module.Reflect(typeof(DiagnosticsModule), context.Push("diagnostics"));
 
-            return root;
+            return context;
         }
 
-        private static AmScope WithTest(AmScope rootLexical)
+        private static Context WithTest(Context rootLexical)
         {
-            return new Testing(rootLexical);
+            var context = rootLexical.Push("testing");
+            return Module.Reflect(typeof(TestingModule), context);
         }
 
         private static Parser MakeParser(ItemStream<char> input)
@@ -98,7 +100,7 @@ namespace CoTy
 
         private static string Read(string name)
         {
-            var assembly = Assembly.GetExecutingAssembly();
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var resourceName = $"CoTy.Code.{name}.coty";
 
             using (var stream = assembly.GetManifestResourceStream(resourceName))

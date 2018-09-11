@@ -9,12 +9,12 @@ namespace CoTy.Modules
 {
     public class DiagnosticsModule : Module
     {
-        public DiagnosticsModule(AmScope parent) : base(parent, "diagnostics")
+        public DiagnosticsModule(Context parent) : base(parent, "diagnostics")
         {
         }
 
         [Builtin("ds")]
-        private static void DumpScope(AmScope context, AmStack stack)
+        private static void DumpScope(Context context, AmStack stack)
         {
 #if true
             var scope = context.Scope;
@@ -22,7 +22,7 @@ namespace CoTy.Modules
             {
                 var syms = scope.Name + "{" + string.Join(" ", scope.Symbols) + "}";
                 Console.WriteLine(syms);
-                scope = (AmScope)scope.Parent;
+                scope = (Context)scope.Parent;
             }
 #else
             Console.WriteLine("===lexical===");

@@ -6,21 +6,22 @@ namespace CoTy.Objects
 {
     public partial class Closure : Sequence
     {
-        public Closure(AmScope lexical, params Cobject[] objs)
+        public Closure(Context lexical, params Cobject[] objs)
             : this(lexical, (IEnumerable<Cobject>) objs)
         {
         }
-        public Closure(AmScope lexical, IEnumerable<Cobject> objs)
+
+        public Closure(Context lexical, IEnumerable<Cobject> objs)
             : base(objs)
         {
             Lexical = lexical;
         }
 
-        private AmScope Lexical { get; }
+        private Context Lexical { get; }
 
-        public override void Apply(AmScope context, AmStack stack)
+        public override void Apply(Context context, AmStack stack)
         {
-            var localContext = new AmScope(Lexical, "local");
+            var localContext = Lexical.Push("local");
             foreach (var value in this)
             {
                 value.Close(localContext, stack);

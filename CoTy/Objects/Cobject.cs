@@ -9,12 +9,12 @@ namespace CoTy.Objects
 {
     public abstract partial class Cobject : DynamicObject, IEnumerable<Cobject>
     {
-        public virtual void Close(AmScope context, AmStack stack)
+        public virtual void Close(Context context, AmStack stack)
         {
             stack.Push(this);
         }
 
-        public virtual void Apply(AmScope context, AmStack stack)
+        public virtual void Apply(Context context, AmStack stack)
         {
             Close(context, stack);
         }

@@ -1,37 +1,39 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
+using CoTy.Ambiance;
 using CoTy.Errors;
 using CoTy.Objects;
 
-namespace CoTy.Ambiance
+namespace CoTy.Objects
 {
-    public class AmScope
+    public class Context : Cobject<Dictionary<Symbol, Binding>, Context>
     {
-        private readonly Dictionary<Symbol, Binding> definitions = new Dictionary<Symbol, Binding>();
-
-        public AmScope(AmScope parent, string name)
+        protected Context(Context parent, string name)
+            : base(new Dictionary<Symbol, Binding>())
         {
             Parent = parent;
             Name = name;
         }
 
-        public IEnumerable<Symbol> Symbols => this.definitions.Keys.OrderBy(k => k.Value);
+        public IEnumerable<Symbol> Symbols => Value.Keys.OrderBy(k => k.Value);
 
-        public AmScope Scope => this;
+        public Context Scope => this;
 
-        public AmScope Pop(out AmScope popped)
+        public static Context Root(string name)
         {
-            var result = Parent;
-            Parent = null;
-            popped = this;
-            return result;
+            return new Context(null, name);
         }
 
-        public AmScope Push(AmScope pushed)
+        public Context Pop()
         {
-            pushed.Parent = this;
-            return pushed;
+            Parent = null;
+            return this;
+        }
+
+        public Context Push(string name)
+        {
+            var newContext = new Context(this, name);
+            return newContext;
         }
 
         public bool IsDefined(Symbol symbol)
@@ -41,7 +43,7 @@ namespace CoTy.Ambiance
 
         public bool CanDefine(Symbol symbol)
         {
-            return !this.definitions.ContainsKey(symbol);
+            return !Value.ContainsKey(symbol);
         }
 
         public bool CanUpdate(Symbol symbol)
@@ -65,7 +67,7 @@ namespace CoTy.Ambiance
             }
 
             binding = new Binding(this, symbol, value, isSealed, isOpaque);
-            this.definitions.Add(symbol, binding);
+            Value.Add(symbol, binding);
         }
 
         public void Undefine(Symbol symbol)
@@ -82,7 +84,7 @@ namespace CoTy.Ambiance
                 throw new BinderException($"`{symbol}´ is marked as sealed and can't be removed");
             }
 
-            binding.Scope.definitions.Remove(symbol);
+            binding.Scope.Value.Remove(symbol);
         }
 
         public void Update(Symbol symbol, Cobject value)
@@ -114,7 +116,7 @@ namespace CoTy.Ambiance
 
         public bool TryFind(Symbol symbol, out Binding binding)
         {
-            if (!this.definitions.TryGetValue(symbol, out binding))
+            if (!Value.TryGetValue(symbol, out binding))
             {
                 if (Parent != null)
                 {
@@ -128,7 +130,7 @@ namespace CoTy.Ambiance
             return true;
         }
 
-        public AmScope Parent { get; set; }
+        public Context Parent { get; private set; }
         public string Name { get; }
 
         public override string ToString()

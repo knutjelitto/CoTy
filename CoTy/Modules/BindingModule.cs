@@ -8,12 +8,12 @@ namespace CoTy.Modules
 {
     public class BindingModule : Module
     {
-        public BindingModule(AmScope parent) : base(parent, "binding")
+        public BindingModule(Context parent) : base(parent, "binding")
         {
         }
 
         [Builtin("def")]
-        private static void Define(AmScope context, AmStack stack)
+        private static void Define(Context context, AmStack stack)
         {
             var symbol = GetSymbol(stack.Pop());
             var value = stack.Pop();
@@ -22,7 +22,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("undef")]
-        private static void Undefine(AmScope context, AmStack stack)
+        private static void Undefine(Context context, AmStack stack)
         {
             var symbol = GetSymbol(stack.Pop());
 
@@ -30,7 +30,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("set")]
-        private static void Set(AmScope context, AmStack stack)
+        private static void Set(Context context, AmStack stack)
         {
             var symbol = GetSymbol(stack.Pop());
             var value = stack.Pop();
@@ -40,7 +40,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("def?")]
-        private static void DefinedPred(AmScope context, AmStack stack)
+        private static void DefinedPred(Context context, AmStack stack)
         {
             if (TryGetSymbol(stack.Pop(), out var symbol))
             {
@@ -50,7 +50,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("value")]
-        private static void GetValue(AmScope context, AmStack stack)
+        private static void GetValue(Context context, AmStack stack)
         {
             var symbol = GetSymbol(stack.Pop());
 

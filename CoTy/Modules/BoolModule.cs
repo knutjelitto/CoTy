@@ -7,36 +7,36 @@ namespace CoTy.Modules
 {
     public class BoolModule : Module
     {
-        public BoolModule(AmScope parent) : base(parent, "bool")
+        public BoolModule(Context parent) : base(parent, "bool")
         {
         }
 
         [Builtin("bool?", InArity = 1)]
-        private static void IsBool(AmScope context, AmStack stack)
+        private static void IsBool(Context context, AmStack stack)
         {
             stack.Push(Bool.From(stack.Pop() is Bool));
         }
 
         [Builtin("true", InArity = 0)]
-        private static void True(AmScope context, AmStack stack)
+        private static void True(Context context, AmStack stack)
         {
             stack.Push(Bool.True);
         }
 
         [Builtin("false", InArity = 0)]
-        private static void False(AmScope context, AmStack stack)
+        private static void False(Context context, AmStack stack)
         {
             stack.Push(Bool.False);
         }
 
         [Builtin("not", InArity = 1)]
-        private static void Not(AmScope context, AmStack stack)
+        private static void Not(Context context, AmStack stack)
         {
             stack.Push(stack.Pop<Bool>().Not());
         }
 
         [Builtin("and", InArity = 2)]
-        private static void And(AmScope context, AmStack stack)
+        private static void And(Context context, AmStack stack)
         {
             var b2 = stack.Pop<Bool>();
             var b1 = stack.Pop<Bool>();
@@ -45,7 +45,7 @@ namespace CoTy.Modules
         }
 
         [Builtin("or", InArity = 2)]
-        private static void Or(AmScope context, AmStack stack)
+        private static void Or(Context context, AmStack stack)
         {
             var b2 = stack.Pop<Bool>();
             var b1 = stack.Pop<Bool>();

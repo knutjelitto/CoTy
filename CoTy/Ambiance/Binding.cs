@@ -4,7 +4,7 @@ namespace CoTy.Ambiance
 {
     public class Binding
     {
-        public Binding(AmScope scope, Symbol symbol, Cobject value, bool isSealed, bool isOpaque)
+        public Binding(Context scope, Symbol symbol, Cobject value, bool isSealed, bool isOpaque)
         {
             Scope = scope;
             Symbol = symbol;
@@ -13,7 +13,7 @@ namespace CoTy.Ambiance
             IsOpaque = isOpaque;
         }
 
-        public AmScope Scope { get; }
+        public Context Scope { get; }
         public Symbol Symbol { get; }
         public Cobject Value { get; set; }
         public bool IsSealed { get; }

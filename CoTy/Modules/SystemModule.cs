@@ -9,12 +9,12 @@ namespace CoTy.Modules
 {
     public class SystemModule : Module
     {
-        public SystemModule(AmScope parent) : base(parent, "system")
+        public SystemModule(Context parent) : base(parent, "system")
         {
         }
 
         [Builtin("exit")]
-        private static void Exit(AmScope context, AmStack stack)
+        private static void Exit(Context context, AmStack stack)
         {
             Environment.Exit(12);
         }

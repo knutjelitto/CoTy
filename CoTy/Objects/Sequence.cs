@@ -16,7 +16,7 @@ namespace CoTy.Objects
         {
         }
 
-        public override void Close(AmScope context, AmStack stack)
+        public override void Close(Context context, AmStack stack)
         {
             stack.Push(new Closure(context, Value));
         }

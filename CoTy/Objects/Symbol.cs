@@ -36,7 +36,7 @@ namespace CoTy.Objects
             return symbol;
         }
 
-        public override void Close(AmScope context, AmStack stack)
+        public override void Close(Context context, AmStack stack)
         {
             context.Get(this, out var value);
 
