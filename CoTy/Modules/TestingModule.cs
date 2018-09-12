@@ -52,9 +52,11 @@ namespace CoTy.Modules
         [Builtin("test")]
         private static void Test(Context context, Stack stack)
         {
-            var p = stack.Pop2();
-            Console.WriteLine($"{p.x}");
-            foreach (var quotation in p.y)
+            var description = stack.Pop();
+            var sequence = stack.Pop();
+
+            Console.WriteLine($"{description}");
+            foreach (var quotation in sequence)
             {
                 quotation.Close(context, stack);
             }

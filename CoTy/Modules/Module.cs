@@ -90,6 +90,7 @@ namespace CoTy.Modules
             public string Name { get; }
             public string[] Aliases { get; }
             public int InArity { get; set; } = -1;
+            public int OutArity { get; set; } = -1;
             public bool IsOpaque { get; set; } = true;
         }
     }

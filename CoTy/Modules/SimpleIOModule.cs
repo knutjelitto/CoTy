@@ -15,13 +15,13 @@ namespace CoTy.Modules
         [Builtin("print", InArity = 1)]
         private static void Print(Context context, Stack stack)
         {
-            stack.Popd().Print();
+            Eval.Print(stack.Pop());
         }
 
         [Builtin("println", InArity = 1)]
         private static void Println(Context context, Stack stack)
         {
-            stack.Popd().Println();
+            Eval.Println(stack.Pop());
         }
 
         [Builtin("newline", InArity = 0)]

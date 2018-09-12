@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-
-using CoTy.Errors;
 
 namespace CoTy.Objects
 {
-    public abstract partial class Cobject : DynamicObject, IEnumerable<Cobject>
+    public abstract partial class Cobject : IEnumerable<Cobject>
     {
+        public static readonly dynamic Eval = new Evaluator();
+
         public virtual void Close(Context context, Stack stack)
         {
             stack.Push(this);
@@ -20,23 +17,19 @@ namespace CoTy.Objects
             Close(context, stack);
         }
 
-        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
-        {
-            var member = GetType().GetMethod(binder.Name, args.Select(arg => arg.GetType()).ToArray());
-            if (member != null)
-            {
-                result = member.Invoke(this, args);
-                return true;
-            }
-            var parameters = string.Join(",", args.Select(arg => arg.GetType().Name));
-            throw new BinderException($"`{binder.Name}´ not defined on `{GetType().Name}´ for `{parameters}´");
-        }
-
         public abstract IEnumerator<Cobject> GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        private class Evaluator : Cobject
+        {
+            public override IEnumerator<Cobject> GetEnumerator()
+            {
+                yield break;
+            }
         }
     }
 

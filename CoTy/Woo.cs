@@ -1,53 +1,98 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
-using System.Xml.Linq;
+using System.Text;
+using CoTy.Implementations;
 using CoTy.Objects;
 
 namespace CoTy
 {
-    public static class Woo
+    public class Woo : IDynamicMetaObjectProvider
     {
         public static void Doo()
         {
+            var integerImpl = new IntegerImpl();
+
+            var method = integerImpl.Get("Compare", typeof(Integer), typeof(Integer));
         }
 
         public static void Doo2()
         {
-            var binder = new Binder("doo", false, new CallInfo(3, "This", "context", "stack"));
-            var type = typeof(Action<CallSite, Cobject, Context, Stack>);
-            var arg0 = Expression.Parameter(typeof(Cobject), "this");
-            var arg1 = Expression.Parameter(typeof(Context), "context");
-            var arg2 = Expression.Parameter(typeof(Stack), "stack");
-            var x = Expression.MakeDynamic(type, binder, arg0, arg1, arg2);
+            var woo = new Woo();
+            var chars1 = new Characters("a");
+            var chars2 = new Characters("b");
+            var int1 = Integer.From(11);
+            var int2 = Integer.From(12);
 
-            var y = Expression.Lambda<Action<Cobject, Context, Stack>>(x, arg0, arg1, arg2);
+            woo.Call(woo, chars1, chars2);
+            woo.Call(woo, chars1, chars2);
+            //((dynamic)woo).Add(chars1, chars2);
+            //((dynamic)woo).Add(int1, int2);
+            //((dynamic)woo).Add((Cobject)chars1, chars2);
+            //((dynamic)woo).Add(chars1, chars2);
 
-            var z = y.Compile();
-
-            var context = Context.Root("root");
-            var stack = new Stack();
-
-            z(Integer.One, context, stack);
-
+            Environment.Exit(12);
         }
 
-        private class Binder : InvokeMemberBinder
+        private void Call(Woo woo, Characters chars1, Characters chars2)
         {
-            public Binder(string name, bool ignoreCase, CallInfo callInfo) : base(name, ignoreCase, callInfo)
+            ((dynamic)woo).Add(chars1, chars2);
+        }
+
+        public void Add(Characters value2, Characters value)
+        {
+        }
+
+        public void Add(Integer value1, Integer value2)
+        {
+        }
+
+        public DynamicMetaObject GetMetaObject(Expression parameter)
+        {
+            return new MyDynamicMetaObject(parameter, this);
+        }
+
+        private class MyDynamicMetaObject : DynamicMetaObject
+        {
+            private static Type voidType = typeof(void);
+
+            public MyDynamicMetaObject(Expression expression, object value) : base(expression, BindingRestrictions.Empty, value)
             {
             }
 
-            public override DynamicMetaObject FallbackInvoke(DynamicMetaObject target, DynamicMetaObject[] args, DynamicMetaObject errorSuggestion)
+            public override DynamicMetaObject BindInvokeMember(InvokeMemberBinder binder, DynamicMetaObject[] args)
             {
-                throw new NotImplementedException();
-            }
+                var method = Value.GetType().GetMethod(binder.Name, args.Select(arg => arg.RuntimeType).ToArray());
 
-            public override DynamicMetaObject FallbackInvokeMember(DynamicMetaObject target, DynamicMetaObject[] args, DynamicMetaObject errorSuggestion)
-            {
-                throw new NotImplementedException();
+                var defaulting = base.BindInvokeMember(binder, args);
+
+                if (method == null)
+                {
+                    return defaulting;
+                }
+
+                var self = Expression.Convert(Expression, LimitType);
+                // ReSharper disable once AssignNullToNotNullAttribute
+                var parameters = args.Select(arg => Expression.Convert(arg.Expression, arg.RuntimeType));
+
+                Expression call = Expression.Call(self, method, parameters);
+
+                if (binder.ReturnType != voidType && method.ReturnType == voidType)
+                {
+                    call = Expression.Block(call, Expression.Default(binder.ReturnType));
+                }
+                else if (binder.ReturnType != method.ReturnType)
+                {
+                    call = Expression.Convert(call, binder.ReturnType);
+                }
+
+                var methodInfo = new DynamicMetaObject(
+                    call,
+                    defaulting.Restrictions);
+
+                return methodInfo;
             }
         }
     }

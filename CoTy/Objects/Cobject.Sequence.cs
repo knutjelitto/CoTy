@@ -12,7 +12,7 @@ namespace CoTy.Objects
 
             foreach (var _ in sequence)
             {
-                count = count.Succ();
+                count = count.Succ(count);
             }
 
             return count;
@@ -22,15 +22,15 @@ namespace CoTy.Objects
         {
             return new Sequence(Loop(seq, cnt));
 
-            IEnumerable<Cobject> Loop(Cobject _seq, dynamic _cnt)
+            IEnumerable<Cobject> Loop(Cobject _seq, Cobject _cnt)
             {
                 foreach (var value in _seq)
                 {
-                    if (_cnt.Greater(Integer.Zero))
+                    if (Eval.Compare(_cnt, Integer.Zero) > 0)
                     {
                         yield return value;
 
-                        _cnt = _cnt.Pred();
+                        _cnt = Eval.Pred(_cnt);
                     }
                     else
                     {
@@ -44,13 +44,13 @@ namespace CoTy.Objects
         {
             return new Sequence(Loop(seq, cnt));
 
-            IEnumerable<Cobject> Loop(Cobject _seq, dynamic _cnt)
+            IEnumerable<Cobject> Loop(Cobject _seq, Cobject _cnt)
             {
                 foreach (var value in _seq)
                 {
-                    if (_cnt.Greater(Integer.Zero))
+                    if (Eval.Compare(_cnt, Integer.Zero) > 0)
                     {
-                        _cnt = _cnt.Pred();
+                        _cnt = Eval.Pred(_cnt);
                     }
                     else
                     {
@@ -61,32 +61,32 @@ namespace CoTy.Objects
             }
         }
 
-        public Sequence Upto(dynamic from, dynamic upto)
+        public Sequence Upto(Cobject from, Cobject upto)
         {
             return new Sequence(Loop(from, upto));
 
-            IEnumerable<Cobject> Loop(dynamic _from, dynamic _upto)
+            IEnumerable<Cobject> Loop(Cobject _from, Cobject _upto)
             {
-                while (_from.LessOrEquals(_upto) is Bool condition && condition)
+                while (Eval.Compare(_from, _upto) <= 0)
                 {
                     yield return _from;
 
-                    _from = _from.Succ();
+                    _from = Eval.Succ(_from);
                 }
             }
         }
 
-        public Sequence Up(dynamic from)
+        public Sequence Up(Cobject from)
         {
             return new Sequence(Loop(from));
 
-            IEnumerable<Cobject> Loop(dynamic _from)
+            IEnumerable<Cobject> Loop(Cobject _from)
             {
                 while (true)
                 {
                     yield return _from;
 
-                    _from = _from.Succ();
+                    _from = Eval.Succ(_from);
                 }
             }
         }
@@ -100,13 +100,13 @@ namespace CoTy.Objects
         {
             return new Sequence(Loop(value, count));
 
-            IEnumerable<Cobject> Loop(Cobject _value, dynamic _count)
+            IEnumerable<Cobject> Loop(Cobject _value, Cobject _count)
             {
-                while (_count.Greater(Integer.Zero))
+                while (Eval.Compare(_count, Integer.Zero) > 0)
                 {
                     yield return _value;
 
-                    _count = _count.Pred();
+                    _count = Eval.Pred(_count);
                 }
             }
         }

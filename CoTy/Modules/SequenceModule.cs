@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
 using CoTy.Objects;
 
@@ -16,67 +15,68 @@ namespace CoTy.Modules
         [Builtin("up", InArity = 1)]
         private static void Up(Context context, Stack stack)
         {
-            var from = stack.Popd();
+            var from = stack.Pop();
             
-            stack.Push(from.Up(from));
+            stack.Push(Eval.Up(from));
         }
 
         [Builtin("upto", InArity = 2)]
         private static void Upto(Context context, Stack stack)
         {
             var to = stack.Pop();
-            var from = stack.Popd();
+            var from = stack.Pop();
 
-            stack.Push(from.Upto(from, to));
+            stack.Push(Eval.Upto(from, to));
         }
 
         [Builtin("take", InArity = 2)]
         private static void Take(Context context, Stack stack)
         {
             var count = stack.Pop();
-            var sequence = stack.Popd();
+            var sequence = stack.Pop();
 
-            stack.Push(sequence.Take(sequence, count));
+            stack.Push(Eval.Take(sequence, count));
         }
 
         [Builtin("skip", InArity = 2)]
         private static void Skip(Context context, Stack stack)
         {
             var count = stack.Pop();
-            var sequence = stack.Popd();
+            var sequence = stack.Pop();
 
-            stack.Push(sequence.Skip(sequence, count));
+            stack.Push(Eval.Skip(sequence, count));
         }
 
         [Builtin("count")]
         private static void Count(Context context, Stack stack)
         {
-            var sequence = stack.Popd();
+            var sequence = stack.Pop();
 
-            stack.Push(sequence.Count(sequence));
+            stack.Push(Eval.Count(sequence));
         }
 
         [Builtin("repeat", InArity = 2)]
         private static void Repeat(Context context, Stack stack)
         {
             var count = stack.Pop();
-            var value = stack.Popd();
+            var value = stack.Pop();
 
-            stack.Push(value.Repeat(value, count));
+            stack.Push(Eval.Repeat(value, count));
         }
 
         [Builtin("reduce")]
         private static void Reduce(Context context, Stack stack)
         {
-            var p = stack.Pop2();
+            var quotation = stack.Pop();
+            var sequence = stack.Pop();
 
             var first = true;
-            foreach (var value in p.x)
+            foreach (var value in sequence)
             {
                 stack.Push(value);
                 if (!first)
                 {
-                    p.y.Apply(context, stack);
+                    quotation.Apply(context, stack);
                 }
                 else
                 {

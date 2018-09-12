@@ -26,5 +26,10 @@ namespace CoTy.Objects
                 value.Close(localContext, stack);
             }
         }
+
+        public override string ToString()
+        {
+            return "[" + string.Join(" ", Value) + "]";
+        }
     }
 }

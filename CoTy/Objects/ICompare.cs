@@ -4,8 +4,8 @@ using System.Text;
 
 namespace CoTy.Objects
 {
-    public interface IEqual<T>
+    public interface ICompare<in T> where T : Cobject
     {
-        Bool Equal(T other);
+        int? Compare(T value1, T value2);
     }
 }

@@ -28,28 +28,36 @@ namespace CoTy.Modules
             stack.Push(Bool.False);
         }
 
-        [Builtin("not", InArity = 1)]
+        [Builtin("not", InArity = 1, OutArity = 1)]
         private static void Not(Context context, Stack stack)
         {
-            stack.Push(stack.Pop<Bool>().Not());
+            var value = stack.Pop();
+
+            var result = Eval.Not(value);
+
+            stack.Push(result);
         }
 
-        [Builtin("and", InArity = 2)]
+        [Builtin("and", InArity = 2, OutArity = 1)]
         private static void And(Context context, Stack stack)
         {
-            var b2 = stack.Pop<Bool>();
-            var b1 = stack.Pop<Bool>();
+            var value2 = stack.Pop();
+            var value1 = stack.Pop();
 
-            stack.Push(Bool.From(b1 && b2));
+            var result = Eval.And(value1, value2);
+
+            stack.Push(result);
         }
 
-        [Builtin("or", InArity = 2)]
+        [Builtin("or", InArity = 2, OutArity = 1)]
         private static void Or(Context context, Stack stack)
         {
-            var b2 = stack.Pop<Bool>();
-            var b1 = stack.Pop<Bool>();
+            var value2 = stack.Pop();
+            var value1 = stack.Pop();
 
-            stack.Push(Bool.From(b1 || b2));
+            var result = Eval.Or(value1, value2);
+
+            stack.Push(result);
         }
     }
 }

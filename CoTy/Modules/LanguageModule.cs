@@ -54,9 +54,10 @@ namespace CoTy.Modules
         [Builtin("curry", IsOpaque = false)]  // a quot1 ⇒ quot2
         private static void Curry(Context context, Stack stack)
         {
-            var p = stack.Pop2();
+            var quotation = stack.Pop();
+            var value = stack.Pop();
 
-            stack.Push(new Closure(context, p.x, p.y, Symbol.ApplySym));
+            stack.Push(new Closure(context, quotation, value, Symbol.ApplySym));
         }
 
         [Builtin("load", InArity = 1)]

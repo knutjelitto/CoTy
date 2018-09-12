@@ -7,8 +7,6 @@ namespace CoTy.Objects
 {
     public class Stack : Cobject<Stack<Cobject>, Stack>
     {
-        //private readonly Stack<Cobject> stack = new Stack<Cobject>();
-
         public Stack() : base(new Stack<Cobject>())
         {
         }
@@ -49,24 +47,6 @@ namespace CoTy.Objects
             return (x, y);
         }
 
-        public dynamic Popd()
-        {
-            return Pop();
-        }
-
-        public (dynamic x, dynamic y) Pop2d()
-        {
-            if (Count < 2)
-            {
-                throw new StackException(2, Count);
-            }
-
-            var y = Pop();
-            var x = Pop();
-
-            return (x, y);
-        }
-
         public T Pop<T>() where T : Cobject
         {
             return (T)Pop();
@@ -93,7 +73,7 @@ namespace CoTy.Objects
         public override string ToString()
         {
             var text = string.Join(" ", Get());
-            return $"[{text}]";
+            return $"({text})";
         }
     }
 }
