@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 
 using CoTy.Errors;
 
@@ -20,7 +22,14 @@ namespace CoTy.Objects
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-            throw new BinderException($"`{binder.Name}´ not defined for `{GetType().Name}´ and `{args[0].GetType().Name}´");
+            var member = GetType().GetMethod(binder.Name, args.Select(arg => arg.GetType()).ToArray());
+            if (member != null)
+            {
+                result = member.Invoke(this, args);
+                return true;
+            }
+            var parameters = string.Join(",", args.Select(arg => arg.GetType().Name));
+            throw new BinderException($"`{binder.Name}´ not defined on `{GetType().Name}´ for `{parameters}´");
         }
 
         public abstract IEnumerator<Cobject> GetEnumerator();

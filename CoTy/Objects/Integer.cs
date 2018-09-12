@@ -1,13 +1,13 @@
-﻿using System.Numerics;
+﻿using System;
 
 namespace CoTy.Objects
 {
-    public partial class Integer : Cobject<BigInteger, Integer>, IOrdered<Integer>
+    public partial class Integer : Cobject<int, Integer>
     {
-        public static Integer Zero = new Integer(BigInteger.Zero);
-        public static Integer One = new Integer(BigInteger.One);
+        public static Integer Zero = new Integer(0);
+        public static Integer One = new Integer(1);
 
-        private Integer(BigInteger value) : base(value)
+        private Integer(int value) : base(value)
         {
         }
 
@@ -18,13 +18,18 @@ namespace CoTy.Objects
 
         public static bool TryFrom(string str, out Integer value)
         {
-            if (BigInteger.TryParse(str, out var parsed))
+            if (int.TryParse(str, out var parsed))
             {
                 value = new Integer(parsed);
                 return true;
             }
             value = null;
             return false;
+        }
+
+        public int CompareTo(Integer other)
+        {
+            return Value.CompareTo(other.Value);
         }
 
         public override string ToString()

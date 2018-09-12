@@ -13,51 +13,64 @@ namespace CoTy.Modules
         [Builtin("==", InArity = 2)]
         private static void Equals(Context context, Stack stack)
         {
-            // use object's equality
-            var p = stack.Pop2();
-            stack.Push((Bool)p.x.Equals(p.y));
+            var value2 = stack.Pop();
+            var value1 = stack.Pop();
+
+            stack.Push(Bool.From(((dynamic)value1).Compare(value1, value2) == 0));
         }
 
         [Builtin("!=", InArity = 2)]
-        private static void NotEquals(Context context, Stack stack)
+        private static void NotEqual(Context context, Stack stack)
         {
-            var p = stack.Pop2d();
-            stack.Push(p.x.NotEquals(p.y));
+            var value2 = stack.Pop();
+            var value1 = stack.Pop();
+
+            stack.Push(Bool.From(((dynamic)value1).Compare(value1, value2) != 0));
         }
 
         [Builtin("<", InArity = 2)]
         private static void Less(Context context, Stack stack)
         {
-            var p = stack.Pop2d();
-            stack.Push(p.x.Less(p.y));
+            var value2 = stack.Pop();
+            var value1 = stack.Pop();
+
+            stack.Push(Bool.From(((dynamic)value1).Compare(value1, value2) < 0));
         }
 
         [Builtin("<=", InArity = 2)]
         private static void LessOrEquals(Context context, Stack stack)
         {
-            var p = stack.Pop2d();
-            stack.Push(p.x.LessOrEquals(p.y));
+            var value2 = stack.Pop();
+            var value1 = stack.Pop();
+
+            stack.Push(Bool.From(((dynamic)value1).Compare(value1, value2) <= 0));
         }
 
         [Builtin(">", InArity = 2)]
         private static void Greater(Context context, Stack stack)
         {
-            var p = stack.Pop2d();
-            stack.Push(p.x.Greater(p.y));
+            var value2 = stack.Pop();
+            var value1 = stack.Pop();
+
+            stack.Push(Bool.From(((dynamic)value1).Compare(value1, value2) > 0));
         }
 
         [Builtin(">=", InArity = 2)]
         private static void GreaterOrEquals(Context context, Stack stack)
         {
-            var p = stack.Pop2d();
-            stack.Push(p.x.GreaterOrEquals(p.y));
+            var value2 = stack.Pop();
+            var value1 = stack.Pop();
+
+            stack.Push(Bool.From(((dynamic)value1).Compare(value1, value2) >= 0));
         }
 
         [Builtin("+", InArity = 2)]
         private static void Plus(Context context, Stack stack)
         {
-            var p = stack.Pop2d();
-            stack.Push(p.x.Add(p.y));
+            var value2 = stack.Pop();
+            var value1 = stack.Pop();
+
+            stack.Push(((dynamic)value1).Add(value1, value2));
         }
 
         [Builtin("-", InArity = 2)]

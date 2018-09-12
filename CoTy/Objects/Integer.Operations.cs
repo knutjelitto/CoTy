@@ -53,13 +53,5 @@ namespace CoTy.Objects
         {
             return new Integer(Value - 1);
         }
-
-
-        // ordering
-
-        public Bool Less(Integer other)
-        {
-            return Value < other.Value;
-        }
     }
 }

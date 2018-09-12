@@ -1,9 +1,14 @@
 ﻿namespace CoTy.Objects
 {
-    public partial class Characters : Cobject<string, Characters>, IOrdered<Characters>
+    public partial class Characters : Cobject<string, Characters>
     {
         public Characters(string value) : base(value)
         {
+        }
+
+        public static implicit operator Characters(string characters)
+        {
+            return new Characters(characters);
         }
 
         public override bool Equals(object obj)
