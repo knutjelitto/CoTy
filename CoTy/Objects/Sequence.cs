@@ -13,7 +13,7 @@ namespace CoTy.Objects
 
         protected override void Close(Context context, Stack stack)
         {
-            stack.Push(new Closure(context, Value));
+            stack.Push(Closure.From(context, Value));
         }
 
         public static Sequence From(Cobject obj)

@@ -171,17 +171,12 @@ namespace CoTy.Objects
             return Sequence.From(Enumerate(single1).Concat(Enumerate(single2)));
         }
 
-        public void Dequote(Stack stack, Sequence sequence)
+        public void Unquote(Stack stack, Cobject sequence)
         {
-            foreach (var value in sequence)
+            foreach (var value in Enumerate(sequence))
             {
                 stack.Push(value);
             }
-        }
-
-        public void Dequote(Stack stack, Cobject value)
-        {
-            stack.Push(value);
         }
     }
 }

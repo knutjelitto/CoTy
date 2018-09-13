@@ -31,22 +31,22 @@ namespace CoTy.Modules
             Close(context, stack, value);
         }
 
-        [Builtin("dequote")]
-        private static void Dequote(Context context, Stack stack)
-        {
-            var value = stack.Pop();
-
-            Dyn.Dequote(stack, value);
-        }
-
         [Builtin("quote", InArity = 1)]
         private static void Quote(Context context, Stack stack)
         {
             var value = stack.Pop();
 
-            var result = new Closure(context, value);
+            var result = Closure.From(context, value);
 
             stack.Push(result);
+        }
+
+        [Builtin("unquote", InArity = 1)]
+        private static void Unquote(Context context, Stack stack)
+        {
+            var value = stack.Pop();
+
+            Cob.Unquote(stack, value);
         }
 
         [Builtin("if")]
@@ -75,7 +75,7 @@ namespace CoTy.Modules
             var quotation = stack.Pop();
             var value = stack.Pop();
 
-            stack.Push(new Closure(context, quotation, value, Symbol.ApplySym));
+            stack.Push(Closure.From(context, quotation, value, Symbol.ApplySym));
         }
 
         [Builtin("load", InArity = 1)]

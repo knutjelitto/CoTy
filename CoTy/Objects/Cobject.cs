@@ -6,7 +6,9 @@ namespace CoTy.Objects
 {
     public partial class Cobject
     {
-        protected static readonly dynamic Dyn = new Cobject();
+        protected static readonly Cobject Cob = new Cobject();
+
+        protected static dynamic Dyn => Cob;
 
         protected virtual void Close(Context context, Stack stack)
         {
