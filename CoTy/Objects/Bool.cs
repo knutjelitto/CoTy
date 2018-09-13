@@ -1,6 +1,6 @@
 ﻿namespace CoTy.Objects
 {
-    public partial class Bool : Cobject<bool, Bool>
+    public partial class Bool : Cobject<bool>
     {
         public static readonly Bool True = new Bool(true);
         public static readonly Bool False = new Bool(false);
@@ -27,6 +27,16 @@
         public static Bool From(bool value)
         {
             return value ? True : False;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Bool other && Equals(Value, other.Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
         }
 
         public override string ToString()

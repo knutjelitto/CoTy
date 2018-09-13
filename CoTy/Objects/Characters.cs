@@ -1,6 +1,6 @@
 ﻿namespace CoTy.Objects
 {
-    public partial class Characters : Cobject<string, Characters>
+    public class Characters : Cobject<string>
     {
         public Characters(string value) : base(value)
         {

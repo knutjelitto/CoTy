@@ -1,40 +1,56 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CoTy.Objects
 {
-    public abstract partial class Cobject : IEnumerable<Cobject>
+    public partial class Cobject
     {
-        public static readonly dynamic Eval = new Evaluator();
+        protected static readonly dynamic Dyn = new Cobject();
 
-        public virtual void Close(Context context, Stack stack)
+        protected virtual void Close(Context context, Stack stack)
         {
             stack.Push(this);
         }
 
-        public virtual void Apply(Context context, Stack stack)
+        protected virtual void Apply(Context context, Stack stack)
         {
             Close(context, stack);
         }
 
-        public abstract IEnumerator<Cobject> GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator()
+        protected static IEnumerable<T> Enumerate<T>(T value)
         {
-            return GetEnumerator();
+            return value as IEnumerable<T> ?? Enumerable.Repeat(value, 1);
         }
 
-        private class Evaluator : Cobject
+        protected static void Apply(Context context, Stack stack, object value)
         {
-            public override IEnumerator<Cobject> GetEnumerator()
+            if (value is Cobject cvalue)
             {
-                yield break;
+                cvalue.Apply(context, stack);
+            }
+            else
+            {
+                throw new NotImplementedException();
+                //stack.Push(value);
+            }
+        }
+
+        protected static void Close(Context context, Stack stack, object value)
+        {
+            if (value is Cobject cvalue)
+            {
+                cvalue.Close(context, stack);
+            }
+            else
+            {
+                throw new NotImplementedException();
+                //stack.Push(value);
             }
         }
     }
 
-    public abstract class Cobject<TClr, TCoty> : Cobject
-        where TCoty : Cobject<TClr, TCoty>
+    public abstract class Cobject<TClr> : Cobject
     {
         protected Cobject(TClr value)
         {
@@ -42,20 +58,5 @@ namespace CoTy.Objects
         }
 
         public TClr Value { get; }
-
-        public override bool Equals(object obj)
-        {
-            return obj is TCoty other && Value.Equals(other.Value);
-        }
-
-        public override int GetHashCode()
-        {
-            return Value.GetHashCode();
-        }
-
-        public override IEnumerator<Cobject> GetEnumerator()
-        {
-            yield return this;
-        }
     }
 }

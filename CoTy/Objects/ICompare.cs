@@ -6,6 +6,6 @@ namespace CoTy.Objects
 {
     public interface ICompare<in T> where T : Cobject
     {
-        int? Compare(T value1, T value2);
+        int Compare(T value1, T value2);
     }
 }

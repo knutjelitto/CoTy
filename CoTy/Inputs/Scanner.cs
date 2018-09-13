@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
@@ -10,9 +9,9 @@ namespace CoTy.Inputs
 {
     public class Scanner : ItemStream<Cobject>
     {
-        private readonly CharSource source;
+        private readonly ItemSource<char> source;
 
-        public Scanner(CharSource source)
+        public Scanner(ItemSource<char> source)
         {
             this.source = source;
         }
@@ -57,7 +56,7 @@ namespace CoTy.Inputs
                         {
                             current.Advance();
                             ScanRestrictedSymbol(":", current, out var restrictedSymbol);
-                            yield return new Sequence(restrictedSymbol);
+                            yield return Sequence.From(restrictedSymbol);
                             yield return Symbol.Define;
                             break;
                         }
@@ -67,7 +66,7 @@ namespace CoTy.Inputs
                         {
                             current.Advance();
                             ScanRestrictedSymbol("!", current, out var restrictedSymbol);
-                            yield return new Sequence(restrictedSymbol);
+                            yield return Sequence.From(restrictedSymbol);
                             yield return Symbol.Set;
                             break;
                         }
@@ -148,7 +147,7 @@ namespace CoTy.Inputs
 
                 if (current && current.Item == ';' && current.Next.Item == ';')
                 {
-                    while (current && current.Item != CharSource.NL)
+                    while (current && current.Item != '\n')
                     {
                         current = current.Next;
                     }
@@ -159,15 +158,6 @@ namespace CoTy.Inputs
                 }
             }
 
-            return current;
-        }
-
-        private Cursor<char> SkipLineComment(Cursor<char> current)
-        {
-            while (current && current.Item != CharSource.NL)
-            {
-                current = current.Next;
-            }
             return current;
         }
 

@@ -4,6 +4,7 @@ using System;
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
+using CoTy.Errors;
 
 namespace CoTy.Objects
 {
@@ -24,18 +25,25 @@ namespace CoTy.Objects
 
             public override DynamicMetaObject BindInvokeMember(InvokeMemberBinder binder, DynamicMetaObject[] args)
             {
-                var method = Value.GetType().GetMethod(binder.Name, args.Select(arg => arg.RuntimeType).ToArray());
+                var method = Value.GetType().GetMethod(binder.Name, args.Select(arg => arg.LimitType).ToArray());
 
                 var defaulting = base.BindInvokeMember(binder, args);
 
                 if (method == null)
                 {
-                    return defaulting;
+                    var error = Expression.Throw(
+                        Expression.Constant(new DynaException(binder.Name, binder.ReturnType, args.Select(arg => arg.LimitType).ToArray())),
+                        binder.ReturnType);
+
+                    var notFound = new DynamicMetaObject(
+                        error,
+                        defaulting.Restrictions);
+
+                    return notFound;
                 }
 
                 var self = Expression.Convert(Expression, LimitType);
-                // ReSharper disable once AssignNullToNotNullAttribute
-                var parameters = args.Select(arg => Expression.Convert(arg.Expression, arg.RuntimeType));
+                var parameters = args.Select(arg => Expression.Convert(arg.Expression, arg.LimitType));
 
                 Expression call = Expression.Call(self, method, parameters);
 

@@ -10,7 +10,7 @@ namespace CoTy.Modules
         {
         }
 
-        [Builtin("==", InArity = 2)]
+        [Builtin("==", InArity = 2, OutArity = 1)]
         private static void Equal(Context context, Stack stack)
         {
             var value2 = stack.Pop();
@@ -19,7 +19,7 @@ namespace CoTy.Modules
             stack.Push(Bool.From(Equals(value1, value2)));
         }
 
-        [Builtin("!=", InArity = 2)]
+        [Builtin("!=", InArity = 2, OutArity = 1)]
         private static void NotEqual(Context context, Stack stack)
         {
             var value2 = stack.Pop();
@@ -28,92 +28,96 @@ namespace CoTy.Modules
             stack.Push(Bool.From(!Equals(value1, value2)));
         }
 
-        [Builtin("<", InArity = 2)]
+        [Builtin("<", InArity = 2, OutArity = 1)]
         private static void LessThan(Context context, Stack stack)
         {
             var value2 = stack.Pop();
             var value1 = stack.Pop();
 
-            stack.Push(Bool.From(Eval.Compare(value1, value2) < 0));
+            stack.Push(Bool.From(Dyn.Compare(value1, value2) < 0));
         }
 
-        [Builtin("<=", InArity = 2)]
+        [Builtin("<=", InArity = 2, OutArity = 1)]
         private static void LessThanOrEqual(Context context, Stack stack)
         {
             var value2 = stack.Pop();
             var value1 = stack.Pop();
 
-            stack.Push(Bool.From(Eval.Compare(value1, value2) <= 0));
+            stack.Push(Bool.From(Dyn.Compare(value1, value2) <= 0));
         }
 
-        [Builtin(">", InArity = 2)]
+        [Builtin(">", InArity = 2, OutArity = 1)]
         private static void GreaterThan(Context context, Stack stack)
         {
             var value2 = stack.Pop();
             var value1 = stack.Pop();
 
-            stack.Push(Bool.From(Eval.Compare(value1, value2) > 0));
+            stack.Push(Bool.From(Dyn.Compare(value1, value2) > 0));
         }
 
-        [Builtin(">=", InArity = 2)]
+        [Builtin(">=", InArity = 2, OutArity = 1)]
         private static void GreaterThanOrEqual(Context context, Stack stack)
         {
             var value2 = stack.Pop();
             var value1 = stack.Pop();
 
-            stack.Push(Bool.From(Eval.Compare(value1, value2) >= 0));
+            stack.Push(Bool.From(Dyn.Compare(value1, value2) >= 0));
         }
 
-        [Builtin("+", InArity = 2)]
+        [Builtin("+", InArity = 2, OutArity = 1)]
         private static void Plus(Context context, Stack stack)
         {
             var value2 = stack.Pop();
             var value1 = stack.Pop();
 
-            stack.Push(Eval.Plus(value1, value2));
+            stack.Push(Dyn.Plus(value1, value2));
         }
 
-        [Builtin("-", InArity = 2)]
+        [Builtin("-", InArity = 2, OutArity = 1)]
         private static void Minus(Context context, Stack stack)
         {
             var value2 = stack.Pop();
             var value1 = stack.Pop();
 
-            stack.Push(Eval.Minus(value1, value2));
+            stack.Push(Dyn.Minus(value1, value2));
         }
 
-        [Builtin("*", InArity = 2)]
+        [Builtin("*", InArity = 2, OutArity = 1)]
         private static void Star(Context context, Stack stack)
         {
             var value2 = stack.Pop();
             var value1 = stack.Pop();
 
-            stack.Push(Eval.Star(value1, value2));
+            stack.Push(Dyn.Star(value1, value2));
         }
 
-        [Builtin("/", InArity = 2)]
+        [Builtin("/", InArity = 2, OutArity = 1)]
         private static void Slash(Context context, Stack stack)
         {
             var value2 = stack.Pop();
             var value1 = stack.Pop();
 
-            stack.Push(Eval.Slash(value1, value2));
+            stack.Push(Dyn.Slash(value1, value2));
         }
 
-        [Builtin("succ", InArity = 1)]
+        [Builtin("succ", InArity = 1, OutArity = 1)]
         private static void Succ(Context context, Stack stack)
         {
             var value = stack.Pop();
 
-            stack.Push(Eval.Succ(value));
+            var result = Dyn.Succ(value);
+
+            stack.Push(result);
         }
 
-        [Builtin("pred", InArity = 1)]
+        [Builtin("pred", InArity = 1, OutArity = 1)]
         private static void Pred(Context context, Stack stack)
         {
             var value = stack.Pop();
 
-            stack.Push(Eval.Pred(value));
+            var result = Dyn.Pred(value);
+
+            stack.Push(result);
         }
 
         [Builtin("concat", "++", InArity = 2)]
@@ -122,7 +126,9 @@ namespace CoTy.Modules
             var seq2 = stack.Pop();
             var seq1 = stack.Pop();
 
-            stack.Push(Eval.Concat(seq1, seq2));
+            var result = Dyn.Concat(seq1, seq2);
+
+            stack.Push(result);
         }
     }
 }

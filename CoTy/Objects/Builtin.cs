@@ -2,7 +2,7 @@
 
 namespace CoTy.Objects
 {
-    public class Builtin : Cobject<Action<Context, Stack>, Builtin>
+    public class Builtin : Cobject<Action<Context, Stack>>
     {
         private readonly Action<Context, Stack> eval;
 
@@ -12,9 +12,19 @@ namespace CoTy.Objects
             this.eval = eval;
         }
 
-        public override void Close(Context context, Stack stack)
+        protected override void Close(Context context, Stack stack)
         {
             this.eval(context, stack);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Builtin other && Equals(Value, other.Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
         }
     }
 }

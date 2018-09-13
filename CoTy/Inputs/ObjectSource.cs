@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-using CoTy.Objects;
+﻿using CoTy.Objects;
 
 namespace CoTy.Inputs
 {
@@ -10,7 +8,5 @@ namespace CoTy.Inputs
             : base(objectStream)
         {
         }
-
-        protected override Cobject EndOfItems => Symbol.End;
     }
 }

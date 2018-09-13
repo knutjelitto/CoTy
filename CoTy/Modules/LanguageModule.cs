@@ -19,16 +19,34 @@ namespace CoTy.Modules
         private static void DoApply(Context context, Stack stack)
         {
             var value = stack.Pop();
-            value.Apply(context, stack);
+
+            Apply(context, stack, value);
+        }
+
+        [Builtin("close")]
+        private static void DoClose(Context context, Stack stack)
+        {
+            var value = stack.Pop();
+
+            Close(context, stack, value);
         }
 
         [Builtin("dequote")]
-        private static void DeQuote(Context context, Stack stack)
+        private static void Dequote(Context context, Stack stack)
         {
-            foreach (var value in stack.Pop())
-            {
-                stack.Push(value);
-            }
+            var value = stack.Pop();
+
+            Dyn.Dequote(stack, value);
+        }
+
+        [Builtin("quote", InArity = 1)]
+        private static void Quote(Context context, Stack stack)
+        {
+            var value = stack.Pop();
+
+            var result = new Closure(context, value);
+
+            stack.Push(result);
         }
 
         [Builtin("if")]
@@ -38,16 +56,16 @@ namespace CoTy.Modules
             var ifTrue = stack.Pop();
             var condition = stack.Pop();
 
-            condition.Apply(context, stack);
+            Apply(context, stack, condition);
             var result = stack.Pop();
 
             if (result is Bool boolean && boolean.Value)
             {
-                ifTrue.Apply(context, stack);
+                Apply(context, stack, ifTrue);
             }
             else
             {
-                ifElse.Apply(context, stack);
+                Apply(context, stack, ifElse);
             }
         }
 
@@ -87,7 +105,7 @@ namespace CoTy.Modules
 
         public static Parser MakeParser(ItemStream<char> input)
         {
-            var source = new CharSource(input);
+            var source = new ItemSource<char>(input);
             var scanner = new Scanner(source);
             var parser = new Parser(scanner);
 
@@ -112,7 +130,7 @@ namespace CoTy.Modules
                 {
                     try
                     {
-                        value.Close(context, stack);
+                        Close(context, stack, value);
                     }
                     catch (CotyException cotyException)
                     {

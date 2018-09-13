@@ -11,11 +11,11 @@ namespace CoTy.Modules
         {
         }
 
-        private static void Outcome(dynamic expected, Context context, Stack stack)
+        private static void Outcome(object expected, Context context, Stack stack)
         {
             var actualQuot = stack.Pop();
-            actualQuot.Apply(context, stack);
-            var actual = (dynamic)stack.Pop();
+            Apply(context, stack, actualQuot);
+            var actual = stack.Pop();
 
             var equals = (Bool)actual.Equals(expected);
 
@@ -29,8 +29,8 @@ namespace CoTy.Modules
         private static void Assert(Context context, Stack stack)
         {
             var expectedQuot = stack.Pop();
-            expectedQuot.Apply(context, stack);
-            var expected = (dynamic) stack.Pop();
+            Apply(context, stack, expectedQuot);
+            var expected = stack.Pop();
 
             Outcome(expected, context, stack);
         }
@@ -53,12 +53,12 @@ namespace CoTy.Modules
         private static void Test(Context context, Stack stack)
         {
             var description = stack.Pop();
-            var sequence = stack.Pop();
+            var sequence = Enumerate(stack.Pop());
 
             Console.WriteLine($"{description}");
-            foreach (var quotation in sequence)
+            foreach (var value in sequence)
             {
-                quotation.Close(context, stack);
+                Close(context, stack, value);
             }
         }
     }

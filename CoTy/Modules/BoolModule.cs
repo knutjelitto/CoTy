@@ -33,7 +33,7 @@ namespace CoTy.Modules
         {
             var value = stack.Pop();
 
-            var result = Eval.Not(value);
+            var result = Dyn.Not(value);
 
             stack.Push(result);
         }
@@ -44,7 +44,7 @@ namespace CoTy.Modules
             var value2 = stack.Pop();
             var value1 = stack.Pop();
 
-            var result = Eval.And(value1, value2);
+            var result = Dyn.And(value1, value2);
 
             stack.Push(result);
         }
@@ -55,7 +55,7 @@ namespace CoTy.Modules
             var value2 = stack.Pop();
             var value1 = stack.Pop();
 
-            var result = Eval.Or(value1, value2);
+            var result = Dyn.Or(value1, value2);
 
             stack.Push(result);
         }

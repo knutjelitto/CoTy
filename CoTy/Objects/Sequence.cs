@@ -1,28 +1,39 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CoTy.Objects
 {
-    public partial class Sequence : Cobject<IEnumerable<Cobject>, Sequence>
+    public class Sequence : Cobject<IEnumerable<Cobject>>, IEnumerable<Cobject>
     {
-        public Sequence(params Cobject[] objs)
-            : this((IEnumerable<Cobject>)objs)
-        {
-        }
-
-        public Sequence(IEnumerable<Cobject> objs)
+        protected Sequence(IEnumerable<Cobject> objs)
             : base(objs)
         {
         }
 
-        public override void Close(Context context, Stack stack)
+        protected override void Close(Context context, Stack stack)
         {
             stack.Push(new Closure(context, Value));
         }
 
+        public static Sequence From(Cobject obj)
+        {
+            return From(Enumerable.Repeat(obj, 1));
+        }
+
+        public static Sequence From(params Cobject[] objs)
+        {
+            return From((IEnumerable<Cobject>)objs);
+        }
+
+        public static Sequence From(IEnumerable<Cobject> objs)
+        {
+            return new Sequence(objs);
+        }
+
         public bool TryGetQuotedSymbol(out Symbol symbol)
         {
-            if (this.FirstOrDefault() is Symbol soleSymbol)
+            if (Value.FirstOrDefault() is Symbol soleSymbol && !Value.Skip(1).Any())
             {
                 symbol = soleSymbol;
                 return true;
@@ -32,7 +43,17 @@ namespace CoTy.Objects
             return false;
         }
 
-        public override IEnumerator<Cobject> GetEnumerator()
+        public override bool Equals(object obj)
+        {
+            return obj is Sequence other && Equals(Value, other.Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
+        }
+
+        public IEnumerator<Cobject> GetEnumerator()
         {
             return Value.GetEnumerator();
         }
@@ -40,6 +61,11 @@ namespace CoTy.Objects
         public override string ToString()
         {
             return "(" + string.Join(" ", Value) + ")";
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

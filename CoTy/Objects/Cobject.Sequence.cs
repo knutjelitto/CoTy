@@ -1,16 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
+// ReSharper disable UnusedParameter.Global
 // ReSharper disable UnusedMember.Global
 namespace CoTy.Objects
 {
-    public abstract partial class Cobject
+    public partial class Cobject
     {
         public Integer Count(Cobject sequence)
         {
             var count = Integer.Zero;
 
-            foreach (var _ in sequence)
+            foreach (var _ in Enumerate(sequence))
             {
                 count = count.Succ(count);
             }
@@ -18,19 +20,21 @@ namespace CoTy.Objects
             return count;
         }
 
-        public Sequence Take(Cobject seq, Cobject cnt)
+        public Sequence Take(Cobject sequence, Cobject count)
         {
-            return new Sequence(Loop(seq, cnt));
+            return Sequence.From(Loop(Enumerate(sequence), count));
 
-            IEnumerable<Cobject> Loop(Cobject _seq, Cobject _cnt)
+            IEnumerable<Cobject> Loop(IEnumerable<Cobject> _sequence, Cobject _count)
             {
-                foreach (var value in _seq)
+                var zero = Dyn.Zero(_count);
+
+                foreach (var value in _sequence)
                 {
-                    if (Eval.Compare(_cnt, Integer.Zero) > 0)
+                    if (Dyn.Compare(zero, _count) < 0)
                     {
                         yield return value;
 
-                        _cnt = Eval.Pred(_cnt);
+                        _count = Dyn.Pred(_count);
                     }
                     else
                     {
@@ -40,17 +44,17 @@ namespace CoTy.Objects
             }
         }
 
-        public Sequence Skip(Cobject seq, Cobject cnt)
+        public Sequence Skip(Cobject sequence, Cobject count)
         {
-            return new Sequence(Loop(seq, cnt));
+            return Sequence.From(Loop(Enumerate(sequence), count));
 
-            IEnumerable<Cobject> Loop(Cobject _seq, Cobject _cnt)
+            IEnumerable<Cobject> Loop(IEnumerable<Cobject> _sequence, Cobject _count)
             {
-                foreach (var value in _seq)
+                foreach (var value in _sequence)
                 {
-                    if (Eval.Compare(_cnt, Integer.Zero) > 0)
+                    if (Dyn.Compare(_count, Integer.Zero) > 0)
                     {
-                        _cnt = Eval.Pred(_cnt);
+                        _count = Dyn.Pred(_count);
                     }
                     else
                     {
@@ -61,24 +65,41 @@ namespace CoTy.Objects
             }
         }
 
-        public Sequence Upto(Cobject from, Cobject upto)
+        public Sequence Range(Cobject from, Cobject count)
         {
-            return new Sequence(Loop(from, upto));
+            return Sequence.From(Loop(from, count));
 
-            IEnumerable<Cobject> Loop(Cobject _from, Cobject _upto)
+            IEnumerable<Cobject> Loop(Cobject _from, Cobject _count)
             {
-                while (Eval.Compare(_from, _upto) <= 0)
+                var zero = Dyn.Zero(_count);
+                while (Dyn.Compare(_count, zero) > 0)
                 {
                     yield return _from;
 
-                    _from = Eval.Succ(_from);
+                    _count = Dyn.Pred(_count);
+                    _from = Dyn.Succ(_from);
+                }
+            }
+        }
+
+        public Sequence Upto(Cobject from, Cobject upto)
+        {
+            return Sequence.From(Loop(from, upto));
+
+            IEnumerable<Cobject> Loop(Cobject _from, Cobject _upto)
+            {
+                while (Dyn.Compare(_from, _upto) <= 0)
+                {
+                    yield return _from;
+
+                    _from = Dyn.Succ(_from);
                 }
             }
         }
 
         public Sequence Up(Cobject from)
         {
-            return new Sequence(Loop(from));
+            return Sequence.From(Loop(from));
 
             IEnumerable<Cobject> Loop(Cobject _from)
             {
@@ -86,29 +107,81 @@ namespace CoTy.Objects
                 {
                     yield return _from;
 
-                    _from = Eval.Succ(_from);
+                    _from = Dyn.Succ(_from);
                 }
+                // ReSharper disable once IteratorNeverReturns
             }
-        }
-
-        public Sequence Concat(Cobject seq1, Cobject seq2)
-        {
-            return new Sequence(seq1.Concat(seq2));
         }
 
         public Sequence Repeat(Cobject value, Cobject count)
         {
-            return new Sequence(Loop(value, count));
+            return Sequence.From(Loop(value, count));
 
             IEnumerable<Cobject> Loop(Cobject _value, Cobject _count)
             {
-                while (Eval.Compare(_count, Integer.Zero) > 0)
+                while (Dyn.Compare(_count, Integer.Zero) > 0)
                 {
                     yield return _value;
 
-                    _count = Eval.Pred(_count);
+                    _count = Dyn.Pred(_count);
                 }
             }
+        }
+
+        public void Reduce(Context context, Stack stack, Cobject sequence, Cobject action)
+        {
+            var first = true;
+            foreach (var value in Enumerate(sequence))
+            {
+                stack.Push(value);
+                if (!first)
+                {
+                    Apply(context, stack, action);
+                }
+                else
+                {
+                    first = false;
+                }
+            }
+        }
+
+        public void Map(Context context, Stack stack, Cobject sequence, Cobject action)
+        {
+            Cobject Eval(Cobject value)
+            {
+                stack.Push(value);
+                Apply(context, stack, action);
+                return stack.Pop();
+            }
+
+            stack.Push(Sequence.From(Enumerate(sequence).Select(Eval)));
+        }
+
+        public void Each(Context context, Stack stack, Cobject sequence, Cobject action)
+        {
+            foreach (var value in Enumerate(sequence))
+            {
+                stack.Push(value);
+                Apply(context, stack, action);
+            }
+        }
+
+        public Sequence Concat(Cobject single1, Cobject single2)
+        {
+            return Sequence.From(Enumerate(single1).Concat(Enumerate(single2)));
+        }
+
+        public void Dequote(Stack stack, Sequence sequence)
+        {
+            foreach (var value in sequence)
+            {
+                stack.Push(value);
+            }
+        }
+
+        public void Dequote(Stack stack, Cobject value)
+        {
+            stack.Push(value);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace CoTy.Inputs
 
         public override IEnumerator<Cobject> GetEnumerator()
         {
-            var current = new Cursor<Cobject>(new ObjectSource(this.Scanner));
+            var current = new Cursor<Cobject>(new ItemSource<Cobject>(this.Scanner));
 
             // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
             while (current)
@@ -47,7 +47,7 @@ namespace CoTy.Inputs
                     throw new ParserException($"dangling `{Symbol.Quoter}´ at end of input");
                 }
 
-                return new Sequence(ParseObject(current));
+                return Sequence.From(ParseObject(current));
             }
 
             var @object = current.Item;
@@ -70,7 +70,7 @@ namespace CoTy.Inputs
                 }
             }
 
-            var quotation = new Sequence(Loop().ToList());
+            var quotation = Sequence.From(Loop().ToList());
 
             if (!current)
             {

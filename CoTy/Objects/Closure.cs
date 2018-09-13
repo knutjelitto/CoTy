@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 // ReSharper disable RedundantAssignment
 namespace CoTy.Objects
 {
-    public partial class Closure : Sequence
+    public class Closure : Sequence
     {
         public Closure(Context lexical, params Cobject[] objs)
             : this(lexical, (IEnumerable<Cobject>) objs)
@@ -18,13 +19,29 @@ namespace CoTy.Objects
 
         private Context Lexical { get; }
 
-        public override void Apply(Context context, Stack stack)
+        protected override void Close(Context context, Stack stack)
         {
-            var localContext = Lexical.Push("local");
-            foreach (var value in this)
+            //stack.Push(new Closure(context, Value));
+            stack.Push(this);
+        }
+
+        protected override void Apply(Context context, Stack stack)
+        {
+            context = Lexical.Push("local");
+            foreach (var value in Value)
             {
-                value.Close(localContext, stack);
+                Close(context, stack, value);
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj) && Equals(Lexical, ((Closure)obj).Lexical);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode() + 17 * Lexical.GetHashCode();
         }
 
         public override string ToString()

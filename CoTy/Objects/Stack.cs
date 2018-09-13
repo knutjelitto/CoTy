@@ -5,7 +5,7 @@ using CoTy.Errors;
 
 namespace CoTy.Objects
 {
-    public class Stack : Cobject<Stack<Cobject>, Stack>
+    public class Stack : Cobject<Stack<Cobject>>
     {
         public Stack() : base(new Stack<Cobject>())
         {
@@ -34,27 +34,6 @@ namespace CoTy.Objects
             return Value.Peek();
         }
 
-        public (Cobject x, Cobject y) Pop2()
-        {
-            if (Count < 2)
-            {
-                throw new StackException(2, Count);
-            }
-
-            var y = Pop();
-            var x = Pop();
-
-            return (x, y);
-        }
-
-        public T Pop<T>() where T : Cobject
-        {
-            return (T)Pop();
-        }
-
-
-        public int Count => Value.Count;
-
         public void Clear()
         {
             Value.Clear();
@@ -62,7 +41,7 @@ namespace CoTy.Objects
 
         public Sequence Get()
         {
-            return new Sequence(Value.Reverse().ToList());
+            return Sequence.From(Value.Reverse().ToList());
         }
 
         public void Dump()
@@ -72,8 +51,8 @@ namespace CoTy.Objects
 
         public override string ToString()
         {
-            var text = string.Join(" ", Get());
-            return $"({text})";
+            return $"<{string.Join(" ", Get().Select(item => item.ToString() + ":" + item.GetType().Name))}>";
+            //return $"<{string.Join(" ", Get())}>";
         }
     }
 }

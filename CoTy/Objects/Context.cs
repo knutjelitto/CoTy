@@ -7,34 +7,8 @@ using CoTy.Errors;
 
 namespace CoTy.Objects
 {
-    public class Context : Cobject<Dictionary<Symbol, Context.Binding>, Context>
+    public class Context : Cobject<Dictionary<Symbol, Context.Binding>>
     {
-        private class Ctx : Cobject<(Dictionary<Symbol, Binding> Dict, Stack Stack), Ctx>
-        {
-            public Ctx()
-                : this(new Dictionary<Symbol, Binding>(), new Stack())
-            {
-            }
-            private Ctx(Dictionary<Symbol, Binding> dict, Stack stack)
-                : base((dict, stack))
-            {
-            }
-
-            public Ctx WithStack(Stack stack)
-            {
-                return new Ctx(Value.Dict, stack);
-            }
-
-            public IEnumerable<object> Components()
-            {
-                var tuple = Value.ToTuple() as ITuple;
-                for (var i = 0; i < tuple.Length; ++i)
-                {
-                    yield return tuple[i];
-                }
-            }
-        }
-
         protected Context(Context parent, string name)
             : base(new Dictionary<Symbol, Binding>())
         {
@@ -160,6 +134,16 @@ namespace CoTy.Objects
         public Context Parent { get; private set; }
         public string Name { get; }
 
+        public override bool Equals(object obj)
+        {
+            return obj is Assoc other && Equals(Value, other.Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
+        }
+
         public override string ToString()
         {
             return Name + "{" + string.Join(" ", Symbols) + "}";
@@ -181,5 +165,30 @@ namespace CoTy.Objects
             public bool IsOpaque { get; }
         }
 
+        private class Ctx : Cobject<(Dictionary<Symbol, Binding> Dict, Stack Stack)>
+        {
+            public Ctx()
+                : this(new Dictionary<Symbol, Binding>(), new Stack())
+            {
+            }
+            private Ctx(Dictionary<Symbol, Binding> dict, Stack stack)
+                : base((dict, stack))
+            {
+            }
+
+            public Ctx WithStack(Stack stack)
+            {
+                return new Ctx(Value.Dict, stack);
+            }
+
+            public IEnumerable<object> Components()
+            {
+                var tuple = Value.ToTuple() as ITuple;
+                for (var i = 0; i < tuple.Length; ++i)
+                {
+                    yield return tuple[i];
+                }
+            }
+        }
     }
 }

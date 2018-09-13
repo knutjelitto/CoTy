@@ -2,13 +2,12 @@
 
 namespace CoTy.Objects
 {
-    public class Symbol : Cobject<string, Symbol>
+    public class Symbol : Cobject<string>
     {
         private static readonly Dictionary<string, Symbol> symbols = new Dictionary<string, Symbol>();
 
         public static readonly Symbol True = Get("true");
         public static readonly Symbol False = Get("false");
-        public static readonly Symbol End = Get("end");
         public static readonly Symbol Quoter = Get("'");
         public static readonly Symbol LeftParent = Get("(");
         public static readonly Symbol RightParent = Get(")");
@@ -34,11 +33,11 @@ namespace CoTy.Objects
             return symbol;
         }
 
-        public override void Close(Context context, Stack stack)
+        protected override void Close(Context context, Stack stack)
         {
             context.Get(this, out var value);
 
-            value.Apply(context, stack);
+            Apply(context, stack, value);
         }
 
         public override int GetHashCode() => this.hashCode;

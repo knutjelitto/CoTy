@@ -15,9 +15,7 @@ namespace CoTy.Modules
         [Builtin("exit", InArity = 1)]
         private static void Exit(Context context, Stack stack)
         {
-            var exit = stack.Pop<Integer>();
-
-            Environment.Exit((int)exit.Value);
+            Environment.Exit(!(stack.Pop() is Integer exit) ? 99 : (int)exit.Value);
         }
     }
 }

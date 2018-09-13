@@ -2,7 +2,7 @@
 
 namespace CoTy.Inputs
 {
-    public abstract class ItemSource<TItem>
+    public class ItemSource<TItem>
     {
         private readonly ItemStream<TItem> itemStream;
         private readonly IEnumerator<TItem> itemIterator;
@@ -15,8 +15,6 @@ namespace CoTy.Inputs
             this.itemIterator = this.itemStream.GetEnumerator();
             this.done = false;
         }
-
-        protected abstract TItem EndOfItems { get; }
 
         public void OpenLevel()
         {
@@ -33,20 +31,21 @@ namespace CoTy.Inputs
             get
             {
                 Suck(index);
-                return index < this.items.Count ? this.items[index] : EndOfItems;
+                return this.items[index];
             }
         }
 
         public bool Has(int index)
         {
-            return !this[index].Equals(EndOfItems);
+            Suck(index);
+            return index < this.items.Count;
         }
 
         private void Suck(int index)
         {
             while (!this.done && index >= this.items.Count)
             {
-                if (this.itemIterator.MoveNext() && !this.itemIterator.Current.Equals(EndOfItems))
+                if (this.itemIterator.MoveNext())
                 {
                     this.items.Add(this.itemIterator.Current);
                 }

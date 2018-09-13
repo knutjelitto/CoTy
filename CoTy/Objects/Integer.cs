@@ -1,24 +1,24 @@
-﻿using System;
+﻿using System.Numerics;
 
 namespace CoTy.Objects
 {
-    public partial class Integer : Cobject<int, Integer>
+    public class Integer : Cobject<BigInteger>
     {
-        public static Integer Zero = new Integer(0);
+        public new static readonly Integer Zero = new Integer(0);
         public static Integer One = new Integer(1);
 
-        private Integer(int value) : base(value)
+        private Integer(BigInteger value) : base(value)
         {
         }
 
-        public static Integer From(int value)
+        public static Integer From(BigInteger value)
         {
             return new Integer(value);
         }
 
         public static bool TryFrom(string str, out Integer value)
         {
-            if (int.TryParse(str, out var parsed))
+            if (BigInteger.TryParse(str, out var parsed))
             {
                 value = new Integer(parsed);
                 return true;
@@ -27,9 +27,14 @@ namespace CoTy.Objects
             return false;
         }
 
-        public int CompareTo(Integer other)
+        public override bool Equals(object obj)
         {
-            return Value.CompareTo(other.Value);
+            return obj is Integer other && Equals(Value, other.Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
         }
 
         public override string ToString()

@@ -1,13 +1,18 @@
 ﻿// ReSharper disable UnusedMember.Global
-using System;
-
+// ReSharper disable UnusedParameter.Global
+// ReSharper disable MemberCanBePrivate.Global
 namespace CoTy.Objects
 {
     public partial class Cobject : ICompare<Integer>
     {
-        public int? Compare(Integer value1, Integer value2)
+        public int Compare(Integer value1, Integer value2)
         {
             return value1.Value.CompareTo(value2.Value);
+        }
+
+        public Integer Zero(Integer value)
+        {
+            return Integer.Zero;
         }
 
         public Integer Plus(Integer value1, Integer value2)

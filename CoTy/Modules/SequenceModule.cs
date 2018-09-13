@@ -12,12 +12,12 @@ namespace CoTy.Modules
         {
         }
 
-        [Builtin("up", InArity = 1)]
+        [Builtin("up", InArity = 1, OutArity = 1)]
         private static void Up(Context context, Stack stack)
         {
             var from = stack.Pop();
             
-            stack.Push(Eval.Up(from));
+            stack.Push(Dyn.Up(from));
         }
 
         [Builtin("upto", InArity = 2)]
@@ -26,7 +26,16 @@ namespace CoTy.Modules
             var to = stack.Pop();
             var from = stack.Pop();
 
-            stack.Push(Eval.Upto(from, to));
+            stack.Push(Dyn.Upto(from, to));
+        }
+
+        [Builtin("range", InArity = 2)]
+        private static void Range(Context context, Stack stack)
+        {
+            var count = stack.Pop();
+            var from = stack.Pop();
+
+            stack.Push(Dyn.Range(from, count));
         }
 
         [Builtin("take", InArity = 2)]
@@ -35,7 +44,7 @@ namespace CoTy.Modules
             var count = stack.Pop();
             var sequence = stack.Pop();
 
-            stack.Push(Eval.Take(sequence, count));
+            stack.Push(Dyn.Take(sequence, count));
         }
 
         [Builtin("skip", InArity = 2)]
@@ -44,7 +53,7 @@ namespace CoTy.Modules
             var count = stack.Pop();
             var sequence = stack.Pop();
 
-            stack.Push(Eval.Skip(sequence, count));
+            stack.Push(Dyn.Skip(sequence, count));
         }
 
         [Builtin("count")]
@@ -52,7 +61,7 @@ namespace CoTy.Modules
         {
             var sequence = stack.Pop();
 
-            stack.Push(Eval.Count(sequence));
+            stack.Push(Dyn.Count(sequence));
         }
 
         [Builtin("repeat", InArity = 2)]
@@ -61,55 +70,34 @@ namespace CoTy.Modules
             var count = stack.Pop();
             var value = stack.Pop();
 
-            stack.Push(Eval.Repeat(value, count));
+            stack.Push(Dyn.Repeat(value, count));
         }
 
         [Builtin("reduce")]
         private static void Reduce(Context context, Stack stack)
         {
-            var quotation = stack.Pop();
+            var action = stack.Pop();
             var sequence = stack.Pop();
 
-            var first = true;
-            foreach (var value in sequence)
-            {
-                stack.Push(value);
-                if (!first)
-                {
-                    quotation.Apply(context, stack);
-                }
-                else
-                {
-                    first = false;
-                }
-            }
+            Dyn.Reduce(context, stack, sequence, action);
         }
 
-        [Builtin("map")]
+        [Builtin("map", InArity = 2, OutArity = 1)]
         private static void Map(Context context, Stack stack)
         {
-            var p = stack.Pop2();
+            var action = stack.Pop();
+            var sequence = stack.Pop();
 
-            Cobject Eval(Cobject value)
-            {
-                stack.Push(value);
-                p.y.Apply(context, stack);
-                return stack.Pop();
-            }
-
-            stack.Push(new Sequence(p.x.Select(Eval)));
+            Dyn.Map(context, stack, sequence, action);
         }
 
         [Builtin("each")]
         private static void Each(Context context, Stack stack)
         {
-            var p = stack.Pop2();
+            var action = stack.Pop();
+            var sequence = stack.Pop();
 
-            foreach (var value in p.x)
-            {
-                stack.Push(value);
-                p.y.Apply(context, stack);
-            }
+            Dyn.Each(context, stack, sequence, action);
         }
     }
 }

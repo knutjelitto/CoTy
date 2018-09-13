@@ -13,13 +13,13 @@ namespace CoTy.Modules
         {
         }
 
-        protected static bool TryGetSymbol(Cobject candidate, out Symbol symbol)
+        protected static bool TryGetSymbol(object candidate, out Symbol symbol)
         {
             if (candidate is Characters str)
             {
                 symbol = Symbol.Get(str.Value);
             }
-            else if (!(candidate is Closure quotation) || !quotation.TryGetQuotedSymbol(out symbol))
+            else if (!(candidate is Sequence sequence) || !sequence.TryGetQuotedSymbol(out symbol))
             {
                 symbol = null;
                 return false;
@@ -28,7 +28,7 @@ namespace CoTy.Modules
             return true;
         }
 
-        protected static Symbol GetSymbol(Cobject candidate)
+        protected static Symbol GetSymbol(object candidate)
         {
             if (!TryGetSymbol(candidate, out var symbol))
             {
@@ -55,9 +55,9 @@ namespace CoTy.Modules
                         var arity = info.InArity;
                         var checkedEval = new Action<Context, Stack>((context, stack) =>
                         {
-                            if (stack.Count < arity)
+                            if (stack.Value.Count < arity)
                             {
-                                throw new StackException(arity, stack.Count);
+                                throw new StackException(arity, stack.Value.Count);
                             }
                             candidate(context, stack);
                         });

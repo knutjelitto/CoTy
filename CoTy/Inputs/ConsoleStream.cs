@@ -33,7 +33,7 @@ namespace CoTy.Inputs
                 {
                     yield return character;
                 }
-                yield return CharSource.NL;
+                yield return '\n';
             }
         }
 
