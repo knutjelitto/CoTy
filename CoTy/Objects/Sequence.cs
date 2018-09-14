@@ -43,6 +43,16 @@ namespace CoTy.Objects
             return false;
         }
 
+        public bool AllSymbols()
+        {
+            return Value.All(value => value is Symbol);
+        }
+
+        public bool IsEmpty()
+        {
+            return !Value.Any();
+        }
+
         public override bool Equals(object obj)
         {
             return obj is Sequence other && Equals(Value, other.Value);

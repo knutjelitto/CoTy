@@ -7,9 +7,7 @@ namespace CoTy.Modules
 {
     public class TestingModule : Module
     {
-        public TestingModule(Context parent) : base(parent, "test")
-        {
-        }
+        public TestingModule() : base("testing") { }
 
         private static void Outcome(object expected, Context context, Stack stack)
         {
@@ -17,9 +15,9 @@ namespace CoTy.Modules
             Apply(context, stack, actualQuot);
             var actual = stack.Pop();
 
-            var equals = (Bool)actual.Equals(expected);
+            var equals = actual.Equals(expected);
 
-            if (!equals.Value)
+            if (!equals)
             {
                 Console.WriteLine($"{expected} != {actual} ;;{actualQuot}");
             }
@@ -38,15 +36,13 @@ namespace CoTy.Modules
         [Builtin("assert-true")]
         private static void IsTrue(Context context, Stack stack)
         {
-            var expected = Bool.True;
-            Outcome(expected, context, stack);
+            Outcome(true, context, stack);
         }
 
         [Builtin("assert-false")]
         private static void IsFalse(Context context, Stack stack)
         {
-            var expected = Bool.False;
-            Outcome(expected, context, stack);
+            Outcome(false, context, stack);
         }
 
         [Builtin("test")]

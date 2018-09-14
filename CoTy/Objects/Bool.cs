@@ -1,4 +1,5 @@
-﻿namespace CoTy.Objects
+﻿#if false
+namespace CoTy.Objects
 {
     public partial class Bool : Cobject<bool>
     {
@@ -45,3 +46,4 @@
         }
     }
 }
+#endif

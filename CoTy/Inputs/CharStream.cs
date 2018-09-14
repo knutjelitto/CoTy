@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace CoTy.Inputs
 {
-    public class StringStream : ItemStream<char>
+    public class CharStream : ItemStream<char>
     {
         private readonly string characters;
 
-        public StringStream(string characters)
+        public CharStream(string characters)
         {
             this.characters = characters;
         }

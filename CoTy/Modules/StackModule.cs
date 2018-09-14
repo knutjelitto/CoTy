@@ -6,9 +6,7 @@ namespace CoTy.Modules
 {
     public class StackModule : Module
     {
-        public StackModule(Context parent) : base(parent, "stack")
-        {
-        }
+        public StackModule() : base("stack") { }
 
         [Builtin("clear-stack", "cs", InArity = 0)]
         private static void ClearStack(Context context, Stack stack)
@@ -19,8 +17,8 @@ namespace CoTy.Modules
         [Builtin("get-stack", "gs", InArity = 0)]
         private static void GetStack(Context context, Stack stack)
         {
-            var quot = stack.Get();
-            stack.Push(quot);
+            var sequence = stack.Get();
+            stack.Push(sequence);
         }
 
         [Builtin("drop", InArity = 1)]

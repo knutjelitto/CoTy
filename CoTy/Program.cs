@@ -19,35 +19,41 @@ namespace CoTy
             var testActivation = testLexical.Push("test");
             var stack = new Stack();
 
-            LanguageModule.Execute(ReadResource("startup"), rootActivation, stack);
             LanguageModule.Execute(ReadResource("tests"), testActivation, stack);
+            LanguageModule.Execute(ReadResource("startup"), rootActivation, stack);
             while (true)
             {
                 LanguageModule.Execute(new ConsoleStream(stack.Dump), rootActivation, stack);
             }
+            // ReSharper disable once FunctionNeverReturns
         }
 
         private static Context MakeRootFrame()
         {
-            var context = Context.Root("language");
-            context = Module.Reflect(typeof(LanguageModule), context);
-            context = Module.Reflect(typeof(BindingModule), context.Push("binding"));
-            context = Module.Reflect(typeof(StackModule), context.Push("stack"));
-            context = Module.Reflect(typeof(BoolModule), context.Push("bool"));
-            context = Module.Reflect(typeof(OperatorModule), context.Push("operator"));
-            context = Module.Reflect(typeof(SequenceModule), context.Push("sequence"));
-            context = Module.Reflect(typeof(SystemModule), context.Push("system"));
-            context = Module.Reflect(typeof(SimpleIOModule), context.Push("simple-io"));
-            context = Module.Reflect(typeof(DiagnosticsModule), context.Push("diagnostics"));
-            context = Module.Reflect(typeof(ShellModule), context.Push("shell"));
+            var modules = new Module[]
+            {
+                new LanguageModule(),
+                new BindingModule(),
+                new StackModule(),
+                new BoolModule(),
+                new OperatorModule(),
+                new SequenceModule(),
+                new SystemModule(),
+                new ConsoleModule(),
+                new DiagnosticsModule(),
+            };
+            var context = Context.Root("bottom");
+            foreach (var module in modules)
+            {
+                context = module.Reflect(context.Push(module.Name));
+            }
 
             return context;
         }
 
         private static Context WithTest(Context rootLexical)
         {
-            var context = rootLexical.Push("testing");
-            return Module.Reflect(typeof(TestingModule), context);
+            return new TestingModule().Reflect(rootLexical.Push("testing"));
         }
 
         private static string ReadResource(string name)

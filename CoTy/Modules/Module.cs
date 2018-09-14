@@ -1,17 +1,18 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using CoTy.Errors;
 using CoTy.Objects;
 
 namespace CoTy.Modules
 {
-    public class Module : Context
+    public class Module : Cobject
     {
-        protected Module(Context parent, string name) : base(parent, name)
+        protected Module(string name)
         {
+            Name = name;
         }
+
+        public string Name { get; }
 
         protected static bool TryGetSymbol(object candidate, out Symbol symbol)
         {
@@ -32,16 +33,20 @@ namespace CoTy.Modules
         {
             if (!TryGetSymbol(candidate, out var symbol))
             {
-                throw new BinderException($"`{candidate}´ can't be a symbol");
+                throw new BinderException($"`{string.Join(" ", Enumerate(candidate))}´ can't be a symbol");
             }
 
             return symbol;
         }
 
-        public static Context Reflect(Type moduleType, Context into)
+        public virtual Context Reflect(Context into)
         {
-            var parts = Regex.Split(moduleType.Name, @"(\p{Lu}\p{Ll}*)").Where(p => !string.IsNullOrWhiteSpace(p)).ToList();
+            Reflect(GetType(), into);
+            return into;
+        }
 
+        private static void Reflect(Type moduleType, Context into)
+        {
             foreach (var method in moduleType.GetMethods(BindingFlags.NonPublic | BindingFlags.Static))
             {
                 var info = method.GetCustomAttribute<BuiltinAttribute>();
@@ -75,8 +80,6 @@ namespace CoTy.Modules
                     }
                 }
             }
-
-            return into;
         }
 
         protected class BuiltinAttribute : Attribute

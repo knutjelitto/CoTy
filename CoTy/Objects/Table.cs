@@ -2,16 +2,16 @@
 
 namespace CoTy.Objects
 {
-    public class Assoc : Cobject<Dictionary<Symbol, object>>
+    public class Table : Cobject<Dictionary<Symbol, object>>
     {
-        public Assoc()
+        public Table()
             : base(new Dictionary<Symbol, object>())
         {
         }
 
         public override bool Equals(object obj)
         {
-            return obj is Assoc other && Equals(Value, other.Value);
+            return obj is Table other && Equals(Value, other.Value);
         }
 
         public override int GetHashCode()

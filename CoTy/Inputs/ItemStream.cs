@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reactive.Disposables;
 
 namespace CoTy.Inputs
 {
@@ -7,12 +9,18 @@ namespace CoTy.Inputs
     {
         public abstract IEnumerator<T> GetEnumerator();
 
-        public virtual void OpenLevel()
+        protected virtual void OpenLevel()
         {
         }
 
-        public virtual void CloseLevel()
+        protected virtual void CloseLevel()
         {
+        }
+
+        public virtual IDisposable LevelUp()
+        {
+            OpenLevel();
+            return Disposable.Create(CloseLevel);
         }
 
         IEnumerator IEnumerable.GetEnumerator()

@@ -9,16 +9,16 @@ namespace CoTy.Inputs
 {
     public class Parser : ItemStream<Cobject>
     {
-        private readonly Scanner Scanner;
+        private Scanner Scanner { get; }
 
         public Parser(Scanner scanner)
         {
-            this.Scanner = scanner;
+            Scanner = scanner;
         }
 
         public override IEnumerator<Cobject> GetEnumerator()
         {
-            var current = new Cursor<Cobject>(new ItemSource<Cobject>(this.Scanner));
+            var current = new Cursor<Cobject>(new ItemSource<Cobject>(Scanner));
 
             // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
             while (current)
@@ -29,9 +29,14 @@ namespace CoTy.Inputs
 
         private Cobject ParseObject(Cursor<Cobject> current)
         {
-            if (Equals(current.Item, Symbol.LeftParent))
+            if (TryParseSequence(current, out var result))
             {
-                return ParseQuotation(current);
+                return result;
+            }
+
+            if (TryParseBinder(current, out var binder))
+            {
+                return binder;
             }
 
             if (Equals(current.Item, Symbol.RightParent))
@@ -56,32 +61,82 @@ namespace CoTy.Inputs
             return @object;
         }
 
-        private Cobject ParseQuotation(Cursor<Cobject> current)
+        private bool TryParseBinder(Cursor<Cobject> current, out Binder binder)
         {
-            Debug.Assert(Equals(current.Item, Symbol.LeftParent));
-            this.Scanner.OpenLevel();
-            current.Advance();
-
-            IEnumerable<Cobject> Loop()
+            if (!Equals(current.Item, Symbol.BindTo))
             {
-                while (current && !Equals(current.Item, Symbol.RightParent))
+                binder = null;
+                return false;
+            }
+
+            using (Scanner.LevelUp())
+            {
+                current.Advance();
+
+                if (TryParseSequence(current, out var sequence))
                 {
-                    yield return ParseObject(current);
+                    if (sequence.IsEmpty())
+                    {
+                        throw new ParserException($"binder objects sequence `{sequence}´ should contain at least one symbol");
+                    }
+                    if (!sequence.AllSymbols())
+                    {
+                        throw new ParserException($"binder objects sequence `{sequence}´ should only contain symbols");
+                    }
+
+                    binder = Binder.From(sequence.Cast<Symbol>());
                 }
+                else
+                {
+                    if (!(current.Item is Symbol symbol))
+                    {
+                        throw new ParserException($"binder object `{current.Item}´ should be a symbols");
+                    }
+
+                    binder = Binder.From(symbol);
+
+                    current.Advance();
+                }
+
+                return true;
             }
+        }
 
-            var quotation = Sequence.From(Loop().ToList());
-
-            if (!current)
+        private bool TryParseSequence(Cursor<Cobject> current, out Sequence sequence)
+        {
+            if (!Equals(current.Item, Symbol.LeftParent))
             {
-                throw new ParserException("unbalanced `(´ in input");
+                sequence = null;
+                return false;
+
             }
 
-            Debug.Assert(Equals(current.Item, Symbol.RightParent));
-            current.Advance();
-            this.Scanner.CloseLevel();
+            using (Scanner.LevelUp())
+            {
+                current.Advance();
 
-            return quotation;
+                IEnumerable<Cobject> Loop()
+                {
+                    while (current && !Equals(current.Item, Symbol.RightParent))
+                    {
+                        yield return ParseObject(current);
+                    }
+                }
+
+                sequence = Sequence.From(Loop().ToList());
+
+                if (!current)
+                {
+                    throw new ParserException("unbalanced `(´ in input");
+                }
+
+                Debug.Assert(Equals(current.Item, Symbol.RightParent));
+
+                current.Advance();
+
+                return true;
+
+            }
         }
     }
 }

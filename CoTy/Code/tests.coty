@@ -86,15 +86,15 @@
 (true  true  >=) assert-true
 
 ;; bool
-(false false and) assert-false
-(false true  and) assert-false
-(true  false and) assert-false
-(true  true  and) assert-true
+(false false &) assert-false
+(false true  &) assert-false
+(true  false &) assert-false
+(true  true  &) assert-true
 
-(false false or ) assert-false
-(false true  or ) assert-true
-(true  false or ) assert-true
-(true  true  or ) assert-true
+(false false |) assert-false
+(false true  |) assert-true
+(true  false |) assert-true
+(true  true  |) assert-true
 
-(false not) assert-true
-(true  not) assert-false
+(false !) assert-true
+(true  !) assert-false

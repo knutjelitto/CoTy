@@ -21,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Reactive" Version="4.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Modules\testing.coty">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

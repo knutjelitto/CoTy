@@ -1,8 +1,9 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 
 namespace CoTy.Objects
 {
-    public class Integer : Cobject<BigInteger>
+    public class Integer : Cobject<BigInteger>, IComparable<Integer>
     {
         public static readonly Integer Zero = new Integer(0);
         public static Integer One = new Integer(1);
@@ -25,6 +26,41 @@ namespace CoTy.Objects
             }
             value = null;
             return false;
+        }
+
+        public int CompareTo(Integer other)
+        {
+            return Value.CompareTo(other.Value);
+        }
+
+        public static explicit operator int(Integer value)
+        {
+            return (int) value.Value;
+        }
+
+        public static Integer operator +(Integer x, Integer y)
+        {
+            return From(x.Value + y.Value);
+        }
+
+        public static Integer operator -(Integer x, Integer y)
+        {
+            return From(x.Value - y.Value);
+        }
+
+        public static Integer operator *(Integer x, Integer y)
+        {
+            return From(x.Value * y.Value);
+        }
+
+        public static Integer operator /(Integer x, Integer y)
+        {
+            return From(x.Value / y.Value);
+        }
+
+        public static Integer operator %(Integer x, Integer y)
+        {
+            return From(x.Value % y.Value);
         }
 
         public override bool Equals(object obj)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CoTy.Inputs
 {
@@ -16,14 +17,9 @@ namespace CoTy.Inputs
             this.done = false;
         }
 
-        public void OpenLevel()
+        public IDisposable LevelUp()
         {
-            this.itemStream.OpenLevel();
-        }
-
-        public void CloseLevel()
-        {
-            this.itemStream.CloseLevel();
+            return this.itemStream.LevelUp();
         }
 
         public TItem this[int index]

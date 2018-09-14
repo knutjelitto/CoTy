@@ -8,9 +8,7 @@ namespace CoTy.Modules
 {
     public class SystemModule : Module
     {
-        public SystemModule(Context parent) : base(parent, "system")
-        {
-        }
+        public SystemModule() : base("system") { }
 
         [Builtin("exit", InArity = 1)]
         private static void Exit(Context context, Stack stack)

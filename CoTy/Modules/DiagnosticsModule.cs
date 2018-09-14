@@ -7,9 +7,7 @@ namespace CoTy.Modules
 {
     public class DiagnosticsModule : Module
     {
-        public DiagnosticsModule(Context parent) : base(parent, "diagnostics")
-        {
-        }
+        public DiagnosticsModule() : base("diagnostics") { }
 
         [Builtin("context")]
         private static void DumpContext(Context context, Stack stack)

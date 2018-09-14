@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace CoTy.Objects
 {
-    public partial class Cobject
+    public class Cobject : DynamicObject
     {
-        protected static readonly Impl.CobjectImpl Impl = new Impl.CobjectImpl();
+        protected static readonly Implementations.Implementation Impl = new Implementations.Implementation();
         protected static dynamic Dyn => Impl;
 
         public virtual void Close(Context context, Stack stack)
@@ -49,6 +51,103 @@ namespace CoTy.Objects
                 //stack.Push(value);
             }
         }
+
+#if true
+        public override DynamicMetaObject GetMetaObject(Expression parameter)
+        {
+            return new ForwardDynamicMetaObject(base.GetMetaObject(parameter));
+        }
+
+        private class ForwardDynamicMetaObject : DynamicMetaObject
+        {
+            private readonly DynamicMetaObject forward;
+
+            public ForwardDynamicMetaObject(DynamicMetaObject forward) : base(forward.Expression, forward.Restrictions, forward.Value)
+            {
+                this.forward = forward;
+            }
+
+            public override DynamicMetaObject BindBinaryOperation(BinaryOperationBinder binder, DynamicMetaObject arg)
+            {
+                return this.forward.BindBinaryOperation(binder, arg);
+            }
+
+            public override DynamicMetaObject BindConvert(ConvertBinder binder)
+            {
+                return this.forward.BindConvert(binder);
+            }
+
+            public override DynamicMetaObject BindCreateInstance(CreateInstanceBinder binder, DynamicMetaObject[] args)
+            {
+                return this.forward.BindCreateInstance(binder, args);
+            }
+
+            public override DynamicMetaObject BindDeleteIndex(DeleteIndexBinder binder, DynamicMetaObject[] indexes)
+            {
+                return this.forward.BindDeleteIndex(binder, indexes);
+            }
+
+            public override DynamicMetaObject BindDeleteMember(DeleteMemberBinder binder)
+            {
+                return this.forward.BindDeleteMember(binder);
+            }
+
+            public override DynamicMetaObject BindGetIndex(GetIndexBinder binder, DynamicMetaObject[] indexes)
+            {
+                return this.forward.BindGetIndex(binder, indexes);
+            }
+
+            public override DynamicMetaObject BindGetMember(GetMemberBinder binder)
+            {
+                return this.forward.BindGetMember(binder);
+            }
+
+            public override DynamicMetaObject BindInvoke(InvokeBinder binder, DynamicMetaObject[] args)
+            {
+                return this.forward.BindInvoke(binder, args);
+            }
+
+            public override DynamicMetaObject BindInvokeMember(InvokeMemberBinder binder, DynamicMetaObject[] args)
+            {
+                return this.forward.BindInvokeMember(binder, args);
+            }
+
+            public override DynamicMetaObject BindSetIndex(SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value)
+            {
+                return this.forward.BindSetIndex(binder, indexes, value);
+            }
+
+            public override DynamicMetaObject BindSetMember(SetMemberBinder binder, DynamicMetaObject value)
+            {
+                return this.forward.BindSetMember(binder, value);
+            }
+
+            public override DynamicMetaObject BindUnaryOperation(UnaryOperationBinder binder)
+            {
+                return this.forward.BindUnaryOperation(binder);
+            }
+
+            public override bool Equals(object obj)
+            {
+                return this.forward.Equals(obj);
+            }
+
+            public override IEnumerable<string> GetDynamicMemberNames()
+            {
+                return this.forward.GetDynamicMemberNames();
+            }
+
+            public override int GetHashCode()
+            {
+                return this.forward.GetHashCode();
+            }
+
+            public override string ToString()
+            {
+                return this.forward.ToString();
+            }
+        }
+#endif
     }
 
     public abstract class Cobject<TClr> : Cobject

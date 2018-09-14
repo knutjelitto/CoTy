@@ -4,22 +4,10 @@ using System.Linq;
 
 // ReSharper disable UnusedParameter.Global
 // ReSharper disable UnusedMember.Global
-namespace CoTy.Objects.Impl
+namespace CoTy.Objects.Implementations
 {
-    public partial class CobjectImpl
+    public partial class Implementation
     {
-        public Integer Count(object sequence)
-        {
-            var count = Integer.Zero;
-
-            foreach (var _ in Enumerate(sequence))
-            {
-                count = Dyn.Succ(count);
-            }
-
-            return count;
-        }
-
         public Sequence Take(object sequence, object count)
         {
             return Sequence.From(Loop(Enumerate(sequence), count));

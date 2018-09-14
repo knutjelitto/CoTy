@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace CoTy.Inputs
@@ -14,12 +13,12 @@ namespace CoTy.Inputs
             this.beforePrompt = beforePrompt ?? (() => { });
         }
 
-        public override void OpenLevel()
+        protected override void OpenLevel()
         {
             this.nesting = this.nesting + 1;
         }
 
-        public override void CloseLevel()
+        protected override void CloseLevel()
         {
             this.nesting = Math.Max(0, this.nesting - 1);
         }

@@ -136,7 +136,7 @@ namespace CoTy.Objects
 
         public override bool Equals(object obj)
         {
-            return obj is Assoc other && Equals(Value, other.Value);
+            return obj is Table other && Equals(Value, other.Value);
         }
 
         public override int GetHashCode()

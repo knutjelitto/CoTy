@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
@@ -16,14 +17,9 @@ namespace CoTy.Inputs
             this.source = source;
         }
 
-        public override void OpenLevel()
+        public override IDisposable LevelUp()
         {
-            this.source.OpenLevel();
-        }
-
-        public override void CloseLevel()
-        {
-            this.source.CloseLevel();
+            return this.source.LevelUp();
         }
 
         public override IEnumerator<Cobject> GetEnumerator()
@@ -37,20 +33,21 @@ namespace CoTy.Inputs
                 switch (current.Item)
                 {
                     case '(':
-                        current = current.Next;
+                        current.Advance();
                         yield return Symbol.LeftParent;
                         break;
                     case ')':
-                        current = current.Next;
+                        current.Advance();
                         yield return Symbol.RightParent;
                         break;
                     case '\'':
-                        current = current.Next;
+                        current.Advance();
                         yield return Symbol.Quoter;
                         break;
                     case '"':
                         yield return ScanString(ref current);
                         break;
+#if false
                     case ':':
                         if (MaybeRestrictedSymbol(current.Next))
                         {
@@ -71,6 +68,7 @@ namespace CoTy.Inputs
                             break;
                         }
                         goto default;
+#endif
                     default:
                         yield return Classify(ScanGrumble(ref current));
                         break;
@@ -186,7 +184,7 @@ namespace CoTy.Inputs
                 throw new ScannerException("EOT in string literal");
             }
             current = current.Next;
-            return new Characters(accu.ToString());
+            return Characters.From(accu);
         }
 
         private string ScanGrumble(ref Cursor<char> current)

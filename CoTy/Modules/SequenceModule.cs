@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 using CoTy.Objects;
 
@@ -8,9 +9,7 @@ namespace CoTy.Modules
 {
     public class SequenceModule : Module
     {
-        public SequenceModule(Context parent) : base(parent, "sequence")
-        {
-        }
+        public SequenceModule() : base("sequence") { }
 
         [Builtin("up", InArity = 1, OutArity = 1)]
         private static void Up(Context context, Stack stack)
@@ -32,10 +31,12 @@ namespace CoTy.Modules
         [Builtin("range", InArity = 2)]
         private static void Range(Context context, Stack stack)
         {
-            var count = stack.Pop();
-            var from = stack.Pop();
+            dynamic count = stack.Pop();
+            dynamic start = stack.Pop();
 
-            stack.Push(Dyn.Range(from, count));
+            var result = Sequence.From(Enumerable.Range((int)start, (int)count));
+
+            stack.Push(result);
         }
 
         [Builtin("take", InArity = 2)]
@@ -59,9 +60,11 @@ namespace CoTy.Modules
         [Builtin("count")]
         private static void Count(Context context, Stack stack)
         {
-            var sequence = stack.Pop();
+            var value = stack.Pop();
 
-            stack.Push(Dyn.Count(sequence));
+            var result = Enumerate(value).Count();
+
+            stack.Push(result);
         }
 
         [Builtin("repeat", InArity = 2)]

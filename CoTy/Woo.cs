@@ -2,8 +2,7 @@
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
-
-using CoTy.Implementations;
+using System.Numerics;
 using CoTy.Objects;
 
 namespace CoTy
@@ -12,18 +11,16 @@ namespace CoTy
     {
         public static void Doo()
         {
-            var integerImpl = new IntegerImpl();
+            ExpressionType x;
 
-            var method = integerImpl.Get("Compare", typeof(Integer), typeof(Integer));
-
-            //Cobject.Dyn.Plus(1, 2);
+            BigInteger y;
         }
 
         public static void Doo2()
         {
             var woo = new Woo();
-            var chars1 = new Characters("a");
-            var chars2 = new Characters("b");
+            var chars1 = Characters.From("a");
+            var chars2 = Characters.From("b");
             var int1 = Integer.From(11);
             var int2 = Integer.From(12);
 

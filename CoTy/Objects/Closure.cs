@@ -40,7 +40,7 @@ namespace CoTy.Objects
 
         public override bool Equals(object obj)
         {
-            return base.Equals(obj) && Equals(Lexical, ((Closure)obj).Lexical);
+            return base.Equals(obj) && obj is Closure other && Equals(Lexical, other.Lexical);
         }
 
         public override int GetHashCode()

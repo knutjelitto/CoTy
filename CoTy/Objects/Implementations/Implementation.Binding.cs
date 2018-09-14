@@ -1,9 +1,9 @@
 ﻿using System;
 
 // ReSharper disable UnusedMember.Global
-namespace CoTy.Objects.Impl
+namespace CoTy.Objects.Implementations
 {
-    public partial class CobjectImpl
+    public partial class Implementation
     {
         public void Define(Context context, Stack stack, Symbol symbol, object value)
         {

@@ -6,9 +6,7 @@ namespace CoTy.Modules
 {
     public class BindingModule : Module
     {
-        public BindingModule(Context parent) : base(parent, "binding")
-        {
-        }
+        public BindingModule() : base("binding"){}
 
         [Builtin("def")]
         private static void Define(Context context, Stack stack)
@@ -42,9 +40,9 @@ namespace CoTy.Modules
         {
             if (TryGetSymbol(stack.Pop(), out var symbol))
             {
-                stack.Push((Bool) context.IsDefined(symbol));
+                stack.Push(context.IsDefined(symbol));
             }
-            stack.Push(Bool.False);
+            stack.Push(false);
         }
 
         [Builtin("value")]
