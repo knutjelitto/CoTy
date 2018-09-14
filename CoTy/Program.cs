@@ -39,6 +39,7 @@ namespace CoTy
             context = Module.Reflect(typeof(SystemModule), context.Push("system"));
             context = Module.Reflect(typeof(SimpleIOModule), context.Push("simple-io"));
             context = Module.Reflect(typeof(DiagnosticsModule), context.Push("diagnostics"));
+            context = Module.Reflect(typeof(ShellModule), context.Push("shell"));
 
             return context;
         }

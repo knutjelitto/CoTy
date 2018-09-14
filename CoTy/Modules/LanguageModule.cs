@@ -44,9 +44,12 @@ namespace CoTy.Modules
         [Builtin("unquote", InArity = 1)]
         private static void Unquote(Context context, Stack stack)
         {
-            var value = stack.Pop();
+            var sequence = stack.Pop();
 
-            Cob.Unquote(stack, value);
+            foreach (var value in Enumerate(sequence))
+            {
+                stack.Push(value);
+            }
         }
 
         [Builtin("if")]

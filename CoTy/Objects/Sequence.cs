@@ -4,29 +4,29 @@ using System.Linq;
 
 namespace CoTy.Objects
 {
-    public class Sequence : Cobject<IEnumerable<Cobject>>, IEnumerable<Cobject>
+    public class Sequence : Cobject<IEnumerable<object>>, IEnumerable<object>
     {
-        protected Sequence(IEnumerable<Cobject> objs)
+        protected Sequence(IEnumerable<object> objs)
             : base(objs)
         {
         }
 
-        protected override void Close(Context context, Stack stack)
+        public override void Close(Context context, Stack stack)
         {
             stack.Push(Closure.From(context, Value));
         }
 
-        public static Sequence From(Cobject obj)
+        public static Sequence From(object obj)
         {
             return From(Enumerable.Repeat(obj, 1));
         }
 
-        public static Sequence From(params Cobject[] objs)
+        public static Sequence From(params object[] objs)
         {
-            return From((IEnumerable<Cobject>)objs);
+            return From((IEnumerable<object>)objs);
         }
 
-        public static Sequence From(IEnumerable<Cobject> objs)
+        public static Sequence From(IEnumerable<object> objs)
         {
             return new Sequence(objs);
         }
@@ -53,7 +53,7 @@ namespace CoTy.Objects
             return Value.GetHashCode();
         }
 
-        public IEnumerator<Cobject> GetEnumerator()
+        public IEnumerator<object> GetEnumerator()
         {
             return Value.GetEnumerator();
         }

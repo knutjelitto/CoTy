@@ -1,7 +1,7 @@
 ﻿// ReSharper disable UnusedMember.Global
-namespace CoTy.Objects
+namespace CoTy.Objects.Impl
 {
-    public partial class Cobject : ICompare<Bool>
+    public partial class CobjectImpl
     {
         public int Compare(Bool value1, Bool value2)
         {

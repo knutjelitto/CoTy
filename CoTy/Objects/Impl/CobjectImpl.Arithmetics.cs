@@ -4,11 +4,11 @@
 using System;
 using CoTy.Errors;
 
-namespace CoTy.Objects
+namespace CoTy.Objects.Impl
 {
-    public partial class Cobject
+    public partial class CobjectImpl
     {
-        public Cobject Plus(Cobject value1, Cobject value2)
+        public object Plus(object value1, object value2)
         {
             if (value1.GetType() != value2.GetType())
             {
@@ -25,7 +25,7 @@ namespace CoTy.Objects
             return value1;
         }
 
-        public Cobject Minus(Cobject value1, Cobject value2)
+        public object Minus(object value1, object value2)
         {
             if (value1.GetType() != value2.GetType())
             {
@@ -42,7 +42,7 @@ namespace CoTy.Objects
             return value1;
         }
 
-        public Cobject Star(Cobject value1, Cobject value2)
+        public object Star(object value1, object value2)
         {
             if (value1.GetType() != value2.GetType())
             {
@@ -60,7 +60,7 @@ namespace CoTy.Objects
             return result;
         }
 
-        public Cobject Slash(Cobject value1, Cobject value2)
+        public object Slash(object value1, object value2)
         {
             if (value1.GetType() != value2.GetType())
             {

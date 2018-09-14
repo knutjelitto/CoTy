@@ -6,9 +6,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using CoTy.Errors;
 
-namespace CoTy.Objects
+namespace CoTy.Objects.Impl
 {
-    public partial class Cobject : IDynamicMetaObjectProvider
+    public partial class CobjectImpl : IDynamicMetaObjectProvider
     {
         public DynamicMetaObject GetMetaObject(Expression parameter)
         {

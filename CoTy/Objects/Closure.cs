@@ -6,7 +6,7 @@ namespace CoTy.Objects
 {
     public class Closure : Sequence
     {
-        protected Closure(Context lexical, IEnumerable<Cobject> objs)
+        protected Closure(Context lexical, IEnumerable<object> objs)
             : base(objs)
         {
             Lexical = lexical;
@@ -14,22 +14,22 @@ namespace CoTy.Objects
 
         private Context Lexical { get; }
 
-        public static Closure From(Context lexical, IEnumerable<Cobject> values)
+        public static Closure From(Context lexical, IEnumerable<object> values)
         {
             return new Closure(lexical, values);
         }
 
-        public static Closure From(Context lexical, params Cobject[] objs)
+        public static Closure From(Context lexical, params object[] objs)
         {
-            return From(lexical, (IEnumerable<Cobject>)objs);
+            return From(lexical, (IEnumerable<object>)objs);
         }
 
-        protected override void Close(Context context, Stack stack)
+        public override void Close(Context context, Stack stack)
         {
             stack.Push(this);
         }
 
-        protected override void Apply(Context context, Stack stack)
+        public override void Apply(Context context, Stack stack)
         {
             context = Lexical.Push("local");
             foreach (var value in Value)

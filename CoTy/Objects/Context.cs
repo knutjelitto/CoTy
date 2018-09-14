@@ -52,7 +52,7 @@ namespace CoTy.Objects
             return TryFind(symbol, out var binding) && !binding.IsSealed;
         }
 
-        public void Define(Symbol symbol, Cobject value, bool isSealed = false, bool isOpaque = false)
+        public void Define(Symbol symbol, object value, bool isSealed = false, bool isOpaque = false)
         {
             if (TryFind(symbol, out var binding))
             {
@@ -88,7 +88,7 @@ namespace CoTy.Objects
             binding.Scope.Value.Remove(symbol);
         }
 
-        public void Update(Symbol symbol, Cobject value)
+        public void Update(Symbol symbol, object value)
         {
             var binding = Find(symbol);
 
@@ -100,7 +100,7 @@ namespace CoTy.Objects
             binding.Value = value;
         }
 
-        public void Get(Symbol symbol, out Cobject value)
+        public void Get(Symbol symbol, out object value)
         {
             value = Find(symbol).Value;
         }
@@ -151,7 +151,7 @@ namespace CoTy.Objects
 
         public class Binding
         {
-            public Binding(Context scope, Cobject value, bool isSealed, bool isOpaque)
+            public Binding(Context scope, object value, bool isSealed, bool isOpaque)
             {
                 Scope = scope;
                 Value = value;
@@ -160,7 +160,7 @@ namespace CoTy.Objects
             }
 
             public Context Scope { get; }
-            public Cobject Value { get; set; }
+            public object Value { get; set; }
             public bool IsSealed { get; }
             public bool IsOpaque { get; }
         }

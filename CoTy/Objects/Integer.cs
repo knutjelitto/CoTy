@@ -4,7 +4,7 @@ namespace CoTy.Objects
 {
     public class Integer : Cobject<BigInteger>
     {
-        public new static readonly Integer Zero = new Integer(0);
+        public static readonly Integer Zero = new Integer(0);
         public static Integer One = new Integer(1);
 
         private Integer(BigInteger value) : base(value)

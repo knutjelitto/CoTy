@@ -2,9 +2,9 @@
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
-namespace CoTy.Objects
+namespace CoTy.Objects.Impl
 {
-    public partial class Cobject
+    public partial class CobjectImpl
     {
         public void Print(object value)
         {

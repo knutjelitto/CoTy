@@ -12,7 +12,7 @@ namespace CoTy.Objects
             this.eval = eval;
         }
 
-        protected override void Close(Context context, Stack stack)
+        public override void Close(Context context, Stack stack)
         {
             this.eval(context, stack);
         }

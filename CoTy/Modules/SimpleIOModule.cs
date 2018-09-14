@@ -29,11 +29,5 @@ namespace CoTy.Modules
         {
             Console.WriteLine();
         }
-
-        [Builtin("cls", InArity = 0)]
-        private static void ClearScreen(Context context, Stack stack)
-        {
-            Console.Clear();
-        }
     }
 }

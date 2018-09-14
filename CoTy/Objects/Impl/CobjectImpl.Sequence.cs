@@ -4,27 +4,27 @@ using System.Linq;
 
 // ReSharper disable UnusedParameter.Global
 // ReSharper disable UnusedMember.Global
-namespace CoTy.Objects
+namespace CoTy.Objects.Impl
 {
-    public partial class Cobject
+    public partial class CobjectImpl
     {
-        public Integer Count(Cobject sequence)
+        public Integer Count(object sequence)
         {
             var count = Integer.Zero;
 
             foreach (var _ in Enumerate(sequence))
             {
-                count = count.Succ(count);
+                count = Dyn.Succ(count);
             }
 
             return count;
         }
 
-        public Sequence Take(Cobject sequence, Cobject count)
+        public Sequence Take(object sequence, object count)
         {
             return Sequence.From(Loop(Enumerate(sequence), count));
 
-            IEnumerable<Cobject> Loop(IEnumerable<Cobject> _sequence, Cobject _count)
+            IEnumerable<object> Loop(IEnumerable<object> _sequence, object _count)
             {
                 var zero = Dyn.Zero(_count);
 
@@ -44,11 +44,11 @@ namespace CoTy.Objects
             }
         }
 
-        public Sequence Skip(Cobject sequence, Cobject count)
+        public Sequence Skip(object sequence, object count)
         {
             return Sequence.From(Loop(Enumerate(sequence), count));
 
-            IEnumerable<Cobject> Loop(IEnumerable<Cobject> _sequence, Cobject _count)
+            IEnumerable<object> Loop(IEnumerable<object> _sequence, object _count)
             {
                 foreach (var value in _sequence)
                 {
@@ -65,11 +65,11 @@ namespace CoTy.Objects
             }
         }
 
-        public Sequence Range(Cobject from, Cobject count)
+        public Sequence Range(object from, object count)
         {
             return Sequence.From(Loop(from, count));
 
-            IEnumerable<Cobject> Loop(Cobject _from, Cobject _count)
+            IEnumerable<object> Loop(object _from, object _count)
             {
                 var zero = Dyn.Zero(_count);
                 while (Dyn.Compare(_count, zero) > 0)
@@ -82,11 +82,11 @@ namespace CoTy.Objects
             }
         }
 
-        public Sequence Upto(Cobject from, Cobject upto)
+        public Sequence Upto(object from, object upto)
         {
             return Sequence.From(Loop(from, upto));
 
-            IEnumerable<Cobject> Loop(Cobject _from, Cobject _upto)
+            IEnumerable<object> Loop(object _from, object _upto)
             {
                 while (Dyn.Compare(_from, _upto) <= 0)
                 {
@@ -97,11 +97,11 @@ namespace CoTy.Objects
             }
         }
 
-        public Sequence Up(Cobject from)
+        public Sequence Up(object from)
         {
             return Sequence.From(Loop(from));
 
-            IEnumerable<Cobject> Loop(Cobject _from)
+            IEnumerable<object> Loop(object _from)
             {
                 while (true)
                 {
@@ -113,11 +113,11 @@ namespace CoTy.Objects
             }
         }
 
-        public Sequence Repeat(Cobject value, Cobject count)
+        public Sequence Repeat(object value, object count)
         {
             return Sequence.From(Loop(value, count));
 
-            IEnumerable<Cobject> Loop(Cobject _value, Cobject _count)
+            IEnumerable<object> Loop(object _value, object _count)
             {
                 while (Dyn.Compare(_count, Integer.Zero) > 0)
                 {
@@ -128,7 +128,7 @@ namespace CoTy.Objects
             }
         }
 
-        public void Reduce(Context context, Stack stack, Cobject sequence, Cobject action)
+        public void Reduce(Context context, Stack stack, object sequence, object action)
         {
             var first = true;
             foreach (var value in Enumerate(sequence))
@@ -136,7 +136,7 @@ namespace CoTy.Objects
                 stack.Push(value);
                 if (!first)
                 {
-                    Apply(context, stack, action);
+                    Cobject.Apply(context, stack, action);
                 }
                 else
                 {
@@ -145,38 +145,34 @@ namespace CoTy.Objects
             }
         }
 
-        public void Map(Context context, Stack stack, Cobject sequence, Cobject action)
+        public void Map(Context context, Stack stack, object sequence, object action)
         {
-            Cobject Eval(Cobject value)
+            object Eval(object value)
             {
                 stack.Push(value);
-                Apply(context, stack, action);
+                Cobject.Apply(context, stack, action);
                 return stack.Pop();
             }
 
             stack.Push(Sequence.From(Enumerate(sequence).Select(Eval)));
         }
 
-        public void Each(Context context, Stack stack, Cobject sequence, Cobject action)
+        public void Each(Context context, Stack stack, object sequence, object action)
         {
             foreach (var value in Enumerate(sequence))
             {
                 stack.Push(value);
-                Apply(context, stack, action);
+                Cobject.Apply(context, stack, action);
             }
         }
 
-        public Sequence Concat(Cobject single1, Cobject single2)
+        public Sequence Concat(object single1, object single2)
         {
             return Sequence.From(Enumerate(single1).Concat(Enumerate(single2)));
         }
 
-        public void Unquote(Stack stack, Cobject sequence)
+        public void Unquote(Stack stack, object sequence)
         {
-            foreach (var value in Enumerate(sequence))
-            {
-                stack.Push(value);
-            }
         }
     }
 }

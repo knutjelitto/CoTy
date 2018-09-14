@@ -33,7 +33,7 @@ namespace CoTy.Objects
             return symbol;
         }
 
-        protected override void Close(Context context, Stack stack)
+        public override void Close(Context context, Stack stack)
         {
             context.Get(this, out var value);
 

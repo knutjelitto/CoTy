@@ -6,16 +6,15 @@ namespace CoTy.Objects
 {
     public partial class Cobject
     {
-        protected static readonly Cobject Cob = new Cobject();
+        protected static readonly Impl.CobjectImpl Impl = new Impl.CobjectImpl();
+        protected static dynamic Dyn => Impl;
 
-        protected static dynamic Dyn => Cob;
-
-        protected virtual void Close(Context context, Stack stack)
+        public virtual void Close(Context context, Stack stack)
         {
             stack.Push(this);
         }
 
-        protected virtual void Apply(Context context, Stack stack)
+        public virtual void Apply(Context context, Stack stack)
         {
             Close(context, stack);
         }
@@ -25,7 +24,7 @@ namespace CoTy.Objects
             return value as IEnumerable<T> ?? Enumerable.Repeat(value, 1);
         }
 
-        protected static void Apply(Context context, Stack stack, object value)
+        public static void Apply(Context context, Stack stack, object value)
         {
             if (value is Cobject cvalue)
             {
@@ -38,7 +37,7 @@ namespace CoTy.Objects
             }
         }
 
-        protected static void Close(Context context, Stack stack, object value)
+        public static void Close(Context context, Stack stack, object value)
         {
             if (value is Cobject cvalue)
             {

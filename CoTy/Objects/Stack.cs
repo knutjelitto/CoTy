@@ -5,18 +5,18 @@ using CoTy.Errors;
 
 namespace CoTy.Objects
 {
-    public class Stack : Cobject<Stack<Cobject>>
+    public class Stack : Cobject<Stack<object>>
     {
-        public Stack() : base(new Stack<Cobject>())
+        public Stack() : base(new Stack<object>())
         {
         }
 
-        public void Push(Cobject obj)
+        public void Push(object obj)
         {
             Value.Push(obj);
         }
 
-        public Cobject Pop()
+        public object Pop()
         {
             if (Value.Count == 0)
             {
@@ -25,7 +25,7 @@ namespace CoTy.Objects
             return Value.Pop();
         }
 
-        public Cobject Peek()
+        public object Peek()
         {
             if (Value.Count == 0)
             {

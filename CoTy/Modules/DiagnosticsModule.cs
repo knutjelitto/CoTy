@@ -11,35 +11,16 @@ namespace CoTy.Modules
         {
         }
 
-        [Builtin("ds")]
-        private static void DumpScope(Context context, Stack stack)
+        [Builtin("context")]
+        private static void DumpContext(Context context, Stack stack)
         {
-#if true
             var scope = context.Scope;
             while (scope != null)
             {
                 var syms = scope.Name + "{" + string.Join(" ", scope.Symbols) + "}";
                 Console.WriteLine(syms);
-                scope = (Context)scope.Parent;
+                scope = scope.Parent;
             }
-#else
-            Console.WriteLine("===lexical===");
-            var lexical = context.Lexical;
-            while (lexical != null)
-            {
-                var syms = lexical.Name + "{" + string.Join(" ", lexical.Symbols) + "}";
-                Console.WriteLine(syms);
-                lexical = lexical.Parent;
-            }
-            Console.WriteLine("===local=====");
-            var local = context.Local;
-            while (local != null)
-            {
-                var syms = local.Name + "{" + string.Join(" ", local.Symbols) + "}";
-                Console.WriteLine(syms);
-                local = local.Parent;
-            }
-#endif
         }
     }
 }

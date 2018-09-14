@@ -1,9 +1,9 @@
 ﻿using System;
 
 // ReSharper disable UnusedMember.Global
-namespace CoTy.Objects
+namespace CoTy.Objects.Impl
 {
-    public partial class Cobject : ICompare<Characters>
+    public partial class CobjectImpl
     {
         public int Compare(Characters chars1, Characters chars2)
         {
