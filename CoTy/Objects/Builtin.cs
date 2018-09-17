@@ -4,17 +4,19 @@ namespace CoTy.Objects
 {
     public class Builtin : Cobject<Action<Context, Stack>>
     {
-        private readonly Action<Context, Stack> eval;
-
-        public Builtin(Action<Context, Stack> eval)
+        private Builtin(Action<Context, Stack> eval)
             : base(eval)
         {
-            this.eval = eval;
+        }
+
+        public static Builtin From(Action<Context, Stack> eval)
+        {
+            return new Builtin(eval);
         }
 
         public override void Close(Context context, Stack stack)
         {
-            this.eval(context, stack);
+            Value(context, stack);
         }
 
         public override bool Equals(object obj)

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace CoTy.Objects
 {
@@ -23,7 +21,8 @@ namespace CoTy.Objects
             return value as IEnumerable<T> ?? Enumerable.Repeat(value, 1);
         }
 
-        public static void Apply(Context context, Stack stack, object value)
+#if false
+        protected static void Apply(Context context, Stack stack, object value)
         {
             if (value is Cobject cvalue)
             {
@@ -35,7 +34,7 @@ namespace CoTy.Objects
             }
         }
 
-        public static void Close(Context context, Stack stack, object value)
+        protected static void Close(Context context, Stack stack, object value)
         {
             if (value is Cobject cvalue)
             {
@@ -43,12 +42,12 @@ namespace CoTy.Objects
             }
             else
             {
-                throw new NotImplementedException();
-                //stack.Push(value);
+                stack.Push(value);
             }
         }
+#endif
 
-#if true
+#if false
         public override DynamicMetaObject GetMetaObject(Expression parameter)
         {
             return new ForwardDynamicMetaObject(base.GetMetaObject(parameter));
@@ -155,6 +154,6 @@ namespace CoTy.Objects
             Value = value;
         }
 
-        public TClr Value { get; }
+        protected TClr Value { get; }
     }
 }

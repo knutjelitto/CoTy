@@ -5,9 +5,9 @@ namespace CoTy.Objects
 {
     public class Characters : Cobject<string>, IComparable<Characters>
     {
-        public static Characters Empty = new Characters(string.Empty);
+        private static readonly Characters Empty = new Characters(string.Empty);
 
-        protected Characters(string value) : base(value)
+        private Characters(string value) : base(value)
         {
         }
 
@@ -31,12 +31,12 @@ namespace CoTy.Objects
             return string.Compare(Value, other.Value, StringComparison.Ordinal);
         }
 
-        public static explicit operator Characters(string characters)
+        public static implicit operator Characters(string characters)
         {
             return new Characters(characters);
         }
 
-        public static explicit operator string(Characters characters)
+        public static implicit operator string(Characters characters)
         {
             return characters.Value;
         }
@@ -73,7 +73,7 @@ namespace CoTy.Objects
 
         private static Characters Multiply(Characters str, Integer count)
         {
-            var bigLength = str.Value.Length * count.Value;
+            var bigLength = str.Value.Length * count;
 
             if (bigLength <= 0 || Equals(str, Empty))
             {
@@ -89,7 +89,7 @@ namespace CoTy.Objects
 
             var builder = new StringBuilder(length);
 
-            for (var i = (int)count.Value; i > 0; --i)
+            for (var i = (int)count; i > 0; --i)
             {
                 builder.Append(str.Value);
             }

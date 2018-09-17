@@ -44,6 +44,10 @@ namespace CoTy.Inputs
                         current.Advance();
                         yield return Symbol.Quoter;
                         break;
+                    case ':':
+                        current.Advance();
+                        yield return Symbol.BindTo;
+                        break;
                     case '"':
                         yield return ScanString(ref current);
                         break;
@@ -85,7 +89,7 @@ namespace CoTy.Inputs
 
         private bool IsStructure(char c)
         {
-            return "()\"\'".Contains(c);
+            return "():\"\'".Contains(c);
         }
 
         private bool IsRestrictedSymbolFirst(char c)
@@ -131,7 +135,7 @@ namespace CoTy.Inputs
 
         private bool IsLineComment(Cursor<char> current)
         {
-            return current.Item == ';' && current.Next.Item == ';';
+            return current && current.Item == '/' && current.Next && current.Next.Item == '/';
         }
 
         private Cursor<char> Skip(Cursor<char> current)

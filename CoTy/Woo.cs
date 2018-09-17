@@ -2,7 +2,6 @@
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Numerics;
 using CoTy.Objects;
 
 namespace CoTy
@@ -11,7 +10,28 @@ namespace CoTy
     {
         public static void Doo()
         {
-#if true
+            ISequence Aggregate(ISequence sequence, object seed, Func<dynamic, dynamic, object> aggregator)
+            {
+                return Sequence.From(sequence.GetIterator().Aggregate(seed, aggregator));
+            }
+
+            ISequence Sub(Context context, ISequence inputs)
+            {
+                return Aggregate(inputs, Integer.Zero, (x, y) => x - y);
+            }
+
+            Sequence Seq(params object[] values)
+            {
+                return Sequence.From(values.AsEnumerable());
+            }
+
+            var result = Sub(Context.Root("root"), Seq(1, Integer.From(2)));
+
+            Console.WriteLine($"{result}");
+        }
+
+        public static void Doo3()
+        {
             Func<dynamic, dynamic, object> binOp = (v1, v2) => v1 * v2;
 
             var context = Expression.Parameter(typeof(Context), "context");
@@ -29,10 +49,7 @@ namespace CoTy
             var action = lambda.Compile();
 
             var xcontext = Context.Root("root");
-            var xstack = new Stack();
-
-            xstack.Push(Integer.From(10));
-            xstack.Push(Integer.From(10));
+            var xstack = Stack.From(Integer.From(10), Integer.From(10));
 
             action(xcontext, xstack);
 
@@ -40,7 +57,6 @@ namespace CoTy
             xstack.Push(10);
 
             action(xcontext, xstack);
-#endif
         }
 
         public static void Doo2()

@@ -3,15 +3,13 @@ using System.Linq;
 
 using CoTy.Objects;
 
-// ReSharper disable UnusedMember.Local
-// ReSharper disable UnusedParameter.Local
-namespace CoTy.Modules
+namespace CoTy.Definitions
 {
-    public class SequenceModule : Module
+    public class SequenceDefiner : Definer
     {
-        public SequenceModule() : base("sequence") { }
+        public SequenceDefiner() : base("sequence") { }
 
-        public override Context Reflect(Context into)
+        public override Context Define(Context into)
         {
             Define(into, "up", (dynamic value) =>
             {
@@ -24,6 +22,7 @@ namespace CoTy.Modules
                         yield return current;
                         value = ++current;
                     }
+                    // ReSharper disable once IteratorNeverReturns
                 }
             });
 
@@ -63,7 +62,7 @@ namespace CoTy.Modules
 
                 IEnumerable<object> Loop(object _values, Integer _count)
                 {
-                    foreach (var value in Enumerate(values))
+                    foreach (var value in Enumerate(_values))
                     {
                         if (Integer.Zero.CompareTo(_count) < 0)
                         {
@@ -84,7 +83,7 @@ namespace CoTy.Modules
 
                 IEnumerable<object> Loop(object _values, Integer _count)
                 {
-                    foreach (var value in Enumerate(values))
+                    foreach (var value in Enumerate(_values))
                     {
                         if (Integer.Zero.CompareTo(_count) < 0)
                         {
@@ -98,7 +97,7 @@ namespace CoTy.Modules
                 }
             });
 
-            Define(into, "forever", (object value) =>
+            Define(into, "forever", value =>
             {
                 return Sequence.From(Loop(value));
 
@@ -108,6 +107,7 @@ namespace CoTy.Modules
                     {
                         yield return _value;
                     }
+                    // ReSharper disable once IteratorNeverReturns
                 }
             });
             
@@ -119,13 +119,13 @@ namespace CoTy.Modules
                 {
                     while (Integer.Zero.CompareTo(_count) < 0)
                     {
-                        yield return value;
+                        yield return _value;
                         --_count;
                     }
                 }
             });
 
-            Define(into, "collapse", (Context context, Stack stack, object values, object action) =>
+            Define(into, "collapse", (context, stack, values, action) =>
             {
                 var first = true;
                 foreach (var value in Enumerate(values))
@@ -133,7 +133,7 @@ namespace CoTy.Modules
                     stack.Push(value);
                     if (!first)
                     {
-                        Apply(context, stack, action);
+                        action.Apply(context, stack);
                     }
                     else
                     {
@@ -142,59 +142,58 @@ namespace CoTy.Modules
                 }
             });
 
-            Define(into, "reduce", (Context context, Stack stack, object values, object seed, object action) =>
+            Define(into, "reduce", (context, stack, values, seed, action) =>
             {
                 stack.Push(seed);
                 foreach (var value in Enumerate(values))
                 {
                     stack.Push(value);
-                    Apply(context, stack, action);
+                    action.Apply(context, stack);
                 }
             });
 
-            return base.Reflect(into);
-        }
+            Define(into,
+                   "map",
+                   (context, stack, sequence, action) =>
+                   {
+                       var result = Sequence.From(Enumerate(sequence).Select(value => Eval(value, action)));
+
+                       stack.Push(result);
+
+                       object Eval(object _value, object _action)
+                       {
+                           stack.Push(_value);
+                           _action.Apply(context, stack);
+                           return stack.Pop();
+                       }
+                   });
+
+            Define(into,
+                   "foreach",
+                   (context, stack, sequence, action) =>
+                   {
+                       foreach (var value in Enumerate(sequence))
+                       {
+                           stack.Push(value);
+                           action.Apply(context, stack);
+                       }
+                   });
 
 
-        [Builtin("map", InArity = 2, OutArity = 1)]
-        private static void Map(Context context, Stack stack)
-        {
-            var action = stack.Pop();
-            var sequence = stack.Pop();
+            Define(into,
+                   "count",
+                   (context, stack, values) =>
+                   {
+                       var count = Integer.Zero;
 
-            var result = Sequence.From(Enumerate(sequence).Select(value => Eval(value, action)));
+                       foreach (var _ in Enumerate(values))
+                       {
+                           ++count;
+                       }
+                       stack.Push(count);
+                   });
 
-            stack.Push(result);
-
-            object Eval(object _value, object _action)
-            {
-                stack.Push(_value);
-                Apply(context, stack, _action);
-                return stack.Pop();
-            }
-        }
-
-        [Builtin("foreach")]
-        private static void Each(Context context, Stack stack)
-        {
-            var action = stack.Pop();
-            var sequence = stack.Pop();
-
-            foreach (var value in Enumerate(sequence))
-            {
-                stack.Push(value);
-                Apply(context, stack, action);
-            }
-        }
-
-        [Builtin("count")]
-        private static void Count(Context context, Stack stack)
-        {
-            var value = stack.Pop();
-
-            var result = Enumerate(value).Count();
-
-            stack.Push(result);
+            return base.Define(into);
         }
     }
 }

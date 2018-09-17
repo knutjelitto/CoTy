@@ -5,10 +5,10 @@ using CoTy.Errors;
 // ReSharper disable RedundantAssignment
 namespace CoTy.Objects
 {
-    public class Binder : Sequence
+    public class Binder : Cobject<List<Symbol>>
     {
-        protected Binder(IEnumerable<Symbol> objs)
-            : base(objs)
+        private Binder(IEnumerable<Symbol> objs)
+            : base(objs.ToList())
         {
         }
 
@@ -24,12 +24,12 @@ namespace CoTy.Objects
 
         public override void Close(Context context, Stack stack)
         {
-            if (Value.Count() > stack.Value.Count)
+            if (Value.Count > stack.Count)
             {
-                throw new StackException(Value.Count(), stack.Value.Count);
+                throw new StackException(Value.Count, stack.Count);
             }
 
-            foreach (var symbol in Value.Reverse().Cast<Symbol>())
+            foreach (var symbol in Value.AsEnumerable().Reverse())
             {
                 var value = stack.Pop();
                 context.Define(symbol, value);
@@ -53,7 +53,11 @@ namespace CoTy.Objects
 
         public override string ToString()
         {
-            return "[" + string.Join(" ", Value) + "]";
+            if (Value.Count == 1)
+            {
+                return ":" + Value[0];
+            }
+            return ":(" + string.Join(" ", Value) + ")";
         }
     }
 }

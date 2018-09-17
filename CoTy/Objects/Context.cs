@@ -16,7 +16,7 @@ namespace CoTy.Objects
             Name = name;
         }
 
-        public IEnumerable<Symbol> Symbols => Value.Keys.OrderBy(k => k.Value);
+        public IEnumerable<Symbol> Symbols => Value.Keys.OrderBy(k => k.ToString());
 
         public Context Scope => this;
 
@@ -136,7 +136,7 @@ namespace CoTy.Objects
 
         public override bool Equals(object obj)
         {
-            return obj is Table other && Equals(Value, other.Value);
+            return obj is Context other && Equals(Value, other.Value);
         }
 
         public override int GetHashCode()
@@ -163,32 +163,6 @@ namespace CoTy.Objects
             public object Value { get; set; }
             public bool IsSealed { get; }
             public bool IsOpaque { get; }
-        }
-
-        private class Ctx : Cobject<(Dictionary<Symbol, Binding> Dict, Stack Stack)>
-        {
-            public Ctx()
-                : this(new Dictionary<Symbol, Binding>(), new Stack())
-            {
-            }
-            private Ctx(Dictionary<Symbol, Binding> dict, Stack stack)
-                : base((dict, stack))
-            {
-            }
-
-            public Ctx WithStack(Stack stack)
-            {
-                return new Ctx(Value.Dict, stack);
-            }
-
-            public IEnumerable<object> Components()
-            {
-                var tuple = Value.ToTuple() as ITuple;
-                for (var i = 0; i < tuple.Length; ++i)
-                {
-                    yield return tuple[i];
-                }
-            }
         }
     }
 }

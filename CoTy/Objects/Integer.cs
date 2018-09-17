@@ -33,12 +33,12 @@ namespace CoTy.Objects
             return Value.CompareTo(other.Value);
         }
 
-        public static explicit operator int(Integer value)
+        public static implicit operator int(Integer value)
         {
             return (int)value.Value;
         }
 
-        public static explicit operator Integer(int value)
+        public static implicit operator Integer(int value)
         {
             return new Integer(value);
         }

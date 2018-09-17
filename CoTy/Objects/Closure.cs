@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 // ReSharper disable RedundantAssignment
 namespace CoTy.Objects
 {
     public class Closure : Sequence
     {
-        protected Closure(Context lexical, IEnumerable<object> objs)
+        private Closure(Context lexical, IEnumerable<object> objs)
             : base(objs)
         {
             Lexical = lexical;
@@ -34,7 +33,7 @@ namespace CoTy.Objects
             context = Lexical.Push("local");
             foreach (var value in Value)
             {
-                Close(context, stack, value);
+                value.Close(context, stack);
             }
         }
 

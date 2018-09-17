@@ -1,7 +1,6 @@
 ﻿using System.IO;
-
+using CoTy.Definitions;
 using CoTy.Inputs;
-using CoTy.Modules;
 using CoTy.Objects;
 
 namespace CoTy
@@ -17,34 +16,34 @@ namespace CoTy
             var testLexical = WithTest(rootLexical);
             var rootActivation = rootLexical.Push("prompt");
             var testActivation = testLexical.Push("test");
-            var stack = new Stack();
+            var stack = Stack.From();
 
-            LanguageModule.Execute(ReadResource("tests"), testActivation, stack);
-            LanguageModule.Execute(ReadResource("startup"), rootActivation, stack);
+            LanguageDefiner.Execute(ReadResource("tests"), testActivation, stack);
+            LanguageDefiner.Execute(ReadResource("startup"), rootActivation, stack);
             while (true)
             {
-                LanguageModule.Execute(new ConsoleStream(stack.Dump), rootActivation, stack);
+                LanguageDefiner.Execute(new ConsoleStream(stack.Dump), rootActivation, stack);
             }
             // ReSharper disable once FunctionNeverReturns
         }
 
         private static Context MakeRootFrame()
         {
-            var modules = new Module[]
+            var modules = new Definer[]
             {
-                new LanguageModule(),
-                new BindingModule(),
-                new StackModule(),
-                new OperatorModule(),
-                new SequenceModule(),
-                new SystemModule(),
-                new ConsoleModule(),
-                new DiagnosticsModule(),
+                new LanguageDefiner(),
+                new BindingDefiner(),
+                new StackDefiner(),
+                new OperatorDefiner(),
+                new SequenceDefiner(),
+                new SystemDefiner(),
+                new ConsoleDefiner(),
+                new DiagnosticsDefiner(),
             };
             var context = Context.Root("bottom");
             foreach (var module in modules)
             {
-                context = module.Reflect(context.Push(module.Name));
+                context = module.Define(context.Push(module.Name));
             }
 
             return context;
@@ -52,7 +51,7 @@ namespace CoTy
 
         private static Context WithTest(Context rootLexical)
         {
-            return new TestingModule().Reflect(rootLexical.Push("testing"));
+            return new TestsDefiner().Define(rootLexical.Push("testing"));
         }
 
         private static string ReadResource(string name)

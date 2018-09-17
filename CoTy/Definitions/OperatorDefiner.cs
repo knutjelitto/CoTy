@@ -1,17 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using CoTy.Errors;
 using CoTy.Objects;
 
-// ReSharper disable UnusedMember.Local
-// ReSharper disable UnusedParameter.Local
-namespace CoTy.Modules
+namespace CoTy.Definitions
 {
-    public class OperatorModule : Module
+    public class OperatorDefiner : Definer
     {
-        public OperatorModule() : base("operator") { }
+        public OperatorDefiner() : base("operator") { }
 
-        public override Context Reflect(Context into)
+        public override Context Define(Context into)
         {
             Define(into, "==", (dynamic value1, dynamic value2) => Equals(value1, value2));
             Define(into, "!=", (dynamic value1, dynamic value2) => !Equals(value1, value2));
@@ -48,7 +46,7 @@ namespace CoTy.Modules
                 }
             });
 
-            return into;
+            return base.Define(into);
         }
     }
 }
