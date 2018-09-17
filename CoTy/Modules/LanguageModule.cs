@@ -4,7 +4,6 @@ using System.IO;
 using CoTy.Errors;
 using CoTy.Inputs;
 using CoTy.Objects;
-using CoTy.Objects.Implementations;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
@@ -17,37 +16,67 @@ namespace CoTy.Modules
         [Builtin("apply", InArity = 1)]
         private static void apply(Context context, Stack stack)
         {
-            Impl.Apply(context, stack);
+            var value = stack.Pop();
+
+            Apply(context, stack, value);
         }
 
         [Builtin("close", InArity = 1)]
         private static void close(Context context, Stack stack)
         {
-            Impl.Close(context, stack);
+            var value = stack.Pop();
+
+            Close(context, stack, value);
         }
 
         [Builtin("quote", InArity = 1)]
         private static void quote(Context context, Stack stack)
         {
-            Impl.Quote(context, stack);
+            var value = stack.Pop();
+
+            var result = Closure.From(context, value);
+
+            stack.Push(result);
         }
 
         [Builtin("unquote", InArity = 1)]
         private static void unquote(Context context, Stack stack)
         {
-            Impl.Unquote(context, stack);
+            var sequence = stack.Pop();
+
+            foreach (var value in Enumerate(sequence))
+            {
+                stack.Push(value);
+            }
         }
 
         [Builtin("if")]
         private static void If(Context context, Stack stack)
         {
-            Impl.If(context, stack);
+            var ifElse = stack.Pop();
+            var ifTrue = stack.Pop();
+            var condition = stack.Pop();
+
+            Apply(context, stack, condition);
+            var result = stack.Pop();
+
+            if (result is bool boolean && boolean)
+            {
+                Apply(context, stack, ifTrue);
+            }
+            else
+            {
+                Apply(context, stack, ifElse);
+            }
         }
 
         [Builtin("curry", InArity = 2, OutArity = 1)]  // a quot1 ⇒ quot2
         private static void Curry(Context context, Stack stack)
         {
-            Impl.Curry(context, stack);
+            var quotation = stack.Pop();
+            var value = stack.Pop();
+
+            stack.Push(Closure.From(context, quotation, value, Symbol.ApplySym));
         }
 
         [Builtin("load", InArity = 1)]
@@ -68,20 +97,11 @@ namespace CoTy.Modules
             var localContext =  context.Push("load");
             var localStack = new Stack();
 
-            Execute(MakeParser(new CharStream(content)), localContext, localStack);
+            Execute(content, localContext, localStack);
 
             localContext = localContext.Pop();
 
             context.Define(symbol, localContext);
-        }
-
-        public static Parser MakeParser(ItemStream<char> input)
-        {
-            var source = new ItemSource<char>(input);
-            var scanner = new Scanner(source);
-            var parser = new Parser(scanner);
-
-            return parser;
         }
 
         public static void Execute(string stream, Context context, Stack stack)
@@ -91,7 +111,7 @@ namespace CoTy.Modules
 
         public static void Execute(ItemStream<char> charStream, Context context, Stack stack)
         {
-            Execute(MakeParser(charStream), context, stack);
+            Execute(new Parser(charStream), context, stack);
         }
 
         public static void Execute(ItemStream<Cobject> stream, Context context, Stack stack)

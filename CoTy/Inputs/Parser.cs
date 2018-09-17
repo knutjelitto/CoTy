@@ -11,9 +11,10 @@ namespace CoTy.Inputs
     {
         private Scanner Scanner { get; }
 
-        public Parser(Scanner scanner)
+        public Parser(ItemStream<char> charStream)
         {
-            Scanner = scanner;
+            var source = new ItemSource<char>(charStream);
+            Scanner = new Scanner(source);
         }
 
         public override IEnumerator<Cobject> GetEnumerator()

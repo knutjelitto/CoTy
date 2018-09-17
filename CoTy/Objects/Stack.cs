@@ -5,15 +5,15 @@ using CoTy.Errors;
 
 namespace CoTy.Objects
 {
-    public class Stack : Cobject<Stack<object>>
+    public class Stack : Cobject<List<object>>
     {
-        public Stack() : base(new Stack<object>())
+        public Stack() : base(new List<object>())
         {
         }
 
-        public void Push(object obj)
+        public void Push(object value)
         {
-            Value.Push(obj);
+            Value.Add(value);
         }
 
         public object Pop()
@@ -22,7 +22,10 @@ namespace CoTy.Objects
             {
                 throw new StackException(1, 0);
             }
-            return Value.Pop();
+
+            var popped = Value[Value.Count - 1];
+            Value.RemoveAt(Value.Count - 1);
+            return popped;
         }
 
         public object Peek()
@@ -31,7 +34,7 @@ namespace CoTy.Objects
             {
                 throw new StackException(1, 0);
             }
-            return Value.Peek();
+            return Value[Value.Count - 1];
         }
 
         public void Clear()
@@ -41,7 +44,7 @@ namespace CoTy.Objects
 
         public Sequence Get()
         {
-            return Sequence.From(Value.Reverse().ToList());
+            return Sequence.From(Value.ToList());
         }
 
         public void Dump()

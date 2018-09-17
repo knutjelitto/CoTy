@@ -14,14 +14,14 @@ namespace CoTy.Objects
 
         private Context Lexical { get; }
 
-        public static Closure From(Context lexical, IEnumerable<object> values)
+        public static Closure From(Context context, IEnumerable<object> values)
         {
-            return new Closure(lexical, values);
+            return new Closure(context, values);
         }
 
-        public static Closure From(Context lexical, params object[] objs)
+        public static Closure From(Context context, params object[] objs)
         {
-            return From(lexical, (IEnumerable<object>)objs);
+            return From(context, (IEnumerable<object>)objs);
         }
 
         public override void Close(Context context, Stack stack)

@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Types\**" />
+    <EmbeddedResource Remove="Types\**" />
+    <None Remove="Types\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Code\startup.coty" />
     <None Remove="Code\tests.coty" />
   </ItemGroup>
@@ -17,10 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Types\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="System.Reactive" Version="4.1.0" />
   </ItemGroup>
 
@@ -28,7 +30,7 @@
     <None Update="Modules\testing.coty">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Modules\Tests\integer-compare.coty">
+    <None Update="Modules\Tests\integer.coty">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

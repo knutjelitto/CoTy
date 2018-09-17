@@ -35,7 +35,22 @@ namespace CoTy.Objects
 
         public static explicit operator int(Integer value)
         {
-            return (int) value.Value;
+            return (int)value.Value;
+        }
+
+        public static explicit operator Integer(int value)
+        {
+            return new Integer(value);
+        }
+
+        public static Integer operator ++(Integer x)
+        {
+            return From(x.Value + 1);
+        }
+
+        public static Integer operator --(Integer x)
+        {
+            return From(x.Value - 1);
         }
 
         public static Integer operator +(Integer x, Integer y)

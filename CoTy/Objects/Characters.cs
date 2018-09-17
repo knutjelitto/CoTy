@@ -31,9 +31,14 @@ namespace CoTy.Objects
             return string.Compare(Value, other.Value, StringComparison.Ordinal);
         }
 
-        public static implicit operator Characters(string characters)
+        public static explicit operator Characters(string characters)
         {
             return new Characters(characters);
+        }
+
+        public static explicit operator string(Characters characters)
+        {
+            return characters.Value;
         }
 
         public static Characters operator +(Characters chars1, Characters chars2)

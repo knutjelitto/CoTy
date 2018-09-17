@@ -16,19 +16,14 @@ namespace CoTy.Objects
             stack.Push(Closure.From(context, Value));
         }
 
-        public static Sequence From(object obj)
+        public static Sequence From(params object[] values)
         {
-            return From(Enumerable.Repeat(obj, 1));
+            return From(values.AsEnumerable());
         }
 
-        public static Sequence From(params object[] objs)
+        public static Sequence From(IEnumerable<object> values)
         {
-            return From((IEnumerable<object>)objs);
-        }
-
-        public static Sequence From(IEnumerable<object> objs)
-        {
-            return new Sequence(objs);
+            return new Sequence(values);
         }
 
         public bool TryGetQuotedSymbol(out Symbol symbol)

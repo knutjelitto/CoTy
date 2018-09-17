@@ -11,9 +11,36 @@ namespace CoTy
     {
         public static void Doo()
         {
-            ExpressionType x;
+#if true
+            Func<dynamic, dynamic, object> binOp = (v1, v2) => v1 * v2;
 
-            BigInteger y;
+            var context = Expression.Parameter(typeof(Context), "context");
+            var stack = Expression.Parameter(typeof(Stack), "stack");
+            var value1 = Expression.Parameter(typeof(object), "value1");
+            var value2 = Expression.Parameter(typeof(object), "value2");
+            var result = Expression.Parameter(typeof(object), "result");
+            var block = Expression.Block(
+                new ParameterExpression[] { value1, value2, result },
+                Expression.Assign(value2, Expression.Call(stack, "Pop", Type.EmptyTypes)),
+                Expression.Assign(value1, Expression.Call(stack, "Pop", Type.EmptyTypes)),
+                Expression.Assign(result, Expression.Call(Expression.Constant(binOp.Target), binOp.Method, value1, value2)),
+                Expression.Call(stack, "Push", Type.EmptyTypes, result));
+            var lambda = Expression.Lambda<Action<Context, Stack>>(block, context, stack);
+            var action = lambda.Compile();
+
+            var xcontext = Context.Root("root");
+            var xstack = new Stack();
+
+            xstack.Push(Integer.From(10));
+            xstack.Push(Integer.From(10));
+
+            action(xcontext, xstack);
+
+            xstack.Push(10);
+            xstack.Push(10);
+
+            action(xcontext, xstack);
+#endif
         }
 
         public static void Doo2()

@@ -10,6 +10,11 @@ namespace CoTy.Modules
     {
         public SystemModule() : base("system") { }
 
+        public override Context Reflect(Context into)
+        {
+            return base.Reflect(into);
+        }
+
         [Builtin("exit", InArity = 1)]
         private static void Exit(Context context, Stack stack)
         {

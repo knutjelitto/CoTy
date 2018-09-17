@@ -35,7 +35,6 @@ namespace CoTy
                 new LanguageModule(),
                 new BindingModule(),
                 new StackModule(),
-                new BoolModule(),
                 new OperatorModule(),
                 new SequenceModule(),
                 new SystemModule(),

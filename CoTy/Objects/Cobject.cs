@@ -8,9 +8,6 @@ namespace CoTy.Objects
 {
     public class Cobject : DynamicObject
     {
-        protected static readonly Implementations.Implementation Impl = new Implementations.Implementation();
-        protected static dynamic Dyn => Impl;
-
         public virtual void Close(Context context, Stack stack)
         {
             stack.Push(this);
@@ -34,8 +31,7 @@ namespace CoTy.Objects
             }
             else
             {
-                throw new NotImplementedException();
-                //stack.Push(value);
+                stack.Push(value);
             }
         }
 
@@ -124,7 +120,9 @@ namespace CoTy.Objects
 
             public override DynamicMetaObject BindUnaryOperation(UnaryOperationBinder binder)
             {
-                return this.forward.BindUnaryOperation(binder);
+                var dyn = this.forward.BindUnaryOperation(binder);
+
+                return dyn;
             }
 
             public override bool Equals(object obj)

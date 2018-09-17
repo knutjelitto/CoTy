@@ -11,50 +11,180 @@ namespace CoTy.Modules
     {
         public SequenceModule() : base("sequence") { }
 
-        [Builtin("up", InArity = 1, OutArity = 1)]
-        private static void Up(Context context, Stack stack)
+        public override Context Reflect(Context into)
         {
-            var from = stack.Pop();
+            Define(into, "up", (dynamic value) =>
+            {
+                return Sequence.From(Loop((Integer)value));
+
+                IEnumerable<object> Loop(Integer current)
+                {
+                    while (true)
+                    {
+                        yield return current;
+                        value = ++current;
+                    }
+                }
+            });
+
+            Define(into, "upto", (dynamic start, dynamic limit) =>
+            {
+                return Sequence.From(Loop((Integer)start, (Integer)limit));
+
+                IEnumerable<object> Loop(Integer current, Integer _limit)
+                {
+                    while (current.CompareTo(_limit) <= 0)
+                    {
+                        yield return current;
+                        current = ++current;
+                    }
+                }
+            });
+
+
+            Define(into, "range", (dynamic start, dynamic count) =>
+            {
+                return Sequence.From(Loop(start, (Integer)count));
+
+                IEnumerable<object> Loop(dynamic current, Integer _count)
+                {
+                    while (Integer.Zero.CompareTo(_count) < 0)
+                    {
+                        yield return current;
+                        current = ++current;
+                        --_count;
+                    }
+                }
+            });
+
+            Define(into, "take", (object values, dynamic count) =>
+            {
+                return Sequence.From(Loop(values, (Integer)count));
+
+                IEnumerable<object> Loop(object _values, Integer _count)
+                {
+                    foreach (var value in Enumerate(values))
+                    {
+                        if (Integer.Zero.CompareTo(_count) < 0)
+                        {
+                            yield return value;
+                            --_count;
+                        }
+                        if (Integer.Zero.CompareTo(_count) >= 0)
+                        {
+                            yield break;
+                        }
+                    }
+                }
+            });
+
+            Define(into, "skip", (object values, dynamic count) =>
+            {
+                return Sequence.From(Loop(values, (Integer)count));
+
+                IEnumerable<object> Loop(object _values, Integer _count)
+                {
+                    foreach (var value in Enumerate(values))
+                    {
+                        if (Integer.Zero.CompareTo(_count) < 0)
+                        {
+                            --_count;
+                        }
+                        else
+                        {
+                            yield return value;
+                        }
+                    }
+                }
+            });
+
+            Define(into, "forever", (object value) =>
+            {
+                return Sequence.From(Loop(value));
+
+                IEnumerable<object> Loop(object _value)
+                {
+                    while (true)
+                    {
+                        yield return _value;
+                    }
+                }
+            });
             
-            stack.Push(Dyn.Up(from));
+            Define(into, "repeat", (object value, dynamic count) =>
+            {
+                return Sequence.From(Loop(value, (Integer)count));
+
+                IEnumerable<object> Loop(object _value, Integer _count)
+                {
+                    while (Integer.Zero.CompareTo(_count) < 0)
+                    {
+                        yield return value;
+                        --_count;
+                    }
+                }
+            });
+
+            Define(into, "collapse", (Context context, Stack stack, object values, object action) =>
+            {
+                var first = true;
+                foreach (var value in Enumerate(values))
+                {
+                    stack.Push(value);
+                    if (!first)
+                    {
+                        Apply(context, stack, action);
+                    }
+                    else
+                    {
+                        first = false;
+                    }
+                }
+            });
+
+            Define(into, "reduce", (Context context, Stack stack, object values, object seed, object action) =>
+            {
+                stack.Push(seed);
+                foreach (var value in Enumerate(values))
+                {
+                    stack.Push(value);
+                    Apply(context, stack, action);
+                }
+            });
+
+            return base.Reflect(into);
         }
 
-        [Builtin("upto", InArity = 2)]
-        private static void Upto(Context context, Stack stack)
+
+        [Builtin("map", InArity = 2, OutArity = 1)]
+        private static void Map(Context context, Stack stack)
         {
-            var to = stack.Pop();
-            var from = stack.Pop();
+            var action = stack.Pop();
+            var sequence = stack.Pop();
 
-            stack.Push(Dyn.Upto(from, to));
-        }
-
-        [Builtin("range", InArity = 2)]
-        private static void Range(Context context, Stack stack)
-        {
-            dynamic count = stack.Pop();
-            dynamic start = stack.Pop();
-
-            var result = Sequence.From(Enumerable.Range((int)start, (int)count));
+            var result = Sequence.From(Enumerate(sequence).Select(value => Eval(value, action)));
 
             stack.Push(result);
+
+            object Eval(object _value, object _action)
+            {
+                stack.Push(_value);
+                Apply(context, stack, _action);
+                return stack.Pop();
+            }
         }
 
-        [Builtin("take", InArity = 2)]
-        private static void Take(Context context, Stack stack)
+        [Builtin("foreach")]
+        private static void Each(Context context, Stack stack)
         {
-            var count = stack.Pop();
+            var action = stack.Pop();
             var sequence = stack.Pop();
 
-            stack.Push(Dyn.Take(sequence, count));
-        }
-
-        [Builtin("skip", InArity = 2)]
-        private static void Skip(Context context, Stack stack)
-        {
-            var count = stack.Pop();
-            var sequence = stack.Pop();
-
-            stack.Push(Dyn.Skip(sequence, count));
+            foreach (var value in Enumerate(sequence))
+            {
+                stack.Push(value);
+                Apply(context, stack, action);
+            }
         }
 
         [Builtin("count")]
@@ -65,42 +195,6 @@ namespace CoTy.Modules
             var result = Enumerate(value).Count();
 
             stack.Push(result);
-        }
-
-        [Builtin("repeat", InArity = 2)]
-        private static void Repeat(Context context, Stack stack)
-        {
-            var count = stack.Pop();
-            var value = stack.Pop();
-
-            stack.Push(Dyn.Repeat(value, count));
-        }
-
-        [Builtin("reduce")]
-        private static void Reduce(Context context, Stack stack)
-        {
-            var action = stack.Pop();
-            var sequence = stack.Pop();
-
-            Dyn.Reduce(context, stack, sequence, action);
-        }
-
-        [Builtin("map", InArity = 2, OutArity = 1)]
-        private static void Map(Context context, Stack stack)
-        {
-            var action = stack.Pop();
-            var sequence = stack.Pop();
-
-            Dyn.Map(context, stack, sequence, action);
-        }
-
-        [Builtin("each")]
-        private static void Each(Context context, Stack stack)
-        {
-            var action = stack.Pop();
-            var sequence = stack.Pop();
-
-            Dyn.Each(context, stack, sequence, action);
         }
     }
 }
