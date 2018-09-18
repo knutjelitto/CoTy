@@ -6,7 +6,7 @@ namespace CoTy.Objects
 {
     public static class ObjectExtensions
     {
-        public static void Apply(this object This, Context context, Stack stack)
+        public static void Apply(this object This, IContext context, IStack stack)
         {
             if (This is Cobject cvalue)
             {
@@ -18,11 +18,11 @@ namespace CoTy.Objects
             }
         }
 
-        public static void Close(this object This, Context context, Stack stack)
+        public static void Lambda(this object This, IContext context, IStack stack)
         {
             if (This is Cobject cvalue)
             {
-                cvalue.Close(context, stack);
+                cvalue.Lambda(context, stack);
             }
             else
             {

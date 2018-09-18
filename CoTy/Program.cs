@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using CoTy.Definitions;
 using CoTy.Inputs;
 using CoTy.Objects;
+using CoTy.Support;
 
 namespace CoTy
 {
@@ -10,6 +12,8 @@ namespace CoTy
         // ReSharper disable once UnusedParameter.Local
         private static void Main(string[] args)
         {
+            SetupConsole();
+
             Woo.Doo();
 
             var rootLexical = MakeRootFrame();
@@ -27,7 +31,19 @@ namespace CoTy
             // ReSharper disable once FunctionNeverReturns
         }
 
-        private static Context MakeRootFrame()
+        private static void SetupConsole()
+        {
+            var width = Console.WindowWidth;
+            var height = Console.WindowHeight;
+
+            Console.SetWindowSize(1, 1);
+            Console.SetBufferSize(width, height);
+            Console.SetWindowSize(width, height);
+
+            G.C = new CoWriter(10, 0, width - 10, height);
+        }
+
+        private static IContext MakeRootFrame()
         {
             var modules = new Definer[]
             {
@@ -40,18 +56,28 @@ namespace CoTy
                 new ConsoleDefiner(),
                 new DiagnosticsDefiner(),
             };
-            var context = Context.Root("bottom");
+
+            var root = Context.Root("root");
+
+            root.Define("root", root);
+
+            var context = root;
             foreach (var module in modules)
             {
-                context = module.Define(context.Push(module.Name));
+                context = context.Push(module.Name);
+                root.Define(context.Name, context);
+
+                module.Define(context);
             }
 
             return context;
         }
 
-        private static Context WithTest(Context rootLexical)
+        private static IContext WithTest(IContext rootLexical)
         {
-            return new TestsDefiner().Define(rootLexical.Push("testing"));
+            var withTest = rootLexical.Push("testing");
+            new TestsDefiner().Define(withTest);
+            return withTest;
         }
 
         private static string ReadResource(string name)

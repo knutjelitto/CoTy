@@ -4,6 +4,7 @@ using System.IO;
 using CoTy.Errors;
 using CoTy.Inputs;
 using CoTy.Objects;
+using CoTy.Support;
 
 namespace CoTy.Definitions
 {
@@ -11,10 +12,10 @@ namespace CoTy.Definitions
     {
         public LanguageDefiner() : base("language") { }
 
-        public override Context Define(Context @into)
+        public override void Define(IContext into)
         {
             Define(into, "apply", (context, stack, value) => value.Apply(context, stack));
-            Define(into, "close", (context, stack, value) => value.Close(context, stack));
+            Define(into, "lambda", (context, stack, value) => value.Lambda(context, stack));
             Define(into, "quote", (context, stack, value) => Closure.From(context, value));
             Define(into, "unquote", 
                    (context, stack, values) =>
@@ -41,12 +42,10 @@ namespace CoTy.Definitions
                        }
                    });
             Define(into, "load", (context, stack, symbol) => Load(context, stack, GetSymbol(symbol)));
-
-            return base.Define(into);
         }
 
 
-        private static void Load(Context context, Stack stack, Symbol symbol)
+        private static void Load(IContext context, IStack stack, Symbol symbol)
         {
             var name = symbol.ToString();
 
@@ -71,17 +70,17 @@ namespace CoTy.Definitions
             context.Define(symbol, localContext);
         }
 
-        public static void Execute(string stream, Context context, Stack stack)
+        public static void Execute(string stream, IContext context, IStack stack)
         {
             Execute(new CharStream(stream), context, stack);
         }
 
-        public static void Execute(ItemStream<char> charStream, Context context, Stack stack)
+        public static void Execute(ItemStream<char> charStream, IContext context, IStack stack)
         {
             Execute(new Parser(charStream), context, stack);
         }
 
-        public static void Execute(ItemStream<Cobject> stream, Context context, Stack stack)
+        public static void Execute(ItemStream<Cobject> stream, IContext context, IStack stack)
         {
             try
             {
@@ -89,17 +88,17 @@ namespace CoTy.Definitions
                 {
                     try
                     {
-                        value.Close(context, stack);
+                        value.Lambda(context, stack);
                     }
                     catch (CotyException cotyException)
                     {
-                        Console.WriteLine($"{cotyException.Message}");
+                        G.C.WriteLine($"{cotyException.Message}");
                     }
                 }
             }
             catch (CotyException cotyException)
             {
-                Console.WriteLine($"{cotyException.Message}");
+                G.C.WriteLine($"{cotyException.Message}");
             }
         }
     }

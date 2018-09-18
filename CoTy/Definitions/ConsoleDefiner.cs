@@ -1,6 +1,7 @@
 ﻿using System;
 
 using CoTy.Objects;
+using CoTy.Support;
 
 namespace CoTy.Definitions
 {
@@ -8,14 +9,12 @@ namespace CoTy.Definitions
     {
         public ConsoleDefiner() : base("console") { }
 
-        public override Context Define(Context @into)
+        public override void Define(IContext into)
         {
-            Define(into, "print", value => Console.Write($"{value}"));
-            Define(into, "println", value => Console.WriteLine($"{value}"));
-            Define(into, "nl", () => Console.WriteLine());
-            Define(into, "cls", Console.Clear);
-
-            return base.Define(@into);
+            Define(into, "print", value => G.C.Write($"{value}"));
+            Define(into, "println", value => G.C.WriteLine($"{value}"));
+            Define(into, "nl", () => G.C.WriteLine());
+            Define(into, "cls", () => G.C.Clear());
         }
     }
 }

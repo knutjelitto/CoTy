@@ -1,5 +1,6 @@
 ﻿using System;
 using CoTy.Objects;
+using CoTy.Support;
 
 namespace CoTy.Definitions
 {
@@ -7,21 +8,19 @@ namespace CoTy.Definitions
     {
         public DiagnosticsDefiner() : base("diagnostics") { }
 
-        public override Context Define(Context @into)
+        public override void Define(IContext into)
         {
-            Define(into, "ctx",
+            Define(into, "cx",
                    (context, stack) =>
                    {
                        var scope = context.Scope;
                        while (scope != null)
                        {
                            var syms = scope.Name + "{" + string.Join(" ", scope.Symbols) + "}";
-                           Console.WriteLine(syms);
+                           G.C.WriteLine(syms);
                            scope = scope.Parent;
                        }
                    });
-
-            return base.Define(@into);
         }
     }
 }

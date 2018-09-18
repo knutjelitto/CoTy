@@ -6,7 +6,7 @@ namespace CoTy.Definitions
     {
         public StackDefiner() : base("stack") { }
 
-        public override Context Define(Context into)
+        public override void Define(IContext into)
         {
             Define(into, "cs", (context, stack) => stack.Clear());
             Define(into, "gs", (context, stack) => stack.Get());
@@ -14,8 +14,6 @@ namespace CoTy.Definitions
             Define(into, "dup", (context, stack) => stack.Dup());
             Define(into, "swap", (context, stack) => stack.Swap());
             Define(into, "over", (context, stack) => stack.Over());
-
-            return base.Define(into);
         }
     }
 }

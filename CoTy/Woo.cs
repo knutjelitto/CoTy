@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using CoTy.Objects;
+using CoTy.Support;
 
 namespace CoTy
 {
@@ -10,31 +12,13 @@ namespace CoTy
     {
         public static void Doo()
         {
-            ISequence Aggregate(ISequence sequence, object seed, Func<dynamic, dynamic, object> aggregator)
-            {
-                return Sequence.From(sequence.GetIterator().Aggregate(seed, aggregator));
-            }
-
-            ISequence Sub(Context context, ISequence inputs)
-            {
-                return Aggregate(inputs, Integer.Zero, (x, y) => x - y);
-            }
-
-            Sequence Seq(params object[] values)
-            {
-                return Sequence.From(values.AsEnumerable());
-            }
-
-            var result = Sub(Context.Root("root"), Seq(1, Integer.From(2)));
-
-            Console.WriteLine($"{result}");
         }
 
         public static void Doo3()
         {
             Func<dynamic, dynamic, object> binOp = (v1, v2) => v1 * v2;
 
-            var context = Expression.Parameter(typeof(Context), "context");
+            var context = Expression.Parameter(typeof(IContext), "context");
             var stack = Expression.Parameter(typeof(Stack), "stack");
             var value1 = Expression.Parameter(typeof(object), "value1");
             var value2 = Expression.Parameter(typeof(object), "value2");
@@ -45,7 +29,7 @@ namespace CoTy
                 Expression.Assign(value1, Expression.Call(stack, "Pop", Type.EmptyTypes)),
                 Expression.Assign(result, Expression.Call(Expression.Constant(binOp.Target), binOp.Method, value1, value2)),
                 Expression.Call(stack, "Push", Type.EmptyTypes, result));
-            var lambda = Expression.Lambda<Action<Context, Stack>>(block, context, stack);
+            var lambda = Expression.Lambda<Action<IContext, IStack>>(block, context, stack);
             var action = lambda.Compile();
 
             var xcontext = Context.Root("root");

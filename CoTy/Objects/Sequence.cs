@@ -4,14 +4,14 @@ using System.Linq;
 
 namespace CoTy.Objects
 {
-    public class Sequence : Cobject<IEnumerable<object>>, ISequence, IEnumerable<object>
+    public class Sequence : Cobject<IEnumerable<object>>, IEnumerable<object>
     {
         protected Sequence(IEnumerable<object> objs)
             : base(objs)
         {
         }
 
-        public override void Close(Context context, Stack stack)
+        public override void Lambda(IContext context, IStack stack)
         {
             stack.Push(Closure.From(context, Value));
         }
@@ -50,7 +50,7 @@ namespace CoTy.Objects
 
         public override bool Equals(object obj)
         {
-            return obj is Sequence other && Equals(Value, other.Value);
+            return obj is Sequence other && Value.SequenceEqual(other.Value);
         }
 
         public override int GetHashCode()
@@ -66,11 +66,6 @@ namespace CoTy.Objects
         public override string ToString()
         {
             return "(" + string.Join(" ", Value) + ")";
-        }
-
-        public IEnumerable<object> GetIterator()
-        {
-            return Value;
         }
 
         IEnumerator IEnumerable.GetEnumerator()

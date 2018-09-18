@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 using CoTy.Errors;
 
 namespace CoTy.Objects
 {
-    public class Context : Cobject<Dictionary<Symbol, Context.Binding>>
+    public class Context : Cobject<Dictionary<Symbol, Binding>>, IContext
     {
-        protected Context(Context parent, string name)
+        private Context(IContext parent, string name)
             : base(new Dictionary<Symbol, Binding>())
         {
             Parent = parent;
@@ -18,20 +16,20 @@ namespace CoTy.Objects
 
         public IEnumerable<Symbol> Symbols => Value.Keys.OrderBy(k => k.ToString());
 
-        public Context Scope => this;
+        public IContext Scope => this;
 
-        public static Context Root(string name)
+        public static IContext Root(string name)
         {
             return new Context(null, name);
         }
 
-        public Context Pop()
+        public IContext Pop()
         {
             Parent = null;
             return this;
         }
 
-        public Context Push(string name)
+        public IContext Push(string name)
         {
             var newContext = new Context(this, name);
             return newContext;
@@ -42,14 +40,9 @@ namespace CoTy.Objects
             return TryFind(symbol, out var _);
         }
 
-        public bool CanDefine(Symbol symbol)
+        public void Define(string symbol, object value, bool isSealed = false, bool isOpaque = false)
         {
-            return !Value.ContainsKey(symbol);
-        }
-
-        public bool CanUpdate(Symbol symbol)
-        {
-            return TryFind(symbol, out var binding) && !binding.IsSealed;
+            Define(Symbol.Get(symbol), value, isSealed, isOpaque);
         }
 
         public void Define(Symbol symbol, object value, bool isSealed = false, bool isOpaque = false)
@@ -71,6 +64,18 @@ namespace CoTy.Objects
             Value.Add(symbol, binding);
         }
 
+        public void Update(Symbol symbol, object value)
+        {
+            var binding = Find(symbol);
+
+            if (binding.IsSealed)
+            {
+                throw new BinderException($"`{symbol}´ is marked as sealed and can't be updated");
+            }
+
+            binding.Value = value;
+        }
+
         public void Undefine(Symbol symbol)
         {
             var binding = Find(symbol);
@@ -88,17 +93,6 @@ namespace CoTy.Objects
             binding.Scope.Value.Remove(symbol);
         }
 
-        public void Update(Symbol symbol, object value)
-        {
-            var binding = Find(symbol);
-
-            if (binding.IsSealed)
-            {
-                throw new BinderException($"`{symbol}´ is marked as sealed and can't be updated");
-            }
-
-            binding.Value = value;
-        }
 
         public void Get(Symbol symbol, out object value)
         {
@@ -131,7 +125,7 @@ namespace CoTy.Objects
             return true;
         }
 
-        public Context Parent { get; private set; }
+        public IContext Parent { get; private set; }
         public string Name { get; }
 
         public override bool Equals(object obj)
@@ -147,22 +141,6 @@ namespace CoTy.Objects
         public override string ToString()
         {
             return Name + "{" + string.Join(" ", Symbols) + "}";
-        }
-
-        public class Binding
-        {
-            public Binding(Context scope, object value, bool isSealed, bool isOpaque)
-            {
-                Scope = scope;
-                Value = value;
-                IsSealed = isSealed;
-                IsOpaque = isOpaque;
-            }
-
-            public Context Scope { get; }
-            public object Value { get; set; }
-            public bool IsSealed { get; }
-            public bool IsOpaque { get; }
         }
     }
 }

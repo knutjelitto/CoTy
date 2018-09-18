@@ -5,35 +5,35 @@ namespace CoTy.Objects
 {
     public class Closure : Sequence
     {
-        private Closure(Context lexical, IEnumerable<object> objs)
+        private Closure(IContext lexical, IEnumerable<object> objs)
             : base(objs)
         {
             Lexical = lexical;
         }
 
-        private Context Lexical { get; }
+        private IContext Lexical { get; }
 
-        public static Closure From(Context context, IEnumerable<object> values)
+        public static Closure From(IContext context, IEnumerable<object> values)
         {
             return new Closure(context, values);
         }
 
-        public static Closure From(Context context, params object[] objs)
+        public static Closure From(IContext context, params object[] objs)
         {
             return From(context, (IEnumerable<object>)objs);
         }
 
-        public override void Close(Context context, Stack stack)
+        public override void Lambda(IContext context, IStack stack)
         {
             stack.Push(this);
         }
 
-        public override void Apply(Context context, Stack stack)
+        public override void Apply(IContext context, IStack stack)
         {
             context = Lexical.Push("local");
             foreach (var value in Value)
             {
-                value.Close(context, stack);
+                value.Lambda(context, stack);
             }
         }
 

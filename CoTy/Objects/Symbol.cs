@@ -2,19 +2,15 @@
 
 namespace CoTy.Objects
 {
-    public class Symbol : Cobject<string>
+    public sealed class Symbol : Cobject<string>
     {
         private static readonly Dictionary<string, Symbol> symbols = new Dictionary<string, Symbol>();
 
-        public static readonly Symbol True = Get("true");
-        public static readonly Symbol False = Get("false");
         public static readonly Symbol Quoter = Get("'");
-        public static readonly Symbol BindTo = Get(":");
+        public static readonly Symbol Bind = Get(":");
+        public static readonly Symbol Assign = Get("~");
         public static readonly Symbol LeftParent = Get("(");
         public static readonly Symbol RightParent = Get(")");
-        public static readonly Symbol Define = Get("def");
-        public static readonly Symbol Set = Get("set");
-        public static readonly Symbol ApplySym = Get("apply");
 
         private readonly int hashCode;
 
@@ -34,7 +30,7 @@ namespace CoTy.Objects
             return symbol;
         }
 
-        public override void Close(Context context, Stack stack)
+        public override void Lambda(IContext context, IStack stack)
         {
             context.Get(this, out var value);
 

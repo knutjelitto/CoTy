@@ -40,6 +40,11 @@ namespace CoTy.Inputs
                 return binder;
             }
 
+            if (TryParseAssigner(current, out var assigner))
+            {
+                return assigner;
+            }
+
             if (Equals(current.Item, Symbol.RightParent))
             {
                 throw new ParserException("unbalanced `)´ in input");
@@ -64,7 +69,7 @@ namespace CoTy.Inputs
 
         private bool TryParseBinder(Cursor<Cobject> current, out Binder binder)
         {
-            if (!Equals(current.Item, Symbol.BindTo))
+            if (!Equals(current.Item, Symbol.Bind))
             {
                 binder = null;
                 return false;
@@ -95,6 +100,48 @@ namespace CoTy.Inputs
                     }
 
                     binder = Binder.From(symbol);
+
+                    current.Advance();
+                }
+
+                return true;
+            }
+        }
+
+
+        private bool TryParseAssigner(Cursor<Cobject> current, out Assigner assigner)
+        {
+            if (!Equals(current.Item, Symbol.Assign))
+            {
+                assigner = null;
+                return false;
+            }
+
+            using (Scanner.LevelUp())
+            {
+                current.Advance();
+
+                if (TryParseSequence(current, out var sequence))
+                {
+                    if (sequence.IsEmpty())
+                    {
+                        throw new ParserException($"assigner objects sequence `{sequence}´ should contain at least one symbol");
+                    }
+                    if (!sequence.AllSymbols())
+                    {
+                        throw new ParserException($"assigner objects sequence `{sequence}´ should only contain symbols");
+                    }
+
+                    assigner = Assigner.From(sequence.Cast<Symbol>());
+                }
+                else
+                {
+                    if (!(current.Item is Symbol symbol))
+                    {
+                        throw new ParserException($"binder object `{current.Item}´ should be a symbols");
+                    }
+
+                    assigner = Assigner.From(symbol);
 
                     current.Advance();
                 }

@@ -64,10 +64,10 @@ namespace CoTy.Objects
             }
         }
 
-        Action<Context, Stack> MakeBinaryOp(Func<dynamic, dynamic, object> binaryOp)
+        Action<IContext, IStack> MakeBinaryOp(Func<dynamic, dynamic, object> binaryOp)
         {
-            var context = Expression.Parameter(typeof(Context), "context");
-            var stack = Expression.Parameter(typeof(Stack), "stack");
+            var context = Expression.Parameter(typeof(IContext), "context");
+            var stack = Expression.Parameter(typeof(IStack), "stack");
             var value1 = Expression.Parameter(typeof(object), "value1");
             var value2 = Expression.Parameter(typeof(object), "value2");
             var result = Expression.Parameter(typeof(object), "result");
@@ -78,16 +78,16 @@ namespace CoTy.Objects
                 Expression.Assign(value1, Expression.Call(stack, "Pop", Type.EmptyTypes)),
                 Expression.Assign(result, Expression.Call(Expression.Constant(binaryOp.Target), binaryOp.Method, value1, value2)),
                 Expression.Call(stack, "Push", Type.EmptyTypes, result));
-            var lambda = Expression.Lambda<Action<Context, Stack>>(block, context, stack);
+            var lambda = Expression.Lambda<Action<IContext, IStack>>(block, context, stack);
             var action = lambda.Compile();
             return action;
         }
 
 
-        Action<Context, Stack> MakeUnaryOp(Func<dynamic, object> unaryOp)
+        Action<IContext, IStack> MakeUnaryOp(Func<dynamic, object> unaryOp)
         {
-            var context = Expression.Parameter(typeof(Context), "context");
-            var stack = Expression.Parameter(typeof(Stack), "stack");
+            var context = Expression.Parameter(typeof(IContext), "context");
+            var stack = Expression.Parameter(typeof(IStack), "stack");
             var value1 = Expression.Parameter(typeof(object), "value");
             var result = Expression.Parameter(typeof(object), "result");
             var block = Expression.Block(
@@ -95,7 +95,7 @@ namespace CoTy.Objects
                 Expression.Assign(value1, Expression.Call(stack, "Pop", Type.EmptyTypes)),
                 Expression.Assign(result, Expression.Call(Expression.Constant(unaryOp.Target), unaryOp.Method, value1)),
                 Expression.Call(stack, "Push", Type.EmptyTypes, result));
-            var lambda = Expression.Lambda<Action<Context, Stack>>(block, context, stack);
+            var lambda = Expression.Lambda<Action<IContext, IStack>>(block, context, stack);
             var action = lambda.Compile();
             return action;
         }

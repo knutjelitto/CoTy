@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CoTy.Support;
 
 namespace CoTy.Inputs
 {
@@ -38,12 +39,12 @@ namespace CoTy.Inputs
 
         private string GetLine()
         {
-            if (!Console.IsInputRedirected)
+            if (!G.C.IsInputRedirected)
             {
                 this.beforePrompt();
-                Console.Write($"{new string('-', this.nesting + 1)}>");
+                G.C.Write($"{new string('-', this.nesting + 1)}>");
             }
-            return Console.ReadLine();
+            return G.C.ReadLine();
         }
     }
 }

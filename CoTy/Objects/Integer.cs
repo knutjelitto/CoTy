@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace CoTy.Objects
 {
-    public class Integer : Cobject<BigInteger>, IComparable<Integer>
+    public sealed class Integer : Cobject<BigInteger>, IComparable<Integer>
     {
         public static readonly Integer Zero = new Integer(0);
         public static Integer One = new Integer(1);

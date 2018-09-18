@@ -2,19 +2,19 @@
 
 namespace CoTy.Objects
 {
-    public class Builtin : Cobject<Action<Context, Stack>>
+    public class Builtin : Cobject<Action<IContext, IStack>>
     {
-        private Builtin(Action<Context, Stack> eval)
+        private Builtin(Action<IContext, IStack> eval)
             : base(eval)
         {
         }
 
-        public static Builtin From(Action<Context, Stack> eval)
+        public static Builtin From(Action<IContext, IStack> eval)
         {
             return new Builtin(eval);
         }
 
-        public override void Close(Context context, Stack stack)
+        public override void Lambda(IContext context, IStack stack)
         {
             Value(context, stack);
         }
@@ -27,6 +27,11 @@ namespace CoTy.Objects
         public override int GetHashCode()
         {
             return Value.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
         }
     }
 }

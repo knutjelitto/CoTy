@@ -8,11 +8,9 @@ namespace CoTy.Definitions
     {
         public SystemDefiner() : base("system") { }
 
-        public override Context Define(Context into)
+        public override void Define(IContext into)
         {
             Define(into, "exit", () => Environment.Exit(42));
-
-            return base.Define(into);
         }
     }
 }

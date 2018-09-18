@@ -9,7 +9,7 @@ namespace CoTy.Definitions
     {
         public SequenceDefiner() : base("sequence") { }
 
-        public override Context Define(Context into)
+        public override void Define(IContext into)
         {
             Define(into, "up", (dynamic value) =>
             {
@@ -192,8 +192,6 @@ namespace CoTy.Definitions
                        }
                        stack.Push(count);
                    });
-
-            return base.Define(into);
         }
     }
 }

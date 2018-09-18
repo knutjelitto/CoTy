@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+
 using CoTy.Objects;
 
 namespace CoTy.Definitions
@@ -9,7 +8,7 @@ namespace CoTy.Definitions
     {
         public OperatorDefiner() : base("operator") { }
 
-        public override Context Define(Context into)
+        public override void Define(IContext into)
         {
             Define(into, "==", (dynamic value1, dynamic value2) => Equals(value1, value2));
             Define(into, "!=", (dynamic value1, dynamic value2) => !Equals(value1, value2));
@@ -28,14 +27,14 @@ namespace CoTy.Definitions
             Define(into, "++", (dynamic value) => ++value);
             Define(into, "--", (dynamic value) => --value);
 
-            Define(into, "!", (dynamic value) => !value);
-            Define(into, "&", (dynamic value1, dynamic value2) => value1 & value2);
-            Define(into, "|", (dynamic value1, dynamic value2) => value1 | value2);
-            Define(into, "^", (dynamic value1, dynamic value2) => value1 ^ value2);
+            Define(into, "not", (dynamic value) => !value);
+            Define(into, "and", (dynamic value1, dynamic value2) => value1 & value2);
+            Define(into, "or", (dynamic value1, dynamic value2) => value1 | value2);
+            Define(into, "xor", (dynamic value1, dynamic value2) => value1 ^ value2);
 
-            Define(into, "bool?", (value) => value is bool);
-            Define(into, "true", true);
-            Define(into, "false", false);
+            Define(into, "bool?", value => value is bool);
+            Define(into, "true", () => true);
+            Define(into, "false", () => false);
 
             Define(into, "<>", (value1, value2) => Sequence.From(Enumerate(value1).Concat(Enumerate(value2))));
             Define(into, "><", (context, stack, values) =>
@@ -45,8 +44,6 @@ namespace CoTy.Definitions
                     stack.Push(value);
                 }
             });
-
-            return base.Define(into);
         }
     }
 }

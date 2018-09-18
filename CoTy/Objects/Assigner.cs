@@ -1,36 +1,37 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks.Sources;
 using CoTy.Support;
 
 // ReSharper disable RedundantAssignment
 namespace CoTy.Objects
 {
-    public class Binder : Cobject<List<Symbol>>
+    public class Assigner : Cobject<List<Symbol>>
     {
-        private Binder(IEnumerable<Symbol> objs)
+        private Assigner(IEnumerable<Symbol> objs)
             : base(objs.Reverse().ToList())
         {
         }
 
         public List<Symbol> Symbols => Value;
 
-        public static Binder From(IEnumerable<Symbol> values)
+        public static Assigner From(IEnumerable<Symbol> values)
         {
-            return new Binder(values);
+            return new Assigner(values);
         }
 
-        public static Binder From(params Symbol[] objs)
+        public static Assigner From(params Symbol[] objs)
         {
             return From(objs.AsEnumerable());
         }
 
         public override void Lambda(IContext context, IStack stack)
         {
-            stack.Check(Value.Count);
-            foreach (var symbol in Value)
+            stack.Check(Symbols.Count);
+            foreach (var symbol in Symbols)
             {
                 var value = stack.Pop();
-                context.Define(symbol, value);
+                context.Update(symbol, value);
             }
         }
 
@@ -41,7 +42,7 @@ namespace CoTy.Objects
 
         public override bool Equals(object obj)
         {
-            return obj is Binder other && Symbols.SequenceEqual(other.Symbols);
+            return obj is Assigner other && Symbols.SequenceEqual(other.Symbols);
         }
 
         public override int GetHashCode()
@@ -53,9 +54,9 @@ namespace CoTy.Objects
         {
             if (Value.Count == 1)
             {
-                return $"{Symbol.Bind}{Value[0]}";
+                return $"{Symbol.Assign}{Value[0]}";
             }
-            return $"{Symbol.Bind}({string.Join(" ", Value.AsEnumerable().Reverse())})";
+            return $"{Symbol.Assign}({string.Join(" ", Value.AsEnumerable().Reverse())})";
         }
     }
 }

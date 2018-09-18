@@ -4,48 +4,22 @@ using System.Linq;
 
 namespace CoTy.Objects
 {
-    public class Cobject : DynamicObject
+    public abstract class Cobject : DynamicObject
     {
-        public virtual void Close(Context context, Stack stack)
+        public virtual void Lambda(IContext context, IStack stack)
         {
             stack.Push(this);
         }
 
-        public virtual void Apply(Context context, Stack stack)
+        public virtual void Apply(IContext context, IStack stack)
         {
-            Close(context, stack);
+            Lambda(context, stack);
         }
 
         protected static IEnumerable<T> Enumerate<T>(T value)
         {
             return value as IEnumerable<T> ?? Enumerable.Repeat(value, 1);
         }
-
-#if false
-        protected static void Apply(Context context, Stack stack, object value)
-        {
-            if (value is Cobject cvalue)
-            {
-                cvalue.Apply(context, stack);
-            }
-            else
-            {
-                stack.Push(value);
-            }
-        }
-
-        protected static void Close(Context context, Stack stack, object value)
-        {
-            if (value is Cobject cvalue)
-            {
-                cvalue.Close(context, stack);
-            }
-            else
-            {
-                stack.Push(value);
-            }
-        }
-#endif
 
 #if false
         public override DynamicMetaObject GetMetaObject(Expression parameter)

@@ -1,6 +1,7 @@
 ﻿using System;
 
 using CoTy.Objects;
+using CoTy.Support;
 
 namespace CoTy.Definitions
 {
@@ -8,9 +9,10 @@ namespace CoTy.Definitions
     {
         public TestsDefiner() : base("testing") { }
 
-        public override Context Define(Context into)
+        public override void Define(IContext into)
         {
-            Define(into, "assert",
+            Define(into,
+                   "assert",
                    (context, stack, actual, expected) =>
                    {
                        expected.Apply(context, stack);
@@ -18,21 +20,15 @@ namespace CoTy.Definitions
 
                        Outcome(expectedValue, actual, context, stack);
                    });
-            Define(into, "assert-true",
-                   (context, stack, actual) =>
-                   {
-                       Outcome(true, actual, context, stack);
-                   });
-            Define(into, "assert-false",
-                   (context, stack, actual) =>
-                   {
-                       Outcome(false, actual, context, stack);
-                   });
-
-            return base.Define(into);
+            Define(into,
+                   "assert-true",
+                   (context, stack, actual) => { Outcome(true, actual, context, stack); });
+            Define(into,
+                   "assert-false",
+                   (context, stack, actual) => { Outcome(false, actual, context, stack); });
         }
 
-        private static void Outcome(object expectedValue, object actual, Context context, Stack stack)
+        private static void Outcome(object expectedValue, object actual, IContext context, IStack stack)
         {
             actual.Apply(context, stack);
             var actualValue = stack.Pop();
@@ -41,7 +37,7 @@ namespace CoTy.Definitions
 
             if (!equals)
             {
-                Console.WriteLine($"{expectedValue} != {actualValue} ;;{actual}");
+                G.C.WriteLine($"{expectedValue} != {actualValue} ;;{actual}");
             }
         }
     }

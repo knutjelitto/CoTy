@@ -46,33 +46,15 @@ namespace CoTy.Inputs
                         break;
                     case ':':
                         current.Advance();
-                        yield return Symbol.BindTo;
+                        yield return Symbol.Bind;
+                        break;
+                    case '~':
+                        current.Advance();
+                        yield return Symbol.Assign;
                         break;
                     case '"':
                         yield return ScanString(ref current);
                         break;
-#if false
-                    case ':':
-                        if (MaybeRestrictedSymbol(current.Next))
-                        {
-                            current.Advance();
-                            ScanRestrictedSymbol(":", current, out var restrictedSymbol);
-                            yield return Sequence.From(restrictedSymbol);
-                            yield return Symbol.Define;
-                            break;
-                        }
-                        goto default;
-                    case '!':
-                        if (MaybeRestrictedSymbol(current.Next))
-                        {
-                            current.Advance();
-                            ScanRestrictedSymbol("!", current, out var restrictedSymbol);
-                            yield return Sequence.From(restrictedSymbol);
-                            yield return Symbol.Set;
-                            break;
-                        }
-                        goto default;
-#endif
                     default:
                         yield return Classify(ScanGrumble(ref current));
                         break;
@@ -89,7 +71,7 @@ namespace CoTy.Inputs
 
         private bool IsStructure(char c)
         {
-            return "():\"\'".Contains(c);
+            return "():~\"\'".Contains(c);
         }
 
         private bool IsRestrictedSymbolFirst(char c)
