@@ -1,4 +1,4 @@
 ﻿(:x (x 1 >) (1 x upto '* collapse) (1) if) :fac
 (dup (1 >) (1 swap upto '* collapse) (1) if) :fac2
 
-(dup 1 > 1 0 if)
+('succ map) : ++

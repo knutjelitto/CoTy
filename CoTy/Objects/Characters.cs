@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
 namespace CoTy.Objects
 {
-    public class Characters : Cobject<string>, IComparable<Characters>
+    public class Characters : Cobject<string>, IComparable<Characters>, IEnumerable<char>
     {
         private static readonly Characters Empty = new Characters(string.Empty);
 
@@ -56,6 +58,11 @@ namespace CoTy.Objects
             return Multiply(chars, count);
         }
 
+        public IEnumerator<char> GetEnumerator()
+        {
+            return Value.GetEnumerator();
+        }
+
         public override bool Equals(object obj)
         {
             return obj is Characters other && Value.Equals(other.Value);
@@ -69,6 +76,11 @@ namespace CoTy.Objects
         public override string ToString()
         {
             return "\"" + Value.Replace("\"", "\\\"") + "\"";
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         private static Characters Multiply(Characters str, Integer count)

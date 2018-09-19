@@ -32,7 +32,7 @@ namespace CoTy
             var lambda = Expression.Lambda<Action<IScope, IStack>>(block, scope, stack);
             var action = lambda.Compile();
 
-            var xcontext = Context.Root("root");
+            var xcontext = Context.Root(Binder.From("root"));
             var xstack = Stack.From(Integer.From(10), Integer.From(10));
 
             action(xcontext, xstack);

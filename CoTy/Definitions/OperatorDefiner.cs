@@ -24,8 +24,8 @@ namespace CoTy.Definitions
             Define(into, "/", (dynamic value1, dynamic value2) => value1 / value2);
             Define(into, "%", (dynamic value1, dynamic value2) => value1 % value2);
 
-            Define(into, "++", (dynamic value) => ++value);
-            Define(into, "--", (dynamic value) => --value);
+            Define(into, "succ", (dynamic value) => ++value);
+            Define(into, "pred", (dynamic value) => --value);
 
             Define(into, "not", (dynamic value) => !value);
             Define(into, "and", (dynamic value1, dynamic value2) => value1 & value2);

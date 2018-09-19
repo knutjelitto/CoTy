@@ -1,36 +1,42 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-
 using CoTy.Errors;
 
 namespace CoTy.Objects
 {
-    public class Context : Cobject<Dictionary<Symbol, Binding>>, IScope
+    public class Context : Cobject, IScope
     {
-        private Context(IScope parent, string name)
-            : base(new Dictionary<Symbol, Binding>())
+        private readonly Context Parent;
+        private readonly IBinder Binder;
+
+        private Context(Context parent, IBinder binder)
         {
-            Parent = parent;
-            Name = name;
+            this.Parent = parent;
+            this.Binder = binder;
         }
 
-        public IEnumerable<Symbol> Symbols => Value.Keys.OrderBy(k => k.ToString());
-
-        public static IScope Root(string name)
+        public IEnumerable<IBinder> Binders
         {
-            return new Context(null, name);
+            get
+            {
+                var current = this;
+                while (current != null)
+                {
+                    yield return current.Binder;
+
+                    current = current.Parent;
+                }
+
+            }
         }
 
-        public IScope Pop()
+        public static IScope Root(IBinder binder)
         {
-            Parent = null;
-            return this;
+            return new Context(null, binder);
         }
 
-        public IScope Push(string name)
+        public IScope Chain(IBinder binder)
         {
-            var newContext = new Context(this, name);
-            return newContext;
+            return new Context(this, binder);
         }
 
         public bool IsDefined(Symbol symbol)
@@ -38,16 +44,11 @@ namespace CoTy.Objects
             return TryFind(symbol, out var _);
         }
 
-        public void Define(string symbol, object value, bool isSealed = false, bool isOpaque = false)
-        {
-            Define(Symbol.Get(symbol), value, isSealed, isOpaque);
-        }
-
         public void Define(Symbol symbol, object value, bool isSealed = false, bool isOpaque = false)
         {
             if (TryFind(symbol, out var binding))
             {
-                if (Equals(binding.Scope, this))
+                if (Equals(binding.Binder, this.Binder))
                 {
                     throw new BinderException($"`{symbol}´ already defined in current scope");
                 }
@@ -58,8 +59,7 @@ namespace CoTy.Objects
                 }
             }
 
-            binding = new Binding(this, value, isSealed, isOpaque);
-            Value.Add(symbol, binding);
+            this.Binder.Define(symbol, value, isSealed, isOpaque);
         }
 
         public void Update(Symbol symbol, object value)
@@ -83,16 +83,11 @@ namespace CoTy.Objects
                 throw new BinderException($"`{symbol}´ is marked as opaque and can't be removed");
             }
 
-            if (binding.IsSealed)
-            {
-                throw new BinderException($"`{symbol}´ is marked as sealed and can't be removed");
-            }
-
-            binding.Scope.Value.Remove(symbol);
+            binding.Binder.Undefine(symbol);
         }
 
 
-        public void Get(Symbol symbol, out object value)
+        public void GetValue(Symbol symbol, out object value)
         {
             value = Find(symbol).Value;
         }
@@ -109,11 +104,11 @@ namespace CoTy.Objects
 
         public bool TryFind(Symbol symbol, out Binding binding)
         {
-            if (!Value.TryGetValue(symbol, out binding))
+            if (!this.Binder.TryFind(symbol, out binding))
             {
-                if (Parent != null)
+                if (this.Parent != null)
                 {
-                    return Parent.TryFind(symbol, out binding);
+                    return this.Parent.TryFind(symbol, out binding);
                 }
 
                 binding = null;
@@ -121,24 +116,6 @@ namespace CoTy.Objects
             }
 
             return true;
-        }
-
-        public IScope Parent { get; private set; }
-        public string Name { get; }
-
-        public override bool Equals(object obj)
-        {
-            return obj is Context other && Equals(Value, other.Value);
-        }
-
-        public override int GetHashCode()
-        {
-            return Value.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return Name + "{" + string.Join(" ", Symbols) + "}";
         }
     }
 }

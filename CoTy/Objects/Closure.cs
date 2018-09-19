@@ -30,10 +30,10 @@ namespace CoTy.Objects
 
         public override void Apply(IScope scope, IStack stack)
         {
-            scope = Lexical.Push("local");
+            var localScope = Lexical.Chain(Binder.From("local"));
             foreach (var value in Value)
             {
-                value.Lambda(scope, stack);
+                value.Lambda(localScope, stack);
             }
         }
 

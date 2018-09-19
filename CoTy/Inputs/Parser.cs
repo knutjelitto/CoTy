@@ -35,7 +35,7 @@ namespace CoTy.Inputs
                 return result;
             }
 
-            if (TryParseBinder(current, out var binder))
+            if (TryParseDefiner(current, out var binder))
             {
                 return binder;
             }
@@ -67,7 +67,7 @@ namespace CoTy.Inputs
             return @object;
         }
 
-        private bool TryParseBinder(Cursor<Cobject> current, out Binder binder)
+        private bool TryParseDefiner(Cursor<Cobject> current, out Definer binder)
         {
             if (!Equals(current.Item, Symbol.Bind))
             {
@@ -83,23 +83,23 @@ namespace CoTy.Inputs
                 {
                     if (sequence.IsEmpty())
                     {
-                        throw new ParserException($"binder objects sequence `{sequence}´ should contain at least one symbol");
+                        throw new ParserException($"definer objects sequence `{sequence}´ should contain at least one symbol");
                     }
                     if (!sequence.AllSymbols())
                     {
-                        throw new ParserException($"binder objects sequence `{sequence}´ should only contain symbols");
+                        throw new ParserException($"definer objects sequence `{sequence}´ should only contain symbols");
                     }
 
-                    binder = Binder.From(sequence.Cast<Symbol>());
+                    binder = Definer.From(sequence.Cast<Symbol>());
                 }
                 else
                 {
                     if (!(current.Item is Symbol symbol))
                     {
-                        throw new ParserException($"binder object `{current.Item}´ should be a symbols");
+                        throw new ParserException($"definer object `{current.Item}´ should be a symbol");
                     }
 
-                    binder = Binder.From(symbol);
+                    binder = Definer.From(symbol);
 
                     current.Advance();
                 }
@@ -138,7 +138,7 @@ namespace CoTy.Inputs
                 {
                     if (!(current.Item is Symbol symbol))
                     {
-                        throw new ParserException($"binder object `{current.Item}´ should be a symbols");
+                        throw new ParserException($"assigner object `{current.Item}´ should be a symbol");
                     }
 
                     assigner = Assigner.From(symbol);

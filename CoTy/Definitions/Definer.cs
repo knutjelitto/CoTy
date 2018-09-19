@@ -34,9 +34,9 @@ namespace CoTy.Definitions
             return symbol;
         }
 
-        private static void Enter(IScope into, string name, Action<IScope, IStack> action)
+        private static void Enter(IScope into, Symbol name, Action<IScope, IStack> action)
         {
-            var builtin = Builtin.From(action);
+            var builtin = Builtin.From(name, action);
             into.Define(name, builtin, true, true);
         }
 

@@ -60,14 +60,13 @@ namespace CoTy.Definitions
 
             var content = File.ReadAllText(path);
 
-            var localContext =  scope.Push(name);
+            var binder = Binder.From(symbol);
+            var localScope =  scope.Chain(binder);
             var localStack = Stack.From();
 
-            Execute(content, localContext, localStack);
+            Execute(content, localScope, localStack);
 
-            localContext = localContext.Pop();
-
-            scope.Define(symbol, localContext);
+            scope.Define(symbol, binder);
         }
 
         public static void Execute(string stream, IScope scope, IStack stack)

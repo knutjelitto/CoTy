@@ -2,15 +2,15 @@
 {
     public class Binding : Cobject
     {
-        public Binding(Context scope, object value, bool isSealed, bool isOpaque)
+        public Binding(IBinder binder, object value, bool isSealed, bool isOpaque)
         {
-            Scope = scope;
+            Binder = binder;
             Value = value;
             IsSealed = isSealed;
             IsOpaque = isOpaque;
         }
 
-        public Context Scope { get; }
+        public IBinder Binder { get; }
         public object Value { get; set; }
         public bool IsSealed { get; set; }
         public bool IsOpaque { get; }

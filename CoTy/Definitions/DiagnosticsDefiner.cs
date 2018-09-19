@@ -13,11 +13,9 @@ namespace CoTy.Definitions
             Define(into, "cx",
                    (scope, stack) =>
                    {
-                       while (scope != null)
+                       foreach (var binder in scope.Binders)
                        {
-                           var syms = scope.Name + "{" + string.Join(" ", scope.Symbols) + "}";
-                           G.C.WriteLine(syms);
-                           scope = scope.Parent;
+                           G.C.WriteLine($"{binder}");
                        }
                    });
         }

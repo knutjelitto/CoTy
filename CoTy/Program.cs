@@ -16,10 +16,10 @@ namespace CoTy
 
             Woo.Doo();
 
-            var rootLexical = MakeRootFrame();
-            var testLexical = WithTest(rootLexical);
-            var rootActivation = rootLexical.Push("prompt");
-            var testActivation = testLexical.Push("test");
+            var rootLexical = MakeRootFrame(out var root);
+            var testLexical = WithTest(root, rootLexical);
+            var rootActivation = rootLexical.Chain(Binder.From("prompt"));
+            var testActivation = testLexical.Chain(Binder.From("test"));
             var stack = Stack.From();
 
             LanguageDefiner.Execute(ReadResource("tests"), testActivation, stack);
@@ -43,9 +43,9 @@ namespace CoTy
             CoWriter.Setup(0, 0, width, height);
         }
 
-        private static IScope MakeRootFrame()
+        private static IScope MakeRootFrame(out IBinder root)
         {
-            var modules = new Definer[]
+            var modules = new Definitions.Definer[]
             {
                 new LanguageDefiner(),
                 new BindingDefiner(),
@@ -57,15 +57,16 @@ namespace CoTy
                 new DiagnosticsDefiner(),
             };
 
-            var root = Context.Root("root");
+            root = Binder.From("root");
+            var scope = Context.Root(root);
 
-            root.Define("root", root);
+            root.Define(root.Name, root);
 
-            var scope = root;
             foreach (var module in modules)
             {
-                scope = scope.Push(module.Name);
-                root.Define(scope.Name, scope);
+                var binder = Binder.From(module.Name);
+                scope = scope.Chain(binder);
+                root.Define(binder.Name, binder);
 
                 module.Define(scope);
             }
@@ -73,9 +74,11 @@ namespace CoTy
             return scope;
         }
 
-        private static IScope WithTest(IScope rootLexical)
+        private static IScope WithTest(IBinder root, IScope rootLexical)
         {
-            var withTest = rootLexical.Push("testing");
+            var testing = Binder.From("testing");
+            root.Define(testing.Name, testing);
+            var withTest = rootLexical.Chain(testing);
             new TestsDefiner().Define(withTest);
             return withTest;
         }

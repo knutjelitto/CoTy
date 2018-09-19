@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks.Sources;
+using CoTy.Support;
+
+// ReSharper disable RedundantAssignment
+namespace CoTy.Objects
+{
+    public abstract class MultiSymbol : Cobject<List<Symbol>>
+    {
+        private readonly Symbol literal;
+        private readonly Action<IScope, Symbol, object> action;
+
+        protected MultiSymbol(IEnumerable<Symbol> objs, Symbol literal, Action<IScope, Symbol, object> action)
+            : base(objs.Reverse().ToList())
+        {
+            this.literal = literal;
+            this.action = action;
+        }
+
+        public List<Symbol> Symbols => Value;
+
+        public override void Lambda(IScope scope, IStack stack)
+        {
+            stack.Check(Symbols.Count);
+            foreach (var symbol in Symbols)
+            {
+                var value = stack.Pop();
+                this.action(scope, symbol, value);
+            }
+        }
+
+        public override void Apply(IScope scope, IStack stack)
+        {
+            // does nothing -- can't be applied
+        }
+
+        public override bool Equals(object obj)
+        {
+            return GetType() == obj.GetType() && obj is MultiSymbol other && Symbols.SequenceEqual(other.Symbols);
+        }
+
+        public override int GetHashCode()
+        {
+            return Hash.Up(Symbols);
+        }
+
+        public override string ToString()
+        {
+            if (Value.Count == 1)
+            {
+                return $"{this.literal}{Value[0]}";
+            }
+            return $"{this.literal}({string.Join(" ", Value.AsEnumerable().Reverse())})";
+        }
+    }
+}

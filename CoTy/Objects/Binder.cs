@@ -1,61 +1,93 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using CoTy.Support;
+using CoTy.Errors;
 
-// ReSharper disable RedundantAssignment
 namespace CoTy.Objects
 {
-    public class Binder : Cobject<List<Symbol>>
+    public class Binder : Cobject, IBinder
     {
-        private Binder(IEnumerable<Symbol> objs)
-            : base(objs.Reverse().ToList())
+        private readonly Dictionary<Symbol, Binding> bindings = new Dictionary<Symbol, Binding>();
+        private readonly List<Symbol> symbols = new List<Symbol>();
+
+        private Binder(Symbol name)
         {
+            Name = name;
         }
 
-        public List<Symbol> Symbols => Value;
+        public Symbol Name { get; }
 
-        public static Binder From(IEnumerable<Symbol> values)
+        public IEnumerable<Symbol> Symbols => this.symbols;
+
+        public static IBinder From(Symbol name)
         {
-            return new Binder(values);
+            return new Binder(name);
         }
 
-        public static Binder From(params Symbol[] objs)
+        public void Define(Symbol symbol, object value, bool isSealed = false, bool isOpaque = false)
         {
-            return From(objs.AsEnumerable());
-        }
-
-        public override void Lambda(IScope scope, IStack stack)
-        {
-            stack.Check(Value.Count);
-            foreach (var symbol in Value)
+            if (TryFind(symbol, out var binding))
             {
-                var value = stack.Pop();
-                scope.Define(symbol, value);
+                throw new BinderException($"`{symbol}´ already defined in current scope");
             }
+
+            binding = new Binding(this, value, isSealed, isOpaque);
+            this.bindings.Add(symbol, binding);
+            this.symbols.Add(symbol);
         }
 
-        public override void Apply(IScope scope, IStack stack)
+        public void GetValue(Symbol symbol, out object value)
         {
-            // does nothing -- can't be applied
+            value = Find(symbol).Value;
         }
 
-        public override bool Equals(object obj)
+        public bool IsDefined(Symbol symbol)
         {
-            return obj is Binder other && Symbols.SequenceEqual(other.Symbols);
+            return TryFind(symbol, out var _);
         }
 
-        public override int GetHashCode()
+        public Binding Find(Symbol symbol)
         {
-            return Hash.Up(Symbols);
+            if (!TryFind(symbol, out var binding))
+            {
+                throw new BinderException($"`{symbol}´ isn't defined in any scope");
+            }
+
+            return binding;
         }
+
+        public bool TryFind(Symbol symbol, out Binding binding)
+        {
+            return this.bindings.TryGetValue(symbol, out binding);
+        }
+
+        public void Undefine(Symbol symbol)
+        {
+            var binding = Find(symbol);
+
+            if (binding.IsOpaque)
+            {
+                throw new BinderException($"`{symbol}´ is marked as opaque and can't be removed");
+            }
+
+            this.bindings.Remove(symbol);
+            this.symbols.Remove(symbol);
+        }
+
+        public void Update(Symbol symbol, object value)
+        {
+            var binding = Find(symbol);
+
+            if (binding.IsSealed)
+            {
+                throw new BinderException($"`{symbol}´ is marked as sealed and can't be updated");
+            }
+
+            binding.Value = value;
+        }
+
 
         public override string ToString()
         {
-            if (Value.Count == 1)
-            {
-                return $"{Symbol.Bind}{Value[0]}";
-            }
-            return $"{Symbol.Bind}({string.Join(" ", Value.AsEnumerable().Reverse())})";
+            return Name + "{" + string.Join(" ", Symbols) + "}";
         }
     }
 }

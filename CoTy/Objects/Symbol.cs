@@ -19,6 +19,11 @@ namespace CoTy.Objects
             this.hashCode = value.GetHashCode();
         }
 
+        public static implicit operator Symbol(string name)
+        {
+            return Get(name);
+        }
+
         public static Symbol Get(string name)
         {
             if (!symbols.TryGetValue(name, out var symbol))
@@ -32,7 +37,7 @@ namespace CoTy.Objects
 
         public override void Lambda(IScope scope, IStack stack)
         {
-            scope.Get(this, out var value);
+            scope.GetValue(this, out var value);
 
             value.Apply(scope, stack);
         }

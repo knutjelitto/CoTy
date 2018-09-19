@@ -4,14 +4,18 @@ namespace CoTy.Objects
 {
     public class Builtin : Cobject<Action<IScope, IStack>>
     {
-        private Builtin(Action<IScope, IStack> eval)
+
+        private Builtin(Symbol name, Action<IScope, IStack> eval)
             : base(eval)
         {
+            Name = name;
         }
 
-        public static Builtin From(Action<IScope, IStack> eval)
+        public Symbol Name { get; }
+
+        public static Builtin From(Symbol name, Action<IScope, IStack> eval)
         {
-            return new Builtin(eval);
+            return new Builtin(name, eval);
         }
 
         public override void Lambda(IScope scope, IStack stack)
@@ -31,7 +35,7 @@ namespace CoTy.Objects
 
         public override string ToString()
         {
-            return Value.ToString();
+            return $"{Name}:{Value}";
         }
     }
 }
