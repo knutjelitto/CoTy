@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace CoTy.Objects
 {
-    public class Sequence : Cobject<IEnumerable<object>>, IEnumerable<object>
+    public class Sequence : Cobject<IEnumerable<object>>
     {
         protected Sequence(IEnumerable<object> objs)
             : base(objs)
@@ -58,7 +58,7 @@ namespace CoTy.Objects
             return Value.GetHashCode();
         }
 
-        public IEnumerator<object> GetEnumerator()
+        public override IEnumerator<object> GetEnumerator()
         {
             return Value.GetEnumerator();
         }
@@ -66,11 +66,6 @@ namespace CoTy.Objects
         public override string ToString()
         {
             return "(" + string.Join(" ", Value) + ")";
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
     }
 }

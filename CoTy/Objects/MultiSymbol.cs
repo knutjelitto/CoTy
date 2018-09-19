@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks.Sources;
+
 using CoTy.Support;
 
-// ReSharper disable RedundantAssignment
 namespace CoTy.Objects
 {
     public abstract class MultiSymbol : Cobject<List<Symbol>>
@@ -20,7 +18,7 @@ namespace CoTy.Objects
             this.action = action;
         }
 
-        public List<Symbol> Symbols => Value;
+        private List<Symbol> Symbols => Value;
 
         public override void Lambda(IScope scope, IStack stack)
         {

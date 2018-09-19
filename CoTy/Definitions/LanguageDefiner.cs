@@ -17,10 +17,10 @@ namespace CoTy.Definitions
             Define(into, "apply", (scope, stack, value) => value.Apply(scope, stack));
             Define(into, "lambda", (scope, stack, value) => value.Lambda(scope, stack));
             Define(into, "quote", (scope, stack, value) => Closure.From(scope, value));
-            Define(into, "unquote", 
-                   (scope, stack, values) =>
+            Define(into, "flatten", 
+                   (IScope scope, IStack stack, dynamic values) =>
                    {
-                       foreach (var value in Enumerate(values))
+                       foreach (var value in values)
                        {
                            stack.Push(value);
                        }
@@ -79,7 +79,7 @@ namespace CoTy.Definitions
             Execute(new Parser(charStream), scope, stack);
         }
 
-        public static void Execute(ItemStream<Cobject> stream, IScope scope, IStack stack)
+        public static void Execute(ItemStream<object> stream, IScope scope, IStack stack)
         {
             try
             {

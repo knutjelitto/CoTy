@@ -13,6 +13,6 @@
         public IBinder Binder { get; }
         public object Value { get; set; }
         public bool IsSealed { get; set; }
-        public bool IsOpaque { get; }
+        public bool IsOpaque { get; set; }
     }
 }

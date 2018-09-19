@@ -32,6 +32,15 @@ namespace CoTy.Definitions
             Define(into,
                    "sealed?",
                    (scope, stack, symbol) => scope.Find(GetSymbol(symbol)).IsSealed);
+            Define(into,
+                   "opaque",
+                   (scope, stack, symbol) => { scope.Find(GetSymbol(symbol)).IsOpaque = true; });
+            Define(into,
+                   "unopaque",
+                   (scope, stack, symbol) => { scope.Find(GetSymbol(symbol)).IsOpaque = false; });
+            Define(into,
+                   "opaque?",
+                   (scope, stack, symbol) => scope.Find(GetSymbol(symbol)).IsOpaque);
         }
     }
 }

@@ -46,27 +46,23 @@ namespace CoTy
         public static void Doo2()
         {
             var woo = new Woo();
-            var chars1 = Characters.From("a");
-            var chars2 = Characters.From("b");
+            var chars1 = "a";
+            var chars2 = "b";
             var int1 = Integer.From(11);
             var int2 = Integer.From(12);
 
             woo.Call(woo, chars1, chars2);
             woo.Call(woo, chars1, chars2);
-            //((dynamic)woo).Add(chars1, chars2);
-            //((dynamic)woo).Add(int1, int2);
-            //((dynamic)woo).Add((Cobject)chars1, chars2);
-            //((dynamic)woo).Add(chars1, chars2);
 
             Environment.Exit(12);
         }
 
-        private void Call(Woo woo, Characters chars1, Characters chars2)
+        private void Call(Woo woo, string chars1, string chars2)
         {
             ((dynamic)woo).Add(chars1, chars2);
         }
 
-        public void Add(Characters value2, Characters value)
+        public void Add(string value2, string value)
         {
         }
 

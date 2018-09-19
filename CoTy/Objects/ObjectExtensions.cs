@@ -1,4 +1,7 @@
-﻿namespace CoTy.Objects
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace CoTy.Objects
 {
     public static class ObjectExtensions
     {
@@ -25,5 +28,25 @@
                 stack.Push(This);
             }
         }
+
+        public static IEnumerable<object> Enumerate(this object This)
+        {
+            if (This is Cobject cobject)
+            {
+                return cobject;
+            }
+
+            // ReSharper disable once UsePatternMatching
+            var enumerable = This as IEnumerable<object>;
+
+            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
+            if (enumerable == null)
+            {
+                enumerable = Enumerable.Repeat(This, 1);
+            }
+
+            return enumerable;
+        }
+
     }
 }

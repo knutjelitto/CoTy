@@ -8,7 +8,7 @@ using CoTy.Errors;
 
 namespace CoTy.Inputs
 {
-    public class Scanner : ItemStream<Cobject>
+    public class Scanner : ItemStream<object>
     {
         private readonly ItemSource<char> source;
 
@@ -22,7 +22,7 @@ namespace CoTy.Inputs
             return this.source.LevelUp();
         }
 
-        public override IEnumerator<Cobject> GetEnumerator()
+        public override IEnumerator<object> GetEnumerator()
         {
             var current = new Cursor<char>(this.source);
 
@@ -44,14 +44,14 @@ namespace CoTy.Inputs
                         current.Advance();
                         yield return Symbol.Quoter;
                         break;
-                    case ':':
-                        current.Advance();
-                        yield return Symbol.Bind;
-                        break;
-                    case '~':
-                        current.Advance();
-                        yield return Symbol.Assign;
-                        break;
+                    //case ':':
+                    //    current.Advance();
+                    //    yield return Symbol.Bind;
+                    //    break;
+                    //case '~':
+                    //    current.Advance();
+                    //    yield return Symbol.Assign;
+                    //    break;
                     case '"':
                         yield return ScanString(ref current);
                         break;
@@ -71,43 +71,7 @@ namespace CoTy.Inputs
 
         private bool IsStructure(char c)
         {
-            return "():~\"\'".Contains(c);
-        }
-
-        private bool IsRestrictedSymbolFirst(char c)
-        {
-            return c == '_' || char.IsLetter(c);
-        }
-
-        private bool IsRestrictedSymbolNext(char c)
-        {
-            return c == '_' || char.IsLetter(c) || char.IsDigit(c);
-        }
-
-        private bool MaybeRestrictedSymbol(Cursor<char> current)
-        {
-            return current && IsRestrictedSymbolFirst(current.Item);
-        }
-
-        private void ScanRestrictedSymbol(string intro, Cursor<char> current, out Symbol restrictedSymbol)
-        {
-            Debug.Assert(MaybeRestrictedSymbol(current));
-
-            var accu = new StringBuilder();
-
-            do
-            {
-                accu.Append(current.Item);
-                current.Advance();
-            }
-            while (current && IsRestrictedSymbolNext(current.Item));
-
-            if (MoreToScan(current))
-            {
-                throw new ScannerException($"exected simple symbol after `{intro}´");
-            }
-
-            restrictedSymbol = Symbol.Get(accu.ToString());
+            return "()\"\'".Contains(c);
         }
 
         private bool MoreToScan(Cursor<char> current)
@@ -145,7 +109,7 @@ namespace CoTy.Inputs
             return current;
         }
 
-        private Characters ScanString(ref Cursor<char> current)
+        private string ScanString(ref Cursor<char> current)
         { 
             Debug.Assert(current.Item == '"');
 
@@ -170,7 +134,8 @@ namespace CoTy.Inputs
                 throw new ScannerException("EOT in string literal");
             }
             current = current.Next;
-            return Characters.From(accu);
+
+            return accu.ToString();
         }
 
         private string ScanGrumble(ref Cursor<char> current)

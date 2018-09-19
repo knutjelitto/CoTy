@@ -28,7 +28,7 @@ namespace CoTy.Definitions
         {
             if (!TryGetSymbol(candidate, out var symbol))
             {
-                throw new BinderException($"`{string.Join(" ", Enumerate(candidate))}´ can't be a symbol");
+                throw new BinderException($"`{candidate}´ can't be a symbol");
             }
 
             return symbol;
@@ -113,6 +113,20 @@ namespace CoTy.Definitions
             }
         }
 
+
+        protected void Define(IScope into, string name, Func<IScope, IStack, object, object, object> operation)
+        {
+            Enter(into, name, Action);
+
+            void Action(IScope scope, IStack stack)
+            {
+                stack.Check(1);
+                var value2 = stack.Pop();
+                var value1 = stack.Pop();
+                var result = operation(scope, stack, value1, value2);
+                stack.Push(result);
+            }
+        }
 
         protected void Define(IScope into, string name, Action operation)
         {

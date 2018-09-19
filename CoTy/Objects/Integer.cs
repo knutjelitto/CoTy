@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Text;
 
 namespace CoTy.Objects
 {
@@ -14,6 +15,11 @@ namespace CoTy.Objects
 
         public static Integer From(BigInteger value)
         {
+            if (value == 0)
+            {
+                return Zero;
+            }
+
             return new Integer(value);
         }
 
@@ -21,7 +27,7 @@ namespace CoTy.Objects
         {
             if (BigInteger.TryParse(str, out var parsed))
             {
-                value = new Integer(parsed);
+                value = From(parsed);
                 return true;
             }
             value = null;
@@ -40,7 +46,7 @@ namespace CoTy.Objects
 
         public static implicit operator Integer(int value)
         {
-            return new Integer(value);
+            return From(value);
         }
 
         public static Integer operator ++(Integer x)
@@ -58,6 +64,16 @@ namespace CoTy.Objects
             return From(x.Value + y.Value);
         }
 
+        public static string operator +(Integer x, string y)
+        {
+            if (ReferenceEquals(x, Zero))
+            {
+                return y;
+            }
+
+            return x.Value + y;
+        }
+
         public static Integer operator -(Integer x, Integer y)
         {
             return From(x.Value - y.Value);
@@ -66,6 +82,30 @@ namespace CoTy.Objects
         public static Integer operator *(Integer x, Integer y)
         {
             return From(x.Value * y.Value);
+        }
+
+        public static string operator *(Integer x, string y)
+        {
+            var builder = new StringBuilder();
+            while (x > 0)
+            {
+                builder.Append(y);
+                x--;
+            }
+
+            return builder.ToString();
+        }
+
+        public static string operator *(string x, Integer y)
+        {
+            var builder = new StringBuilder();
+            while (y > 0)
+            {
+                builder.Append(x);
+                y--;
+            }
+
+            return builder.ToString();
         }
 
         public static Integer operator /(Integer x, Integer y)

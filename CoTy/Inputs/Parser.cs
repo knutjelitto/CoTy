@@ -7,7 +7,7 @@ using CoTy.Objects;
 
 namespace CoTy.Inputs
 {
-    public class Parser : ItemStream<Cobject>
+    public class Parser : ItemStream<object>
     {
         private Scanner Scanner { get; }
 
@@ -17,9 +17,9 @@ namespace CoTy.Inputs
             Scanner = new Scanner(source);
         }
 
-        public override IEnumerator<Cobject> GetEnumerator()
+        public override IEnumerator<object> GetEnumerator()
         {
-            var current = new Cursor<Cobject>(new ItemSource<Cobject>(Scanner));
+            var current = new Cursor<object>(new ItemSource<object>(Scanner));
 
             // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
             while (current)
@@ -28,7 +28,7 @@ namespace CoTy.Inputs
             }
         }
 
-        private Cobject ParseObject(Cursor<Cobject> current)
+        private object ParseObject(Cursor<object> current)
         {
             if (TryParseSequence(current, out var result))
             {
@@ -67,7 +67,7 @@ namespace CoTy.Inputs
             return @object;
         }
 
-        private bool TryParseDefiner(Cursor<Cobject> current, out Definer binder)
+        private bool TryParseDefiner(Cursor<object> current, out Definer binder)
         {
             if (!Equals(current.Item, Symbol.Bind))
             {
@@ -109,7 +109,7 @@ namespace CoTy.Inputs
         }
 
 
-        private bool TryParseAssigner(Cursor<Cobject> current, out Assigner assigner)
+        private bool TryParseAssigner(Cursor<object> current, out Assigner assigner)
         {
             if (!Equals(current.Item, Symbol.Assign))
             {
@@ -150,7 +150,7 @@ namespace CoTy.Inputs
             }
         }
 
-        private bool TryParseSequence(Cursor<Cobject> current, out Sequence sequence)
+        private bool TryParseSequence(Cursor<object> current, out Sequence sequence)
         {
             if (!Equals(current.Item, Symbol.LeftParent))
             {
@@ -163,7 +163,7 @@ namespace CoTy.Inputs
             {
                 current.Advance();
 
-                IEnumerable<Cobject> Loop()
+                IEnumerable<object> Loop()
                 {
                     while (current && !Equals(current.Item, Symbol.RightParent))
                     {

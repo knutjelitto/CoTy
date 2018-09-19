@@ -1,12 +1,12 @@
 ﻿;; integer comparisons
 
-(1 1 ==) assert-true
-(1 2 ==) assert-false
-(2 1 ==) assert-false
+(1 1 eq?) assert-true
+(1 2 eq?) assert-false
+(2 1 eq?) assert-false
 
-(1 1 !=) assert-false
-(2 1 !=) assert-true
-(1 2 !=) assert-true
+(1 1 ne?) assert-false
+(2 1 ne?) assert-true
+(1 2 ne?) assert-true
 
 (1 1 < ) assert-false
 (1 2 < ) assert-true
@@ -26,13 +26,13 @@
 
 ;; character comparisons
 
-("1" "1" ==) assert-true
-("1" "2" ==) assert-false
-("2" "1" ==) assert-false
+("1" "1" eq?) assert-true
+("1" "2" eq?) assert-false
+("2" "1" eq?) assert-false
 
-("1" "1" !=) assert-false
-("2" "1" !=) assert-true
-("1" "2" !=) assert-true
+("1" "1" ne?) assert-false
+("2" "1" ne?) assert-true
+("1" "2" ne?) assert-true
 
 (""  "1" < ) assert-true
 ("1" "1" < ) assert-false
@@ -55,15 +55,15 @@
 ("2" "1" >=) assert-true
 
 ;; bool comparisons
-(false false ==) assert-true
-(false true  ==) assert-false
-(true  false ==) assert-false
-(true  true  ==) assert-true
+(false false eq?) assert-true
+(false true  eq?) assert-false
+(true  false eq?) assert-false
+(true  true  eq?) assert-true
 
-(false false !=) assert-false
-(false true  !=) assert-true
-(true  false !=) assert-true
-(true  true  !=) assert-false
+(false false ne?) assert-false
+(false true  ne?) assert-true
+(true  false ne?) assert-true
+(true  true  ne?) assert-false
 
 (false false < ) assert-false
 (false true  < ) assert-true

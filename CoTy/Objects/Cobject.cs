@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 
 namespace CoTy.Objects
 {
-    public abstract class Cobject : DynamicObject
+    public abstract class Cobject : DynamicObject, IEnumerable<object>
     {
         public virtual void Lambda(IScope scope, IStack stack)
         {
@@ -16,9 +17,14 @@ namespace CoTy.Objects
             Lambda(scope, stack);
         }
 
-        protected static IEnumerable<T> Enumerate<T>(T value)
+        public virtual IEnumerator<object> GetEnumerator()
         {
-            return value as IEnumerable<T> ?? Enumerable.Repeat(value, 1);
+            yield return this;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
 #if false
