@@ -11,9 +11,9 @@ namespace CoTy.Objects
         {
         }
 
-        public override void Lambda(IContext context, IStack stack)
+        public override void Lambda(IScope scope, IStack stack)
         {
-            stack.Push(Closure.From(context, Value));
+            stack.Push(Closure.From(scope, Value));
         }
 
         public static Sequence From(params object[] values)

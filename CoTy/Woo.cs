@@ -18,7 +18,7 @@ namespace CoTy
         {
             Func<dynamic, dynamic, object> binOp = (v1, v2) => v1 * v2;
 
-            var context = Expression.Parameter(typeof(IContext), "context");
+            var scope = Expression.Parameter(typeof(IScope), "scope");
             var stack = Expression.Parameter(typeof(Stack), "stack");
             var value1 = Expression.Parameter(typeof(object), "value1");
             var value2 = Expression.Parameter(typeof(object), "value2");
@@ -29,7 +29,7 @@ namespace CoTy
                 Expression.Assign(value1, Expression.Call(stack, "Pop", Type.EmptyTypes)),
                 Expression.Assign(result, Expression.Call(Expression.Constant(binOp.Target), binOp.Method, value1, value2)),
                 Expression.Call(stack, "Push", Type.EmptyTypes, result));
-            var lambda = Expression.Lambda<Action<IContext, IStack>>(block, context, stack);
+            var lambda = Expression.Lambda<Action<IScope, IStack>>(block, scope, stack);
             var action = lambda.Compile();
 
             var xcontext = Context.Root("root");

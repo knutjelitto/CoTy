@@ -5,9 +5,9 @@ using CoTy.Errors;
 
 namespace CoTy.Objects
 {
-    public class Context : Cobject<Dictionary<Symbol, Binding>>, IContext
+    public class Context : Cobject<Dictionary<Symbol, Binding>>, IScope
     {
-        private Context(IContext parent, string name)
+        private Context(IScope parent, string name)
             : base(new Dictionary<Symbol, Binding>())
         {
             Parent = parent;
@@ -16,20 +16,18 @@ namespace CoTy.Objects
 
         public IEnumerable<Symbol> Symbols => Value.Keys.OrderBy(k => k.ToString());
 
-        public IContext Scope => this;
-
-        public static IContext Root(string name)
+        public static IScope Root(string name)
         {
             return new Context(null, name);
         }
 
-        public IContext Pop()
+        public IScope Pop()
         {
             Parent = null;
             return this;
         }
 
-        public IContext Push(string name)
+        public IScope Push(string name)
         {
             var newContext = new Context(this, name);
             return newContext;
@@ -125,7 +123,7 @@ namespace CoTy.Objects
             return true;
         }
 
-        public IContext Parent { get; private set; }
+        public IScope Parent { get; private set; }
         public string Name { get; }
 
         public override bool Equals(object obj)

@@ -34,101 +34,101 @@ namespace CoTy.Definitions
             return symbol;
         }
 
-        private static void Enter(IContext into, string name, Action<IContext, IStack> action)
+        private static void Enter(IScope into, string name, Action<IScope, IStack> action)
         {
             var builtin = Builtin.From(action);
             into.Define(name, builtin, true, true);
         }
 
-        public abstract void Define(IContext into);
+        public abstract void Define(IScope into);
 
         /* ---------------------------------------------------------------------------------------------------------------------- */
 
-        protected void Define(IContext into, string name, Func<object> operation)
+        protected void Define(IScope into, string name, Func<object> operation)
         {
             Enter(into, name, Action);
 
-            void Action(IContext context, IStack stack)
+            void Action(IScope scope, IStack stack)
             {
                 var result = operation();
                 stack.Push(result);
             }
         }
 
-        protected void Define(IContext into, string name, Func<object, object> operation)
+        protected void Define(IScope into, string name, Func<object, object> operation)
         {
             Enter(into, name, Action);
 
-            void Action(IContext context, IStack stack)
+            void Action(IScope scope, IStack stack)
             {
                 stack.Check(1);
                 var value = stack.Pop();
-                value.Apply(context, stack);
+                value.Apply(scope, stack);
                 value = stack.Pop();
                 var result = operation(value);
                 stack.Push(result);
             }
         }
 
-        protected void Define(IContext into, string name, Func<object, object, object> operation)
+        protected void Define(IScope into, string name, Func<object, object, object> operation)
         {
             Enter(into, name, Action);
 
-            void Action(IContext context, IStack stack)
+            void Action(IScope scope, IStack stack)
             {
                 stack.Check(2);
                 var value2 = stack.Pop();
                 var value1 = stack.Pop();
-                value1.Apply(context, stack);
+                value1.Apply(scope, stack);
                 value1 = stack.Pop();
-                value2.Apply(context, stack);
+                value2.Apply(scope, stack);
                 value2 = stack.Pop();
                 var result = operation(value1, value2);
                 stack.Push(result);
             }
         }
 
-        protected void Define(IContext into, string name, Func<IContext, IStack, object> operation)
+        protected void Define(IScope into, string name, Func<IScope, IStack, object> operation)
         {
             Enter(into, name, Action);
 
-            void Action(IContext context, IStack stack)
+            void Action(IScope scope, IStack stack)
             {
-                var result = operation(context, stack);
+                var result = operation(scope, stack);
 
                 stack.Push(result);
             }
         }
 
-        protected void Define(IContext into, string name, Func<IContext, IStack, object, object> operation)
+        protected void Define(IScope into, string name, Func<IScope, IStack, object, object> operation)
         {
             Enter(into, name, Action);
 
-            void Action(IContext context, IStack stack)
+            void Action(IScope scope, IStack stack)
             {
                 stack.Check(1);
                 var value = stack.Pop();
-                var result = operation(context, stack, value);
+                var result = operation(scope, stack, value);
                 stack.Push(result);
             }
         }
 
 
-        protected void Define(IContext into, string name, Action operation)
+        protected void Define(IScope into, string name, Action operation)
         {
             Enter(into, name, Action);
 
-            void Action(IContext context, IStack stack)
+            void Action(IScope scope, IStack stack)
             {
                 operation();
             }
         }
 
-        protected void Define(IContext into, string name, Action<object> operation)
+        protected void Define(IScope into, string name, Action<object> operation)
         {
             Enter(into, name, Action);
 
-            void Action(IContext context, IStack stack)
+            void Action(IScope scope, IStack stack)
             {
                 stack.Check(1);
                 var value = stack.Pop();
@@ -136,52 +136,52 @@ namespace CoTy.Definitions
             }
         }
 
-        protected void Define(IContext into, string name, Action<IContext, IStack> operation)
+        protected void Define(IScope into, string name, Action<IScope, IStack> operation)
         {
             Enter(into, name, Action);
 
-            void Action(IContext context, IStack stack)
+            void Action(IScope scope, IStack stack)
             {
-                operation(context, stack);
+                operation(scope, stack);
             }
         }
 
-        protected void Define(IContext into, string name, Action<IContext, IStack, object> operation)
+        protected void Define(IScope into, string name, Action<IScope, IStack, object> operation)
         {
             Enter(into, name, Action);
 
-            void Action(IContext context, IStack stack)
+            void Action(IScope scope, IStack stack)
             {
                 stack.Check(1);
                 var value = stack.Pop();
-                operation(context, stack, value);
+                operation(scope, stack, value);
             }
         }
 
-        protected void Define(IContext into, string name, Action<IContext, IStack, object, object> operation)
+        protected void Define(IScope into, string name, Action<IScope, IStack, object, object> operation)
         {
             Enter(into, name, Action);
 
-            void Action(IContext context, IStack stack)
+            void Action(IScope scope, IStack stack)
             {
                 stack.Check(2);
                 var value2 = stack.Pop();
                 var value1 = stack.Pop();
-                operation(context, stack, value1, value2);
+                operation(scope, stack, value1, value2);
             }
         }
 
-        protected void Define(IContext into, string name, Action<IContext, IStack, object, object, object> operation)
+        protected void Define(IScope into, string name, Action<IScope, IStack, object, object, object> operation)
         {
             Enter(into, name, Action);
 
-            void Action(IContext context, IStack stack)
+            void Action(IScope scope, IStack stack)
             {
                 stack.Check(2);
                 var value3 = stack.Pop();
                 var value2 = stack.Pop();
                 var value1 = stack.Pop();
-                operation(context, stack, value1, value2, value3);
+                operation(scope, stack, value1, value2, value3);
             }
 
         }

@@ -9,7 +9,7 @@ namespace CoTy.Definitions
     {
         public ConsoleDefiner() : base("console") { }
 
-        public override void Define(IContext into)
+        public override void Define(IScope into)
         {
             Define(into, "print", value => G.C.Write($"{value}"));
             Define(into, "println", value => G.C.WriteLine($"{value}"));

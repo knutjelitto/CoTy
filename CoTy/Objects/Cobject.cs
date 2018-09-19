@@ -6,14 +6,14 @@ namespace CoTy.Objects
 {
     public abstract class Cobject : DynamicObject
     {
-        public virtual void Lambda(IContext context, IStack stack)
+        public virtual void Lambda(IScope scope, IStack stack)
         {
             stack.Push(this);
         }
 
-        public virtual void Apply(IContext context, IStack stack)
+        public virtual void Apply(IScope scope, IStack stack)
         {
-            Lambda(context, stack);
+            Lambda(scope, stack);
         }
 
         protected static IEnumerable<T> Enumerate<T>(T value)

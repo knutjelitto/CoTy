@@ -8,7 +8,7 @@ namespace CoTy.Definitions
     {
         public OperatorDefiner() : base("operator") { }
 
-        public override void Define(IContext into)
+        public override void Define(IScope into)
         {
             Define(into, "==", (dynamic value1, dynamic value2) => Equals(value1, value2));
             Define(into, "!=", (dynamic value1, dynamic value2) => !Equals(value1, value2));
@@ -37,7 +37,7 @@ namespace CoTy.Definitions
             Define(into, "false", () => false);
 
             Define(into, "<>", (value1, value2) => Sequence.From(Enumerate(value1).Concat(Enumerate(value2))));
-            Define(into, "><", (context, stack, values) =>
+            Define(into, "><", (scope, stack, values) =>
             {
                 foreach (var value in Enumerate(values))
                 {

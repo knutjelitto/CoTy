@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CoTy.Objects
+﻿namespace CoTy.Objects
 {
     public static class ObjectExtensions
     {
-        public static void Apply(this object This, IContext context, IStack stack)
+        public static void Apply(this object This, IScope scope, IStack stack)
         {
             if (This is Cobject cvalue)
             {
-                cvalue.Apply(context, stack);
+                cvalue.Apply(scope, stack);
             }
             else
             {
@@ -18,11 +14,11 @@ namespace CoTy.Objects
             }
         }
 
-        public static void Lambda(this object This, IContext context, IStack stack)
+        public static void Lambda(this object This, IScope scope, IStack stack)
         {
             if (This is Cobject cvalue)
             {
-                cvalue.Lambda(context, stack);
+                cvalue.Lambda(scope, stack);
             }
             else
             {

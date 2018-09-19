@@ -9,28 +9,28 @@ namespace CoTy.Definitions
     {
         public TestsDefiner() : base("testing") { }
 
-        public override void Define(IContext into)
+        public override void Define(IScope into)
         {
             Define(into,
                    "assert",
-                   (context, stack, actual, expected) =>
+                   (scope, stack, actual, expected) =>
                    {
-                       expected.Apply(context, stack);
+                       expected.Apply(scope, stack);
                        var expectedValue = stack.Pop();
 
-                       Outcome(expectedValue, actual, context, stack);
+                       Outcome(expectedValue, actual, scope, stack);
                    });
             Define(into,
                    "assert-true",
-                   (context, stack, actual) => { Outcome(true, actual, context, stack); });
+                   (scope, stack, actual) => { Outcome(true, actual, scope, stack); });
             Define(into,
                    "assert-false",
-                   (context, stack, actual) => { Outcome(false, actual, context, stack); });
+                   (scope, stack, actual) => { Outcome(false, actual, scope, stack); });
         }
 
-        private static void Outcome(object expectedValue, object actual, IContext context, IStack stack)
+        private static void Outcome(object expectedValue, object actual, IScope scope, IStack stack)
         {
-            actual.Apply(context, stack);
+            actual.Apply(scope, stack);
             var actualValue = stack.Pop();
 
             var equals = actualValue.Equals(expectedValue);

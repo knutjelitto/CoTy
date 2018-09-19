@@ -9,7 +9,7 @@ namespace CoTy.Definitions
     {
         public SequenceDefiner() : base("sequence") { }
 
-        public override void Define(IContext into)
+        public override void Define(IScope into)
         {
             Define(into, "up", (dynamic value) =>
             {
@@ -125,7 +125,7 @@ namespace CoTy.Definitions
                 }
             });
 
-            Define(into, "collapse", (context, stack, values, action) =>
+            Define(into, "collapse", (scope, stack, values, action) =>
             {
                 var first = true;
                 foreach (var value in Enumerate(values))
@@ -133,7 +133,7 @@ namespace CoTy.Definitions
                     stack.Push(value);
                     if (!first)
                     {
-                        action.Apply(context, stack);
+                        action.Apply(scope, stack);
                     }
                     else
                     {
@@ -142,19 +142,19 @@ namespace CoTy.Definitions
                 }
             });
 
-            Define(into, "reduce", (context, stack, values, seed, action) =>
+            Define(into, "reduce", (scope, stack, values, seed, action) =>
             {
                 stack.Push(seed);
                 foreach (var value in Enumerate(values))
                 {
                     stack.Push(value);
-                    action.Apply(context, stack);
+                    action.Apply(scope, stack);
                 }
             });
 
             Define(into,
                    "map",
-                   (context, stack, sequence, action) =>
+                   (scope, stack, sequence, action) =>
                    {
                        var result = Sequence.From(Enumerate(sequence).Select(value => Eval(value, action)));
 
@@ -163,26 +163,26 @@ namespace CoTy.Definitions
                        object Eval(object _value, object _action)
                        {
                            stack.Push(_value);
-                           _action.Apply(context, stack);
+                           _action.Apply(scope, stack);
                            return stack.Pop();
                        }
                    });
 
             Define(into,
                    "foreach",
-                   (context, stack, sequence, action) =>
+                   (scope, stack, sequence, action) =>
                    {
                        foreach (var value in Enumerate(sequence))
                        {
                            stack.Push(value);
-                           action.Apply(context, stack);
+                           action.Apply(scope, stack);
                        }
                    });
 
 
             Define(into,
                    "count",
-                   (context, stack, values) =>
+                   (scope, stack, values) =>
                    {
                        var count = Integer.Zero;
 

@@ -2,21 +2,21 @@
 
 namespace CoTy.Objects
 {
-    public class Builtin : Cobject<Action<IContext, IStack>>
+    public class Builtin : Cobject<Action<IScope, IStack>>
     {
-        private Builtin(Action<IContext, IStack> eval)
+        private Builtin(Action<IScope, IStack> eval)
             : base(eval)
         {
         }
 
-        public static Builtin From(Action<IContext, IStack> eval)
+        public static Builtin From(Action<IScope, IStack> eval)
         {
             return new Builtin(eval);
         }
 
-        public override void Lambda(IContext context, IStack stack)
+        public override void Lambda(IScope scope, IStack stack)
         {
-            Value(context, stack);
+            Value(scope, stack);
         }
 
         public override bool Equals(object obj)

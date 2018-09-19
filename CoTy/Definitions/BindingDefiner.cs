@@ -6,32 +6,32 @@ namespace CoTy.Definitions
     {
         public BindingDefiner() : base("binding"){}
 
-        public override void Define(IContext into)
+        public override void Define(IScope into)
         {
             Define(into,
                    "def",
-                   (context, stack, value, symbol) => { context.Define(GetSymbol(symbol), value); });
+                   (scope, stack, value, symbol) => { scope.Define(GetSymbol(symbol), value); });
             Define(into,
                    "undef",
-                   (context, stack, symbol) => { context.Undefine(GetSymbol(symbol)); });
+                   (scope, stack, symbol) => { scope.Undefine(GetSymbol(symbol)); });
             Define(into,
                    "set",
-                   (context, stack, value, symbol) => { context.Update(GetSymbol(symbol), value); });
+                   (scope, stack, value, symbol) => { scope.Update(GetSymbol(symbol), value); });
             Define(into,
                    "def?",
-                   (context, stack, symbol) => TryGetSymbol(symbol, out var asSymbol) && context.IsDefined(asSymbol));
+                   (scope, stack, symbol) => TryGetSymbol(symbol, out var asSymbol) && scope.IsDefined(asSymbol));
             Define(into,
                    "value",
-                   (context, stack, symbol) => context.Find(GetSymbol(symbol)).Value);
+                   (scope, stack, symbol) => scope.Find(GetSymbol(symbol)).Value);
             Define(into,
                    "seal",
-                   (context, stack, symbol) => { context.Find(GetSymbol(symbol)).IsSealed = true; });
+                   (scope, stack, symbol) => { scope.Find(GetSymbol(symbol)).IsSealed = true; });
             Define(into,
                    "unseal",
-                   (context, stack, symbol) => { context.Find(GetSymbol(symbol)).IsSealed = false; });
+                   (scope, stack, symbol) => { scope.Find(GetSymbol(symbol)).IsSealed = false; });
             Define(into,
                    "sealed?",
-                   (context, stack, symbol) => context.Find(GetSymbol(symbol)).IsSealed);
+                   (scope, stack, symbol) => scope.Find(GetSymbol(symbol)).IsSealed);
         }
     }
 }

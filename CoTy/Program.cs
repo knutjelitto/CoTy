@@ -40,10 +40,10 @@ namespace CoTy
             Console.SetBufferSize(width, height);
             Console.SetWindowSize(width, height);
 
-            G.C = new CoWriter(10, 0, width - 10, height);
+            CoWriter.Setup(0, 0, width, height);
         }
 
-        private static IContext MakeRootFrame()
+        private static IScope MakeRootFrame()
         {
             var modules = new Definer[]
             {
@@ -61,19 +61,19 @@ namespace CoTy
 
             root.Define("root", root);
 
-            var context = root;
+            var scope = root;
             foreach (var module in modules)
             {
-                context = context.Push(module.Name);
-                root.Define(context.Name, context);
+                scope = scope.Push(module.Name);
+                root.Define(scope.Name, scope);
 
-                module.Define(context);
+                module.Define(scope);
             }
 
-            return context;
+            return scope;
         }
 
-        private static IContext WithTest(IContext rootLexical)
+        private static IScope WithTest(IScope rootLexical)
         {
             var withTest = rootLexical.Push("testing");
             new TestsDefiner().Define(withTest);

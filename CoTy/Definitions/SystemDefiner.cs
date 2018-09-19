@@ -8,7 +8,7 @@ namespace CoTy.Definitions
     {
         public SystemDefiner() : base("system") { }
 
-        public override void Define(IContext into)
+        public override void Define(IScope into)
         {
             Define(into, "exit", () => Environment.Exit(42));
         }

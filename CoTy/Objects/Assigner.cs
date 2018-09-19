@@ -25,17 +25,17 @@ namespace CoTy.Objects
             return From(objs.AsEnumerable());
         }
 
-        public override void Lambda(IContext context, IStack stack)
+        public override void Lambda(IScope scope, IStack stack)
         {
             stack.Check(Symbols.Count);
             foreach (var symbol in Symbols)
             {
                 var value = stack.Pop();
-                context.Update(symbol, value);
+                scope.Update(symbol, value);
             }
         }
 
-        public override void Apply(IContext context, IStack stack)
+        public override void Apply(IScope scope, IStack stack)
         {
             // does nothing -- can't be applied
         }

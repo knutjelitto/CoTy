@@ -30,11 +30,11 @@ namespace CoTy.Objects
             return symbol;
         }
 
-        public override void Lambda(IContext context, IStack stack)
+        public override void Lambda(IScope scope, IStack stack)
         {
-            context.Get(this, out var value);
+            scope.Get(this, out var value);
 
-            value.Apply(context, stack);
+            value.Apply(scope, stack);
         }
 
         public override int GetHashCode() => this.hashCode;

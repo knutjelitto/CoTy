@@ -12,13 +12,13 @@ namespace CoTy.Definitions
     {
         public LanguageDefiner() : base("language") { }
 
-        public override void Define(IContext into)
+        public override void Define(IScope into)
         {
-            Define(into, "apply", (context, stack, value) => value.Apply(context, stack));
-            Define(into, "lambda", (context, stack, value) => value.Lambda(context, stack));
-            Define(into, "quote", (context, stack, value) => Closure.From(context, value));
+            Define(into, "apply", (scope, stack, value) => value.Apply(scope, stack));
+            Define(into, "lambda", (scope, stack, value) => value.Lambda(scope, stack));
+            Define(into, "quote", (scope, stack, value) => Closure.From(scope, value));
             Define(into, "unquote", 
-                   (context, stack, values) =>
+                   (scope, stack, values) =>
                    {
                        foreach (var value in Enumerate(values))
                        {
@@ -27,25 +27,25 @@ namespace CoTy.Definitions
                    });
             Define(into,
                    "if",
-                   (context, stack, condition, ifTrue, ifElse) =>
+                   (scope, stack, condition, ifTrue, ifElse) =>
                    {
-                       condition.Apply(context, stack);
+                       condition.Apply(scope, stack);
                        var result = stack.Pop();
 
                        if (result is bool boolean && boolean)
                        {
-                           ifTrue.Apply(context, stack);
+                           ifTrue.Apply(scope, stack);
                        }
                        else
                        {
-                           ifElse.Apply(context, stack);
+                           ifElse.Apply(scope, stack);
                        }
                    });
-            Define(into, "load", (context, stack, symbol) => Load(context, stack, GetSymbol(symbol)));
+            Define(into, "load", (scope, stack, symbol) => Load(scope, stack, GetSymbol(symbol)));
         }
 
 
-        private static void Load(IContext context, IStack stack, Symbol symbol)
+        private static void Load(IScope scope, IStack stack, Symbol symbol)
         {
             var name = symbol.ToString();
 
@@ -60,27 +60,27 @@ namespace CoTy.Definitions
 
             var content = File.ReadAllText(path);
 
-            var localContext =  context.Push(name);
+            var localContext =  scope.Push(name);
             var localStack = Stack.From();
 
             Execute(content, localContext, localStack);
 
             localContext = localContext.Pop();
 
-            context.Define(symbol, localContext);
+            scope.Define(symbol, localContext);
         }
 
-        public static void Execute(string stream, IContext context, IStack stack)
+        public static void Execute(string stream, IScope scope, IStack stack)
         {
-            Execute(new CharStream(stream), context, stack);
+            Execute(new CharStream(stream), scope, stack);
         }
 
-        public static void Execute(ItemStream<char> charStream, IContext context, IStack stack)
+        public static void Execute(ItemStream<char> charStream, IScope scope, IStack stack)
         {
-            Execute(new Parser(charStream), context, stack);
+            Execute(new Parser(charStream), scope, stack);
         }
 
-        public static void Execute(ItemStream<Cobject> stream, IContext context, IStack stack)
+        public static void Execute(ItemStream<Cobject> stream, IScope scope, IStack stack)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace CoTy.Definitions
                 {
                     try
                     {
-                        value.Lambda(context, stack);
+                        value.Lambda(scope, stack);
                     }
                     catch (CotyException cotyException)
                     {
