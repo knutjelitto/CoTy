@@ -10,7 +10,7 @@
 
         public static string operator +(Neutrum neutral, string value)
         {
-            return string.Empty + value;
+            return value;
         }
 
         public static Integer operator +(Neutrum neutral, Integer value)
@@ -28,14 +28,14 @@
             return value;
         }
 
-        public static Integer operator /(Neutrum neutral, Integer value)
+        public static object operator /(Neutrum neutral, Integer value)
         {
             return 1 / value;
         }
 
         public override string ToString()
         {
-            return "neutral";
+            return "<neutral>";
         }
     }
 }

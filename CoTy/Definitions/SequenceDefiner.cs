@@ -13,6 +13,55 @@ namespace CoTy.Definitions
 
         public override void Define(IScope into)
         {
+            Define(into,
+                   "any?",
+                   value => !(value is IEnumerable<object> enumerable) || enumerable.Any());
+
+            Define(into,
+                   "empty?",
+                   value => value is IEnumerable<object> enumerable && !enumerable.Any());
+
+            Define(into,
+                   "single?",
+                   value =>
+                   {
+                       if (value is IEnumerable<object> enumerable)
+                       {
+                           using (var enumerator = enumerable.GetEnumerator())
+                           {
+                               return enumerator.MoveNext() && !enumerator.MoveNext();
+                           }
+                       }
+                       return true;
+                   });
+
+            Define(into,
+                   "first-rest",
+                   (scope, stack, value) =>
+                   {
+                       if (value is IEnumerable<object> enumerable)
+                       {
+                           using (var enumerator = enumerable.GetEnumerator())
+                           {
+                               if (enumerator.MoveNext())
+                               {
+                                   stack.Push(enumerator.Current);
+                                   stack.Push(Sequence.From(enumerator));
+                               }
+                               else
+                               {
+                                   stack.Push(Sequence.Empty);
+                                   stack.Push(Sequence.Empty);
+                               }
+                           }
+                       }
+                       else
+                       {
+                           stack.Push(value);
+                           stack.Push(Sequence.Empty);
+                       }
+                   });
+
             Define(into, ",", (scope, stack, value1, value2) => Sequence.From(value1.Enumerate().Concat(value2.Enumerate())));
             Define(into, ",,", (scope, stack, value1, value2, value3) => Sequence.From(value1.Enumerate().Concat(value2.Enumerate()).Concat(value3.Enumerate())));
 
@@ -162,12 +211,17 @@ namespace CoTy.Definitions
                            stack.Push(value);
                            if (!first)
                            {
-                               action.Apply(scope, stack);
+                               action.Eval(scope, stack);
                            }
                            else
                            {
                                first = false;
                            }
+                       }
+
+                       if (first)
+                       {
+                           stack.Push(Sequence.From());
                        }
                    });
 
@@ -179,7 +233,7 @@ namespace CoTy.Definitions
                        foreach (var value in values.Enumerate())
                        {
                            stack.Push(value);
-                           action.Apply(scope, stack);
+                           action.Eval(scope, stack);
                        }
                    });
 
@@ -197,7 +251,7 @@ namespace CoTy.Definitions
                        object Eval(object _value, object _action)
                        {
                            stack.Push(_value);
-                           _action.Apply(scope, stack);
+                           _action.Eval(scope, stack);
                            return stack.Pop();
                        }
                    });
@@ -209,26 +263,12 @@ namespace CoTy.Definitions
                        foreach (var value in sequence.Enumerate())
                        {
                            stack.Push(value);
-                           action.Apply(scope, stack);
+                           action.Eval(scope, stack);
                        }
                    });
 
             Define(into,
                    "count",
-                   (scope, stack, values) =>
-                   {
-                       var count = Integer.Zero;
-
-                       foreach (var _ in values.Enumerate())
-                       {
-                           ++count;
-                       }
-
-                       stack.Push(count);
-                   });
-
-            Define(into,
-                   "fr",
                    (scope, stack, values) =>
                    {
                        var count = Integer.Zero;

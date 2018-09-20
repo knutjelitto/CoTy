@@ -4,24 +4,13 @@ using System.Linq;
 
 namespace CoTy.Objects
 {
-    public class Sequence : Cobject<IEnumerable<object>>
+    public class Sequence : Cobject<IEnumerable<object>>, IEnumerable<object>
     {
+        public static readonly Sequence Empty = From();
+
         protected Sequence(IEnumerable<object> objs)
             : base(objs)
         {
-        }
-
-        public override void Lambda(IScope scope, IStack stack)
-        {
-            stack.Push(Closure.From(scope, Value));
-        }
-
-        public override void Apply(IScope scope, IStack stack)
-        {
-            foreach (var value in Value)
-            {
-                value.Lambda(scope, stack);
-            }
         }
 
         public static Sequence From(params object[] values)
@@ -32,6 +21,11 @@ namespace CoTy.Objects
         public static Sequence From(IEnumerable<object> values)
         {
             return new Sequence(values);
+        }
+
+        public static Sequence From(IEnumerator<object> rest)
+        {
+            return new Sequence(Loop(rest));
         }
 
         public bool TryGetQuotedSymbol(out Symbol symbol)
@@ -66,7 +60,7 @@ namespace CoTy.Objects
             return Value.GetHashCode();
         }
 
-        public override IEnumerator<object> GetEnumerator()
+        public IEnumerator<object> GetEnumerator()
         {
             return Value.GetEnumerator();
         }
@@ -74,6 +68,19 @@ namespace CoTy.Objects
         public override string ToString()
         {
             return "(" + string.Join(" ", Value) + ")";
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        private static IEnumerable<object> Loop(IEnumerator<object> enumerator)
+        {
+            while (enumerator.MoveNext())
+            {
+                yield return enumerator.Current;
+            }
         }
     }
 }

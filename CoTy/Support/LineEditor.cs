@@ -252,12 +252,12 @@ namespace CoTy.Support
             /// <summary>
             /// Array of results, with the stem removed.
             /// </summary>
-            public string[] Result;
+            public readonly string[] Result;
 
             /// <summary>
             /// Shared prefix for the completion results.
             /// </summary>
-            public string Prefix;
+            public readonly string Prefix;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="T:Mono.Terminal.LineEditor.Completion"/> class.
@@ -266,8 +266,8 @@ namespace CoTy.Support
             /// <param name="result">Array of possible completions.</param>
             public Completion(string prefix, string[] result)
             {
-                Prefix = prefix;
-                Result = result;
+                this.Prefix = prefix;
+                this.Result = result;
             }
         }
 
@@ -303,87 +303,86 @@ namespace CoTy.Support
         //static StreamWriter log;
 
         // The text being edited.
-        StringBuilder text;
+        private StringBuilder text;
 
         // The text as it is rendered (replaces (char)1 with ^A on display for example).
-        StringBuilder rendered_text;
+        private readonly StringBuilder rendered_text;
 
         // The prompt specified, and the prompt shown to the user.
-        string prompt;
-        string shown_prompt;
+        private string shown_prompt;
 
         // The current cursor position, indexes into "text", for an index
         // into rendered_text, use TextToRenderPos
-        int cursor;
+        private int cursor;
 
         // The row where we started displaying data.
-        int home_row;
+        private int home_row;
 
         // The maximum length that has been displayed on the screen
-        int max_rendered;
+        private int max_rendered;
 
         // If we are done editing, this breaks the interactive loop
-        bool done = false;
+        private bool done;
 
         // The thread where the Editing started taking place
-        Thread edit_thread;
+        private Thread edit_thread;
 
         // Our object that tracks history
-        History history;
+        private readonly History history;
 
         // The contents of the kill buffer (cut/paste in Emacs parlance)
-        string kill_buffer = "";
+        private string kill_buffer = "";
 
         // The string being searched for
-        string search;
-        string last_search;
+        private string search;
+        private string last_search;
 
         // whether we are searching (-1= reverse; 0 = no; 1 = forward)
-        int searching;
+        private int searching;
 
         // The position where we found the match.
-        int match_at;
+        private int match_at;
 
         // Used to implement the Kill semantics (multiple Alt-Ds accumulate)
-        KeyHandler last_handler;
+        private KeyHandler last_handler;
 
         // If we have a popup completion, this is not null and holds the state.
-        CompletionState current_completion;
+        private CompletionState current_completion;
 
         // If this is set, it contains an escape sequence to reset the Unix colors to the ones that were used on startup
-        static byte[] unix_reset_colors;
+        private static byte[] unix_reset_colors;
 
         // This contains a raw stream pointing to stdout, used to bypass the TermInfoDriver
-        static Stream unix_raw_output;
+        private static Stream unix_raw_output;
 
-        delegate void KeyHandler();
+        private delegate void KeyHandler();
 
-        struct Handler
+        private struct Handler
         {
-            public ConsoleKeyInfo CKI;
-            public KeyHandler KeyHandler;
-            public bool ResetCompletion;
+            public readonly ConsoleKeyInfo CKI;
+            public readonly KeyHandler KeyHandler;
+            public readonly bool ResetCompletion;
 
             public Handler(ConsoleKey key, KeyHandler h, bool resetCompletion = true)
             {
-                CKI = new ConsoleKeyInfo((char)0, key, false, false, false);
-                KeyHandler = h;
-                ResetCompletion = resetCompletion;
+                this.CKI = new ConsoleKeyInfo((char)0, key, false, false, false);
+                this.KeyHandler = h;
+                this.ResetCompletion = resetCompletion;
             }
 
-            public Handler(char c, KeyHandler h, bool resetCompletion = true)
+            private Handler(char c, KeyHandler h, bool resetCompletion = true)
             {
-                KeyHandler = h;
+                this.KeyHandler = h;
                 // Use the "Zoom" as a flag that we only have a character.
-                CKI = new ConsoleKeyInfo(c, ConsoleKey.Zoom, false, false, false);
-                ResetCompletion = resetCompletion;
+                this.CKI = new ConsoleKeyInfo(c, ConsoleKey.Zoom, false, false, false);
+                this.ResetCompletion = resetCompletion;
             }
 
-            public Handler(ConsoleKeyInfo cki, KeyHandler h, bool resetCompletion = true)
+            private Handler(ConsoleKeyInfo cki, KeyHandler h, bool resetCompletion = true)
             {
-                CKI = cki;
-                KeyHandler = h;
-                ResetCompletion = resetCompletion;
+                this.CKI = cki;
+                this.KeyHandler = h;
+                this.ResetCompletion = resetCompletion;
             }
 
             public static Handler Control(char c, KeyHandler h, bool resetCompletion = true)
@@ -393,7 +392,7 @@ namespace CoTy.Support
 
             public static Handler Alt(char c, ConsoleKey k, KeyHandler h)
             {
-                ConsoleKeyInfo cki = new ConsoleKeyInfo((char)c, k, false, true, false);
+                var cki = new ConsoleKeyInfo(c, k, false, true, false);
                 return new Handler(cki, h);
             }
         }
@@ -412,7 +411,7 @@ namespace CoTy.Support
         /// </remarks>
         public AutoCompleteHandler AutoCompleteEvent;
 
-        static Handler[] handlers;
+        private static Handler[] handlers;
 
         private readonly bool isWindows;
 
@@ -429,9 +428,9 @@ namespace CoTy.Support
         /// </summary>
         /// <param name="name">Prefix for storing the editing history.</param>
         /// <param name="histsize">Number of entries to store in the history file.</param>
-        public LineEditor(string name, int histsize)
+        protected LineEditor(string name, int histsize)
         {
-            handlers = new Handler[] {
+            handlers = new[] {
                 new Handler (ConsoleKey.Home,       CmdHome),
                 new Handler (ConsoleKey.End,        CmdEnd),
                 new Handler (ConsoleKey.LeftArrow,  CmdLeft),
@@ -466,15 +465,15 @@ namespace CoTy.Support
 				//Handler.Control ('T', CmdDebug),
 
 				// quote
-				Handler.Control ('Q', delegate { HandleChar (Console.ReadKey (true).KeyChar); })
+				Handler.Control ('Q', delegate { HandleChar (G.C.ReadKey (true).KeyChar); })
             };
 
-            rendered_text = new StringBuilder();
-            text = new StringBuilder();
+            this.rendered_text = new StringBuilder();
+            this.text = new StringBuilder();
 
-            history = new History(name, histsize);
+            this.history = new History(name, histsize);
 
-            isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            this.isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             GetUnixConsoleReset();
             //if (File.Exists ("log"))File.Delete ("log");
             //log = File.CreateText ("log"); 
@@ -485,274 +484,299 @@ namespace CoTy.Support
         // BackgroundColor properties, so we have to use the terminfo driver in Mono to
         // fetch these values
 
-        void GetUnixConsoleReset()
+        private void GetUnixConsoleReset()
         {
             //
             // On Unix, we want to be able to reset the color for the pop-up completion
             //
-            if (isWindows)
+            if (this.isWindows)
+            {
                 return;
+            }
 
             // Sole purpose of this call is to initialize the Terminfo driver
-            var x = Console.CursorLeft;
+            var unused = G.C.CursorLeft;
 
             try
             {
                 var terminfo_driver = Type.GetType("System.ConsoleDriver")?.GetField("driver", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null);
                 if (terminfo_driver == null)
+                {
                     return;
+                }
 
-                var unix_reset_colors_str = (terminfo_driver?.GetType()?.GetField("origPair", BindingFlags.Instance | BindingFlags.NonPublic))?.GetValue(terminfo_driver) as string;
+                if (terminfo_driver.GetType()?.GetField("origPair", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(terminfo_driver) is string unix_reset_colors_str)
+                {
+                    unix_reset_colors = Encoding.UTF8.GetBytes(unix_reset_colors_str);
+                }
 
-                if (unix_reset_colors_str != null)
-                    unix_reset_colors = Encoding.UTF8.GetBytes((string)unix_reset_colors_str);
-                unix_raw_output = Console.OpenStandardOutput();
+                unix_raw_output = G.C.OpenStandardOutput();
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error: " + e);
+                G.C.WriteLine("Error: " + e);
             }
         }
 
-
-        void CmdDebug()
+        private void CmdDebug()
         {
-            history.Dump();
-            Console.WriteLine();
+            this.history.Dump();
+            G.C.WriteLine();
             Render();
         }
 
-        void Render()
+        private void Render()
         {
-            Console.Write(shown_prompt);
-            Console.Write(rendered_text);
+            G.C.Write(this.shown_prompt);
+            G.C.Write(this.rendered_text.ToString());
 
-            int max = System.Math.Max(rendered_text.Length + shown_prompt.Length, max_rendered);
+            var max = Math.Max(this.rendered_text.Length + this.shown_prompt.Length, this.max_rendered);
 
-            for (int i = rendered_text.Length + shown_prompt.Length; i < max_rendered; i++)
-                Console.Write(' ');
-            max_rendered = shown_prompt.Length + rendered_text.Length;
+            for (var i = this.rendered_text.Length + this.shown_prompt.Length; i < this.max_rendered; i++)
+            {
+                G.C.Write(" ");
+            }
+            this.max_rendered = this.shown_prompt.Length + this.rendered_text.Length;
 
             // Write one more to ensure that we always wrap around properly if we are at the
             // end of a line.
-            Console.Write(' ');
+            G.C.Write(" ");
 
             UpdateHomeRow(max);
         }
 
-        void UpdateHomeRow(int screenpos)
+        private void UpdateHomeRow(int screenpos)
         {
-            int lines = 1 + (screenpos / Console.WindowWidth);
+            var lines = 1 + screenpos / G.C.WindowWidth;
 
-            home_row = Console.CursorTop - (lines - 1);
-            if (home_row < 0)
-                home_row = 0;
-        }
-
-
-        void RenderFrom(int pos)
-        {
-            int rpos = TextToRenderPos(pos);
-            int i;
-
-            for (i = rpos; i < rendered_text.Length; i++)
-                Console.Write(rendered_text[i]);
-
-            if ((shown_prompt.Length + rendered_text.Length) > max_rendered)
-                max_rendered = shown_prompt.Length + rendered_text.Length;
-            else
+            this.home_row = G.C.CursorTop - (lines - 1);
+            if (this.home_row < 0)
             {
-                int max_extra = max_rendered - shown_prompt.Length;
-                for (; i < max_extra; i++)
-                    Console.Write(' ');
+                this.home_row = 0;
             }
         }
 
-        void ComputeRendered()
+        private void RenderFrom(int pos)
         {
-            rendered_text.Length = 0;
+            var rpos = TextToRenderPos(pos);
+            int i;
 
-            for (int i = 0; i < text.Length; i++)
+            for (i = rpos; i < this.rendered_text.Length; i++)
             {
-                int c = (int)text[i];
+                G.C.Write(this.rendered_text[i].ToString());
+            }
+
+            if (this.shown_prompt.Length + this.rendered_text.Length > this.max_rendered)
+            {
+                this.max_rendered = this.shown_prompt.Length + this.rendered_text.Length;
+            }
+            else
+            {
+                var max_extra = this.max_rendered - this.shown_prompt.Length;
+                for (; i < max_extra; i++)
+                {
+                    G.C.Write(" ");
+                }
+            }
+        }
+
+        private void ComputeRendered()
+        {
+            this.rendered_text.Length = 0;
+
+            for (var i = 0; i < this.text.Length; i++)
+            {
+                var c = (int) this.text[i];
                 if (c < 26)
                 {
                     if (c == '\t')
-                        rendered_text.Append("    ");
+                    {
+                        this.rendered_text.Append("    ");
+                    }
                     else
                     {
-                        rendered_text.Append('^');
-                        rendered_text.Append((char)(c + (int)'A' - 1));
+                        this.rendered_text.Append('^');
+                        this.rendered_text.Append((char)(c + 'A' - 1));
                     }
                 }
                 else
-                    rendered_text.Append((char)c);
+                {
+                    this.rendered_text.Append((char)c);
+                }
             }
         }
 
-        int TextToRenderPos(int pos)
+        private int TextToRenderPos(int pos)
         {
-            int p = 0;
+            var p = 0;
 
-            for (int i = 0; i < pos; i++)
+            for (var i = 0; i < pos; i++)
             {
-                int c;
-
-                c = (int)text[i];
+                var c = (int) this.text[i];
 
                 if (c < 26)
                 {
                     if (c == 9)
+                    {
                         p += 4;
+                    }
                     else
+                    {
                         p += 2;
+                    }
                 }
                 else
+                {
                     p++;
+                }
             }
 
             return p;
         }
 
-        int TextToScreenPos(int pos)
+        private int TextToScreenPos(int pos)
         {
-            return shown_prompt.Length + TextToRenderPos(pos);
+            return this.shown_prompt.Length + TextToRenderPos(pos);
         }
 
-        string Prompt
-        {
-            get { return prompt; }
-            set { prompt = value; }
-        }
+        private int LineCount => (this.shown_prompt.Length + this.rendered_text.Length) / G.C.WindowWidth;
 
-        int LineCount
+        private void ForceCursor(int newpos)
         {
-            get
+            this.cursor = newpos;
+
+            var actual_pos = this.shown_prompt.Length + TextToRenderPos(this.cursor);
+            var row = this.home_row + actual_pos / G.C.WindowWidth;
+            var col = actual_pos % G.C.WindowWidth;
+
+            if (row >= G.C.BufferHeight)
             {
-                return (shown_prompt.Length + rendered_text.Length) / Console.WindowWidth;
+                row = G.C.BufferHeight - 1;
             }
-        }
 
-        void ForceCursor(int newpos)
-        {
-            cursor = newpos;
-
-            int actual_pos = shown_prompt.Length + TextToRenderPos(cursor);
-            int row = home_row + (actual_pos / Console.WindowWidth);
-            int col = actual_pos % Console.WindowWidth;
-
-            if (row >= Console.BufferHeight)
-                row = Console.BufferHeight - 1;
-            Console.SetCursorPosition(col, row);
+            G.C.SetCursorPosition(col, row);
 
             //log.WriteLine ("Going to cursor={0} row={1} col={2} actual={3} prompt={4} ttr={5} old={6}", newpos, row, col, actual_pos, prompt.Length, TextToRenderPos (cursor), cursor);
             //log.Flush ();
         }
 
-        void UpdateCursor(int newpos)
+        private void UpdateCursor(int newpos)
         {
-            if (cursor == newpos)
+            if (this.cursor == newpos)
+            {
                 return;
+            }
 
             ForceCursor(newpos);
         }
 
-        void InsertChar(char c)
+        private void InsertChar(char c)
         {
-            int prev_lines = LineCount;
-            text = text.Insert(cursor, c);
+            var prev_lines = LineCount;
+            this.text = this.text.Insert(this.cursor, c);
             ComputeRendered();
             if (prev_lines != LineCount)
             {
 
-                Console.SetCursorPosition(0, home_row);
+                G.C.SetCursorPosition(0, this.home_row);
                 Render();
-                ForceCursor(++cursor);
+                ForceCursor(++this.cursor);
             }
             else
             {
-                RenderFrom(cursor);
-                ForceCursor(++cursor);
-                UpdateHomeRow(TextToScreenPos(cursor));
+                RenderFrom(this.cursor);
+                ForceCursor(++this.cursor);
+                UpdateHomeRow(TextToScreenPos(this.cursor));
             }
         }
 
-        static void SaveExcursion(Action code)
+        private static void SaveExcursion(Action code)
         {
-            var saved_col = Console.CursorLeft;
-            var saved_row = Console.CursorTop;
-            var saved_fore = Console.ForegroundColor;
-            var saved_back = Console.BackgroundColor;
+            var saved_col = G.C.CursorLeft;
+            var saved_row = G.C.CursorTop;
+            var saved_fore = G.C.ForegroundColor;
+            var saved_back = G.C.BackgroundColor;
 
             code();
 
-            Console.CursorLeft = saved_col;
-            Console.CursorTop = saved_row;
+            G.C.CursorLeft = saved_col;
+            G.C.CursorTop = saved_row;
             if (unix_reset_colors != null)
             {
                 unix_raw_output.Write(unix_reset_colors, 0, unix_reset_colors.Length);
             }
             else
             {
-                Console.ForegroundColor = saved_fore;
-                Console.BackgroundColor = saved_back;
+                G.C.ForegroundColor = saved_fore;
+                G.C.BackgroundColor = saved_back;
             }
         }
 
-        class CompletionState
+        private class CompletionState
         {
             public string Prefix;
             public string[] Completions;
-            public int Col, Row, Width, Height;
-            int selected_item, top_item;
+            private readonly int Col;
+            private readonly int Row;
+            private readonly int Width;
+            private readonly int Height;
+            private int selected_item, top_item;
 
             public CompletionState(int col, int row, int width, int height)
             {
-                Col = col;
-                Row = row;
-                Width = width;
-                Height = height;
+                this.Col = col;
+                this.Row = row;
+                this.Width = width;
+                this.Height = height;
 
-                if (Col < 0)
-                    throw new ArgumentException("Cannot be less than zero" + Col, "Col");
-                if (Row < 0)
-                    throw new ArgumentException("Cannot be less than zero", "Row");
-                if (Width < 1)
-                    throw new ArgumentException("Cannot be less than one", "Width");
-                if (Height < 1)
-                    throw new ArgumentException("Cannot be less than one", "Height");
-
-            }
-
-            void DrawSelection()
-            {
-                for (int r = 0; r < Height; r++)
+                if (this.Col < 0)
                 {
-                    int item_idx = top_item + r;
-                    bool selected = (item_idx == selected_item);
+                    throw new ArgumentException("Cannot be less than zero" + this.Col, nameof(col));
+                }
 
-                    Console.ForegroundColor = selected ? ConsoleColor.Black : ConsoleColor.Gray;
-                    Console.BackgroundColor = selected ? ConsoleColor.Cyan : ConsoleColor.Blue;
+                if (this.Row < 0)
+                {
+                    throw new ArgumentException("Cannot be less than zero", nameof(row));
+                }
 
-                    var item = Prefix + Completions[item_idx];
-                    if (item.Length > Width)
-                        item = item.Substring(0, Width);
+                if (this.Width < 1)
+                {
+                    throw new ArgumentException("Cannot be less than one", nameof(width));
+                }
 
-                    Console.CursorLeft = Col;
-                    Console.CursorTop = Row + r;
-                    Console.Write(item);
-                    for (int space = item.Length; space <= Width; space++)
-                        Console.Write(" ");
+                if (this.Height < 1)
+                {
+                    throw new ArgumentException("Cannot be less than one", nameof(height));
                 }
             }
 
-            public string Current
+            private void DrawSelection()
             {
-                get
+                for (var r = 0; r < this.Height; r++)
                 {
-                    return Completions[selected_item];
+                    var item_idx = this.top_item + r;
+                    var selected = item_idx == this.selected_item;
+
+                    G.C.ForegroundColor = selected ? ConsoleColor.Black : ConsoleColor.Gray;
+                    G.C.BackgroundColor = selected ? ConsoleColor.Cyan : ConsoleColor.Blue;
+
+                    var item = this.Prefix + this.Completions[item_idx];
+                    if (item.Length > this.Width)
+                    {
+                        item = item.Substring(0, this.Width);
+                    }
+
+                    G.C.CursorLeft = this.Col;
+                    G.C.CursorTop = this.Row + r;
+                    G.C.Write(item);
+                    for (var space = item.Length; space <= this.Width; space++)
+                    {
+                        G.C.Write(" ");
+                    }
                 }
             }
+
+            public string Current => this.Completions[this.selected_item];
 
             public void Show()
             {
@@ -761,34 +785,42 @@ namespace CoTy.Support
 
             public void SelectNext()
             {
-                if (selected_item + 1 < Completions.Length)
+                if (this.selected_item + 1 < this.Completions.Length)
                 {
-                    selected_item++;
-                    if (selected_item - top_item >= Height)
-                        top_item++;
+                    this.selected_item++;
+                    if (this.selected_item - this.top_item >= this.Height)
+                    {
+                        this.top_item++;
+                    }
+
                     SaveExcursion(DrawSelection);
                 }
             }
 
             public void SelectPrevious()
             {
-                if (selected_item > 0)
+                if (this.selected_item > 0)
                 {
-                    selected_item--;
-                    if (selected_item < top_item)
-                        top_item = selected_item;
+                    this.selected_item--;
+                    if (this.selected_item < this.top_item)
+                    {
+                        this.top_item = this.selected_item;
+                    }
+
                     SaveExcursion(DrawSelection);
                 }
             }
 
-            void Clear()
+            private void Clear()
             {
-                for (int r = 0; r < Height; r++)
+                for (var r = 0; r < this.Height; r++)
                 {
-                    Console.CursorLeft = Col;
-                    Console.CursorTop = Row + r;
-                    for (int space = 0; space <= Width; space++)
-                        Console.Write(" ");
+                    G.C.CursorLeft = this.Col;
+                    G.C.CursorTop = this.Row + r;
+                    for (var space = 0; space <= this.Width; space++)
+                    {
+                        G.C.Write(" ");
+                    }
                 }
             }
 
@@ -798,41 +830,48 @@ namespace CoTy.Support
             }
         }
 
-        void ShowCompletions(string prefix, string[] completions)
+        private void ShowCompletions(string prefix, string[] completions)
         {
             // Ensure we have space, determine window size
-            int window_height = System.Math.Min(completions.Length, Console.WindowHeight / 5);
-            int target_line = Console.WindowHeight - window_height - 1;
-            if (!isWindows && Console.CursorTop > target_line)
+            var window_height = Math.Min(completions.Length, G.C.WindowHeight / 5);
+            var target_line = G.C.WindowHeight - window_height - 1;
+            if (!this.isWindows && G.C.CursorTop > target_line)
             {
-                var delta = Console.CursorTop - target_line;
-                Console.CursorLeft = 0;
-                Console.CursorTop = Console.WindowHeight - 1;
-                for (int i = 0; i < delta + 1; i++)
+                var delta = G.C.CursorTop - target_line;
+                G.C.CursorLeft = 0;
+                G.C.CursorTop = G.C.WindowHeight - 1;
+                for (var i = 0; i < delta + 1; i++)
                 {
-                    for (int c = Console.WindowWidth; c > 0; c--)
-                        Console.Write(" "); // To debug use ("{0}", i%10);
+                    for (var c = G.C.WindowWidth; c > 0; c--)
+                    {
+                        G.C.Write(" "); // To debug use ("{0}", i%10);
+                    }
                 }
-                Console.CursorTop = target_line;
-                Console.CursorLeft = 0;
+                G.C.CursorTop = target_line;
+                G.C.CursorLeft = 0;
                 Render();
             }
 
             const int MaxWidth = 50;
-            int window_width = 12;
-            int plen = prefix.Length;
+            var window_width = 12;
+            var plen = prefix.Length;
             foreach (var s in completions)
-                window_width = System.Math.Max(plen + s.Length, window_width);
-            window_width = System.Math.Min(window_width, MaxWidth);
-
-            if (current_completion == null)
             {
-                int left = Console.CursorLeft - prefix.Length;
+                window_width = Math.Max(plen + s.Length, window_width);
+            }
 
-                if (left + window_width + 1 >= Console.WindowWidth)
-                    left = Console.WindowWidth - window_width - 1;
+            window_width = Math.Min(window_width, MaxWidth);
 
-                current_completion = new CompletionState(left, Console.CursorTop + 1, window_width, window_height)
+            if (this.current_completion == null)
+            {
+                var left = G.C.CursorLeft - prefix.Length;
+
+                if (left + window_width + 1 >= G.C.WindowWidth)
+                {
+                    left = G.C.WindowWidth - window_width - 1;
+                }
+
+                this.current_completion = new CompletionState(left, G.C.CursorTop + 1, window_width, window_height)
                 {
                     Prefix = prefix,
                     Completions = completions,
@@ -840,19 +879,23 @@ namespace CoTy.Support
             }
             else
             {
-                current_completion.Prefix = prefix;
-                current_completion.Completions = completions;
+                this.current_completion.Prefix = prefix;
+                this.current_completion.Completions = completions;
             }
-            current_completion.Show();
-            Console.CursorLeft = 0;
+
+            this.current_completion.Show();
+            G.C.CursorLeft = 0;
         }
 
-        void HideCompletions()
+        private void HideCompletions()
         {
-            if (current_completion == null)
+            if (this.current_completion == null)
+            {
                 return;
-            current_completion.Remove();
-            current_completion = null;
+            }
+
+            this.current_completion.Remove();
+            this.current_completion = null;
         }
 
         //
@@ -860,17 +903,17 @@ namespace CoTy.Support
         // insert the best match found, this behaves like the shell "tab" which will
         // complete as much as possible given the options.
         //
-        void Complete()
+        private void Complete()
         {
-            Completion completion = AutoCompleteEvent(text.ToString(), cursor);
-            string[] completions = completion.Result;
+            var completion = this.AutoCompleteEvent(this.text.ToString(), this.cursor);
+            var completions = completion.Result;
             if (completions == null)
             {
                 HideCompletions();
                 return;
             }
 
-            int ncompletions = completions.Length;
+            var ncompletions = completions.Length;
             if (ncompletions == 0)
             {
                 HideCompletions();
@@ -884,17 +927,19 @@ namespace CoTy.Support
             }
             else
             {
-                int last = -1;
+                var last = -1;
 
-                for (int p = 0; p < completions[0].Length; p++)
+                for (var p = 0; p < completions[0].Length; p++)
                 {
-                    char c = completions[0][p];
+                    var c = completions[0][p];
 
 
-                    for (int i = 1; i < ncompletions; i++)
+                    for (var i = 1; i < ncompletions; i++)
                     {
                         if (completions[i].Length < p)
+                        {
                             goto mismatch;
+                        }
 
                         if (completions[i][p] != c)
                         {
@@ -911,12 +956,14 @@ namespace CoTy.Support
 
                     // Adjust the completions to skip the common prefix
                     prefix += completions[0].Substring(0, last + 1);
-                    for (int i = 0; i < completions.Length; i++)
+                    for (var i = 0; i < completions.Length; i++)
+                    {
                         completions[i] = completions[i].Substring(last + 1);
+                    }
                 }
                 ShowCompletions(prefix, completions);
                 Render();
-                ForceCursor(cursor);
+                ForceCursor(this.cursor);
             }
         }
 
@@ -925,53 +972,62 @@ namespace CoTy.Support
         // the contents of it.   The completion window is assumed to be hidden at this
         // point
         // 
-        void UpdateCompletionWindow()
+        private void UpdateCompletionWindow()
         {
-            if (current_completion != null)
+            if (this.current_completion != null)
+            {
                 throw new Exception("This method should only be called if the window has been hidden");
+            }
 
-            Completion completion = AutoCompleteEvent(text.ToString(), cursor);
-            string[] completions = completion.Result;
+            var completion = this.AutoCompleteEvent(this.text.ToString(), this.cursor);
+            var completions = completion.Result;
             if (completions == null)
+            {
                 return;
+            }
 
-            int ncompletions = completions.Length;
+            var ncompletions = completions.Length;
             if (ncompletions == 0)
+            {
                 return;
+            }
 
             ShowCompletions(completion.Prefix, completion.Result);
             Render();
-            ForceCursor(cursor);
+            ForceCursor(this.cursor);
         }
 
 
         //
         // Commands
         //
-        void CmdDone()
+        private void CmdDone()
         {
-            if (current_completion != null)
+            if (this.current_completion != null)
             {
-                InsertTextAtCursor(current_completion.Current);
+                InsertTextAtCursor(this.current_completion.Current);
                 HideCompletions();
                 return;
             }
-            done = true;
+
+            this.done = true;
         }
 
-        void CmdTabOrComplete()
+        private void CmdTabOrComplete()
         {
-            bool complete = false;
+            var complete = false;
 
-            if (AutoCompleteEvent != null)
+            if (this.AutoCompleteEvent != null)
             {
                 if (TabAtStartCompletes)
+                {
                     complete = true;
+                }
                 else
                 {
-                    for (int i = 0; i < cursor; i++)
+                    for (var i = 0; i < this.cursor; i++)
                     {
-                        if (!Char.IsWhiteSpace(text[i]))
+                        if (!char.IsWhiteSpace(this.text[i]))
                         {
                             complete = true;
                             break;
@@ -980,199 +1036,257 @@ namespace CoTy.Support
                 }
 
                 if (complete)
+                {
                     Complete();
+                }
                 else
+                {
                     HandleChar('\t');
+                }
             }
             else
+            {
                 HandleChar('t');
+            }
         }
 
-        void CmdHome()
+        private void CmdHome()
         {
             UpdateCursor(0);
         }
 
-        void CmdEnd()
+        private void CmdEnd()
         {
-            UpdateCursor(text.Length);
+            UpdateCursor(this.text.Length);
         }
 
-        void CmdLeft()
+        private void CmdLeft()
         {
-            if (cursor == 0)
+            if (this.cursor == 0)
+            {
                 return;
+            }
 
-            UpdateCursor(cursor - 1);
+            UpdateCursor(this.cursor - 1);
         }
 
-        void CmdBackwardWord()
+        private void CmdBackwardWord()
         {
-            int p = WordBackward(cursor);
+            var p = WordBackward(this.cursor);
             if (p == -1)
+            {
                 return;
+            }
+
             UpdateCursor(p);
         }
 
-        void CmdForwardWord()
+        private void CmdForwardWord()
         {
-            int p = WordForward(cursor);
+            var p = WordForward(this.cursor);
             if (p == -1)
+            {
                 return;
+            }
+
             UpdateCursor(p);
         }
 
-        void CmdRight()
+        private void CmdRight()
         {
-            if (cursor == text.Length)
+            if (this.cursor == this.text.Length)
+            {
                 return;
+            }
 
-            UpdateCursor(cursor + 1);
+            UpdateCursor(this.cursor + 1);
         }
 
-        void RenderAfter(int p)
+        private void RenderAfter(int p)
         {
             ForceCursor(p);
             RenderFrom(p);
-            ForceCursor(cursor);
+            ForceCursor(this.cursor);
         }
 
-        void CmdBackspace()
+        private void CmdBackspace()
         {
-            if (cursor == 0)
-                return;
-
-            bool completing = current_completion != null;
-            HideCompletions();
-
-            text.Remove(--cursor, 1);
-            ComputeRendered();
-            RenderAfter(cursor);
-            if (completing)
-                UpdateCompletionWindow();
-        }
-
-        void CmdDeleteChar()
-        {
-            // If there is no input, this behaves like EOF
-            if (text.Length == 0)
+            if (this.cursor == 0)
             {
-                done = true;
-                text = null;
-                Console.WriteLine();
                 return;
             }
 
-            if (cursor == text.Length)
-                return;
-            text.Remove(cursor, 1);
+            var completing = this.current_completion != null;
+            HideCompletions();
+
+            this.text.Remove(--this.cursor, 1);
             ComputeRendered();
-            RenderAfter(cursor);
+            RenderAfter(this.cursor);
+            if (completing)
+            {
+                UpdateCompletionWindow();
+            }
         }
 
-        int WordForward(int p)
+        private void CmdDeleteChar()
         {
-            if (p >= text.Length)
-                return -1;
-
-            int i = p;
-            if (Char.IsPunctuation(text[p]) || Char.IsSymbol(text[p]) || Char.IsWhiteSpace(text[p]))
+            // If there is no input, this behaves like EOF
+            if (this.text.Length == 0)
             {
-                for (; i < text.Length; i++)
+                this.done = true;
+                this.text = null;
+                G.C.WriteLine();
+                return;
+            }
+
+            if (this.cursor == this.text.Length)
+            {
+                return;
+            }
+
+            this.text.Remove(this.cursor, 1);
+            ComputeRendered();
+            RenderAfter(this.cursor);
+        }
+
+        private int WordForward(int p)
+        {
+            if (p >= this.text.Length)
+            {
+                return -1;
+            }
+
+            var i = p;
+            if (char.IsPunctuation(this.text[p]) || char.IsSymbol(this.text[p]) || char.IsWhiteSpace(this.text[p]))
+            {
+                for (; i < this.text.Length; i++)
                 {
-                    if (Char.IsLetterOrDigit(text[i]))
+                    if (char.IsLetterOrDigit(this.text[i]))
+                    {
                         break;
+                    }
                 }
-                for (; i < text.Length; i++)
+                for (; i < this.text.Length; i++)
                 {
-                    if (!Char.IsLetterOrDigit(text[i]))
+                    if (!char.IsLetterOrDigit(this.text[i]))
+                    {
                         break;
+                    }
                 }
             }
             else
             {
-                for (; i < text.Length; i++)
+                for (; i < this.text.Length; i++)
                 {
-                    if (!Char.IsLetterOrDigit(text[i]))
+                    if (!char.IsLetterOrDigit(this.text[i]))
+                    {
                         break;
+                    }
                 }
             }
             if (i != p)
+            {
                 return i;
+            }
+
             return -1;
         }
 
-        int WordBackward(int p)
+        private int WordBackward(int p)
         {
             if (p == 0)
+            {
                 return -1;
+            }
 
-            int i = p - 1;
+            var i = p - 1;
             if (i == 0)
+            {
                 return 0;
+            }
 
-            if (Char.IsPunctuation(text[i]) || Char.IsSymbol(text[i]) || Char.IsWhiteSpace(text[i]))
+            if (char.IsPunctuation(this.text[i]) || char.IsSymbol(this.text[i]) || char.IsWhiteSpace(this.text[i]))
             {
                 for (; i >= 0; i--)
                 {
-                    if (Char.IsLetterOrDigit(text[i]))
+                    if (char.IsLetterOrDigit(this.text[i]))
+                    {
                         break;
+                    }
                 }
                 for (; i >= 0; i--)
                 {
-                    if (!Char.IsLetterOrDigit(text[i]))
+                    if (!char.IsLetterOrDigit(this.text[i]))
+                    {
                         break;
+                    }
                 }
             }
             else
             {
                 for (; i >= 0; i--)
                 {
-                    if (!Char.IsLetterOrDigit(text[i]))
+                    if (!char.IsLetterOrDigit(this.text[i]))
+                    {
                         break;
+                    }
                 }
             }
             i++;
 
             if (i != p)
+            {
                 return i;
+            }
 
             return -1;
         }
 
-        void CmdDeleteWord()
+        private void CmdDeleteWord()
         {
-            int pos = WordForward(cursor);
+            var pos = WordForward(this.cursor);
 
             if (pos == -1)
+            {
                 return;
+            }
 
-            string k = text.ToString(cursor, pos - cursor);
+            var k = this.text.ToString(this.cursor, pos - this.cursor);
 
-            if (last_handler == CmdDeleteWord)
-                kill_buffer = kill_buffer + k;
+            if (this.last_handler == CmdDeleteWord)
+            {
+                this.kill_buffer = this.kill_buffer + k;
+            }
             else
-                kill_buffer = k;
+            {
+                this.kill_buffer = k;
+            }
 
-            text.Remove(cursor, pos - cursor);
+            this.text.Remove(this.cursor, pos - this.cursor);
             ComputeRendered();
-            RenderAfter(cursor);
+            RenderAfter(this.cursor);
         }
 
-        void CmdDeleteBackword()
+        private void CmdDeleteBackword()
         {
-            int pos = WordBackward(cursor);
+            var pos = WordBackward(this.cursor);
             if (pos == -1)
+            {
                 return;
+            }
 
-            string k = text.ToString(pos, cursor - pos);
+            var k = this.text.ToString(pos, this.cursor - pos);
 
-            if (last_handler == CmdDeleteBackword)
-                kill_buffer = k + kill_buffer;
+            if (this.last_handler == CmdDeleteBackword)
+            {
+                this.kill_buffer = k + this.kill_buffer;
+            }
             else
-                kill_buffer = k;
+            {
+                this.kill_buffer = k;
+            }
 
-            text.Remove(pos, cursor - pos);
+            this.text.Remove(pos, this.cursor - pos);
             ComputeRendered();
             RenderAfter(pos);
         }
@@ -1180,115 +1294,127 @@ namespace CoTy.Support
         //
         // Adds the current line to the history if needed
         //
-        void HistoryUpdateLine()
+        private void HistoryUpdateLine()
         {
-            history.Update(text.ToString());
+            this.history.Update(this.text.ToString());
         }
 
-        void CmdHistoryPrev()
+        private void CmdHistoryPrev()
         {
-            if (!history.PreviousAvailable())
+            if (!this.history.PreviousAvailable())
+            {
                 return;
+            }
 
             HistoryUpdateLine();
 
-            SetText(history.Previous());
+            SetText(this.history.Previous());
         }
 
-        void CmdHistoryNext()
+        private void CmdHistoryNext()
         {
-            if (!history.NextAvailable())
+            if (!this.history.NextAvailable())
+            {
                 return;
+            }
 
-            history.Update(text.ToString());
-            SetText(history.Next());
+            this.history.Update(this.text.ToString());
+            SetText(this.history.Next());
 
         }
 
-        void CmdUp()
+        private void CmdUp()
         {
-            if (current_completion == null)
+            if (this.current_completion == null)
+            {
                 CmdHistoryPrev();
+            }
             else
-                current_completion.SelectPrevious();
+            {
+                this.current_completion.SelectPrevious();
+            }
         }
 
-        void CmdDown()
+        private void CmdDown()
         {
-            if (current_completion == null)
+            if (this.current_completion == null)
+            {
                 CmdHistoryNext();
+            }
             else
-                current_completion.SelectNext();
+            {
+                this.current_completion.SelectNext();
+            }
         }
 
-        void CmdKillToEOF()
+        private void CmdKillToEOF()
         {
-            kill_buffer = text.ToString(cursor, text.Length - cursor);
-            text.Length = cursor;
+            this.kill_buffer = this.text.ToString(this.cursor, this.text.Length - this.cursor);
+            this.text.Length = this.cursor;
             ComputeRendered();
-            RenderAfter(cursor);
+            RenderAfter(this.cursor);
         }
 
-        void CmdYank()
+        private void CmdYank()
         {
-            InsertTextAtCursor(kill_buffer);
+            InsertTextAtCursor(this.kill_buffer);
         }
 
-        void InsertTextAtCursor(string str)
+        private void InsertTextAtCursor(string str)
         {
-            int prev_lines = LineCount;
-            text.Insert(cursor, str);
+            var prev_lines = LineCount;
+            this.text.Insert(this.cursor, str);
             ComputeRendered();
             if (prev_lines != LineCount)
             {
-                Console.SetCursorPosition(0, home_row);
+                G.C.SetCursorPosition(0, this.home_row);
                 Render();
-                cursor += str.Length;
-                ForceCursor(cursor);
+                this.cursor += str.Length;
+                ForceCursor(this.cursor);
             }
             else
             {
-                RenderFrom(cursor);
-                cursor += str.Length;
-                ForceCursor(cursor);
-                UpdateHomeRow(TextToScreenPos(cursor));
+                RenderFrom(this.cursor);
+                this.cursor += str.Length;
+                ForceCursor(this.cursor);
+                UpdateHomeRow(TextToScreenPos(this.cursor));
             }
         }
 
-        void SetSearchPrompt(string s)
+        private void SetSearchPrompt(string s)
         {
             SetPrompt("(reverse-i-search)`" + s + "': ");
         }
 
-        void ReverseSearch()
+        private void ReverseSearch()
         {
             int p;
 
-            if (cursor == text.Length)
+            if (this.cursor == this.text.Length)
             {
                 // The cursor is at the end of the string
 
-                p = text.ToString().LastIndexOf(search);
+                p = this.text.ToString().LastIndexOf(this.search, StringComparison.Ordinal);
                 if (p != -1)
                 {
-                    match_at = p;
-                    cursor = p;
-                    ForceCursor(cursor);
+                    this.match_at = p;
+                    this.cursor = p;
+                    ForceCursor(this.cursor);
                     return;
                 }
             }
             else
             {
                 // The cursor is somewhere in the middle of the string
-                int start = (cursor == match_at) ? cursor - 1 : cursor;
+                var start = this.cursor == this.match_at ? this.cursor - 1 : this.cursor;
                 if (start != -1)
                 {
-                    p = text.ToString().LastIndexOf(search, start);
+                    p = this.text.ToString().LastIndexOf(this.search, start, StringComparison.Ordinal);
                     if (p != -1)
                     {
-                        match_at = p;
-                        cursor = p;
-                        ForceCursor(cursor);
+                        this.match_at = p;
+                        this.cursor = p;
+                        ForceCursor(this.cursor);
                         return;
                     }
                 }
@@ -1296,33 +1422,33 @@ namespace CoTy.Support
 
             // Need to search backwards in history
             HistoryUpdateLine();
-            string s = history.SearchBackward(search);
+            var s = this.history.SearchBackward(this.search);
             if (s != null)
             {
-                match_at = -1;
+                this.match_at = -1;
                 SetText(s);
                 ReverseSearch();
             }
         }
 
-        void CmdReverseSearch()
+        private void CmdReverseSearch()
         {
-            if (searching == 0)
+            if (this.searching == 0)
             {
-                match_at = -1;
-                last_search = search;
-                searching = -1;
-                search = "";
+                this.match_at = -1;
+                this.last_search = this.search;
+                this.searching = -1;
+                this.search = "";
                 SetSearchPrompt("");
             }
             else
             {
-                if (search == "")
+                if (this.search == "")
                 {
-                    if (last_search != "" && last_search != null)
+                    if (!string.IsNullOrEmpty(this.last_search))
                     {
-                        search = last_search;
-                        SetSearchPrompt(search);
+                        this.search = this.last_search;
+                        SetSearchPrompt(this.search);
 
                         ReverseSearch();
                     }
@@ -1332,47 +1458,49 @@ namespace CoTy.Support
             }
         }
 
-        void SearchAppend(char c)
+        private void SearchAppend(char c)
         {
-            search = search + c;
-            SetSearchPrompt(search);
+            this.search = this.search + c;
+            SetSearchPrompt(this.search);
 
             //
             // If the new typed data still matches the current text, stay here
             //
-            if (cursor < text.Length)
+            if (this.cursor < this.text.Length)
             {
-                string r = text.ToString(cursor, text.Length - cursor);
-                if (r.StartsWith(search))
+                var r = this.text.ToString(this.cursor, this.text.Length - this.cursor);
+                if (r.StartsWith(this.search))
+                {
                     return;
+                }
             }
 
             ReverseSearch();
         }
 
-        void CmdRefresh()
+        private void CmdRefresh()
         {
-            Console.Clear();
-            max_rendered = 0;
+            G.C.Clear();
+            this.max_rendered = 0;
             Render();
-            ForceCursor(cursor);
+            ForceCursor(this.cursor);
         }
 
-        void InterruptEdit(object sender, ConsoleCancelEventArgs a)
+        private void InterruptEdit(object sender, ConsoleCancelEventArgs a)
         {
             // Do not abort our program:
             a.Cancel = true;
 
             // Interrupt the editor
-            edit_thread.Abort();
+            this.edit_thread.Abort();
         }
 
         //
         // Implements heuristics to show the completion window based on the mode
         //
-        bool HeuristicAutoComplete(bool wasCompleting, char insertedChar)
+        private bool HeuristicAutoComplete(bool wasCompleting, char insertedChar)
         {
-            if (HeuristicsMode == "csharp")
+            if (this.HeuristicsMode == "csharp")
             {
                 // csharp heuristics
                 if (wasCompleting)
@@ -1387,17 +1515,25 @@ namespace CoTy.Support
                 if (insertedChar == '.')
                 {
                     // Avoid completing for numbers "1.2" for example
-                    if (cursor > 1 && Char.IsDigit(text[cursor - 2]))
+                    if (this.cursor > 1 && char.IsDigit(this.text[this.cursor - 2]))
                     {
-                        for (int p = cursor - 3; p >= 0; p--)
+                        for (var p = this.cursor - 3; p >= 0; p--)
                         {
-                            char c = text[p];
-                            if (Char.IsDigit(c))
+                            var c = this.text[p];
+                            if (char.IsDigit(c))
+                            {
                                 continue;
+                            }
+
                             if (c == '_')
+                            {
                                 return true;
-                            if (Char.IsLetter(c) || Char.IsPunctuation(c) || Char.IsSymbol(c) || Char.IsControl(c))
+                            }
+
+                            if (char.IsLetter(c) || char.IsPunctuation(c) || char.IsSymbol(c) || char.IsControl(c))
+                            {
                                 return true;
+                            }
                         }
                         return false;
                     }
@@ -1407,81 +1543,90 @@ namespace CoTy.Support
             return false;
         }
 
-        void HandleChar(char c)
+        private void HandleChar(char c)
         {
-            if (searching != 0)
+            if (this.searching != 0)
+            {
                 SearchAppend(c);
+            }
             else
             {
-                bool completing = current_completion != null;
+                var completing = this.current_completion != null;
                 HideCompletions();
 
                 InsertChar(c);
                 if (HeuristicAutoComplete(completing, c))
+                {
                     UpdateCompletionWindow();
+                }
             }
         }
 
-        void EditLoop()
+        private void EditLoop()
         {
-            ConsoleKeyInfo cki;
-
-            while (!done)
+            while (!this.done)
             {
                 ConsoleModifiers mod;
 
-                cki = Console.ReadKey(true);
+                var cki = G.C.ReadKey(true);
                 if (cki.Key == ConsoleKey.Escape)
                 {
-                    if (current_completion != null)
+                    if (this.current_completion != null)
                     {
                         HideCompletions();
                         continue;
                     }
                     else
                     {
-                        cki = Console.ReadKey(true);
+                        cki = G.C.ReadKey(true);
 
                         mod = ConsoleModifiers.Alt;
                     }
                 }
                 else
-                    mod = cki.Modifiers;
-
-                bool handled = false;
-
-                foreach (Handler handler in handlers)
                 {
-                    ConsoleKeyInfo t = handler.CKI;
+                    mod = cki.Modifiers;
+                }
+
+                var handled = false;
+
+                foreach (var handler in handlers)
+                {
+                    var t = handler.CKI;
 
                     if (t.Key == cki.Key && t.Modifiers == mod)
                     {
                         handled = true;
                         if (handler.ResetCompletion)
+                        {
                             HideCompletions();
+                        }
+
                         handler.KeyHandler();
-                        last_handler = handler.KeyHandler;
+                        this.last_handler = handler.KeyHandler;
                         break;
                     }
                     else if (t.KeyChar == cki.KeyChar && t.Key == ConsoleKey.Zoom)
                     {
                         handled = true;
                         if (handler.ResetCompletion)
+                        {
                             HideCompletions();
+                        }
 
                         handler.KeyHandler();
-                        last_handler = handler.KeyHandler;
+                        this.last_handler = handler.KeyHandler;
                         break;
                     }
                 }
                 if (handled)
                 {
-                    if (searching != 0)
+                    if (this.searching != 0)
                     {
-                        if (last_handler != CmdReverseSearch)
+                        if (this.last_handler != CmdReverseSearch)
                         {
-                            searching = 0;
-                            SetPrompt(prompt);
+                            this.searching = 0;
+                            SetPrompt(string.Empty);
                         }
                     }
                     continue;
@@ -1494,27 +1639,27 @@ namespace CoTy.Support
             }
         }
 
-        void InitText(string initial)
+        private void InitText(string initial)
         {
-            text = new StringBuilder(initial);
+            this.text = new StringBuilder(initial);
             ComputeRendered();
-            cursor = text.Length;
+            this.cursor = this.text.Length;
             Render();
-            ForceCursor(cursor);
+            ForceCursor(this.cursor);
         }
 
-        void SetText(string newtext)
+        private void SetText(string newtext)
         {
-            Console.SetCursorPosition(0, home_row);
+            G.C.SetCursorPosition(0, this.home_row);
             InitText(newtext);
         }
 
-        void SetPrompt(string newprompt)
+        private void SetPrompt(string newprompt)
         {
-            shown_prompt = newprompt;
-            Console.SetCursorPosition(0, home_row);
+            this.shown_prompt = newprompt;
+            G.C.SetCursorPosition(0, this.home_row);
             Render();
-            ForceCursor(cursor);
+            ForceCursor(this.cursor);
         }
 
         /// <summary>
@@ -1525,18 +1670,17 @@ namespace CoTy.Support
         /// <param name="initial">Initial contents, can be null.</param>
         public string Edit(string prompt, string initial)
         {
-            edit_thread = Thread.CurrentThread;
-            searching = 0;
-            Console.CancelKeyPress += InterruptEdit;
+            this.edit_thread = Thread.CurrentThread;
+            this.searching = 0;
+            G.C.CancelKeyPress += InterruptEdit;
 
-            done = false;
-            history.CursorToEnd();
-            max_rendered = 0;
+            this.done = false;
+            this.history.CursorToEnd();
+            this.max_rendered = 0;
 
-            Prompt = prompt;
-            shown_prompt = prompt;
+            this.shown_prompt = prompt;
             InitText(initial);
-            history.Append(initial);
+            this.history.Append(initial);
 
             do
             {
@@ -1546,28 +1690,32 @@ namespace CoTy.Support
                 }
                 catch (ThreadAbortException)
                 {
-                    searching = 0;
+                    this.searching = 0;
                     Thread.ResetAbort();
-                    Console.WriteLine();
+                    G.C.WriteLine();
                     SetPrompt(prompt);
                     SetText("");
                 }
-            } while (!done);
-            Console.WriteLine();
+            } while (!this.done);
+            G.C.WriteLine();
 
-            Console.CancelKeyPress -= InterruptEdit;
+            G.C.CancelKeyPress -= InterruptEdit;
 
-            if (text == null)
+            if (this.text == null)
             {
-                history.Close();
+                this.history.Close();
                 return null;
             }
 
-            string result = text.ToString();
+            var result = this.text.ToString();
             if (result != "")
-                history.Accept(result);
+            {
+                this.history.Accept(result);
+            }
             else
-                history.RemoveLast();
+            {
+                this.history.RemoveLast();
+            }
 
             return result;
         }
@@ -1577,10 +1725,7 @@ namespace CoTy.Support
         /// </summary>
         public void SaveHistory()
         {
-            if (history != null)
-            {
-                history.Close();
-            }
+            this.history?.Close();
         }
 
         /// <summary>
@@ -1593,22 +1738,23 @@ namespace CoTy.Support
         // Emulates the bash-like behavior, where edits done to the
         // history are recorded
         //
-        class History
+        private class History
         {
-            string[] history;
-            int head, tail;
-            int cursor, count;
-            string histfile;
+            private readonly string[] history;
+            private int head, tail;
+            private int cursor, count;
+            private readonly string histfile;
 
             public History(string app, int size)
             {
                 if (size < 1)
+                {
                     throw new ArgumentException("size");
+                }
 
                 if (app != null)
                 {
-                    string dir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                    //Console.WriteLine (dir);
+                    var dir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                     if (!Directory.Exists(dir))
                     {
                         try
@@ -1621,22 +1767,26 @@ namespace CoTy.Support
                         }
                     }
                     if (app != null)
-                        histfile = Path.Combine(dir, app) + ".history";
+                    {
+                        this.histfile = Path.Combine(dir, app) + ".history";
+                    }
                 }
 
-                history = new string[size];
-                head = tail = cursor = 0;
+                this.history = new string[size];
+                this.head = this.tail = this.cursor = 0;
 
-                if (File.Exists(histfile))
+                if (File.Exists(this.histfile))
                 {
-                    using (StreamReader sr = File.OpenText(histfile))
+                    using (var sr = File.OpenText(this.histfile))
                     {
                         string line;
 
                         while ((line = sr.ReadLine()) != null)
                         {
                             if (line != "")
+                            {
                                 Append(line);
+                            }
                         }
                     }
                 }
@@ -1644,18 +1794,20 @@ namespace CoTy.Support
 
             public void Close()
             {
-                if (histfile == null)
+                if (this.histfile == null)
+                {
                     return;
+                }
 
                 try
                 {
-                    using (StreamWriter sw = File.CreateText(histfile))
+                    using (var sw = File.CreateText(this.histfile))
                     {
-                        int start = (count == history.Length) ? head : tail;
-                        for (int i = start; i < start + count; i++)
+                        var start = (this.count == this.history.Length) ? this.head : this.tail;
+                        for (var i = start; i < start + this.count; i++)
                         {
-                            int p = i % history.Length;
-                            sw.WriteLine(history[p]);
+                            var p = i % this.history.Length;
+                            sw.WriteLine(this.history[p]);
                         }
                     }
                 }
@@ -1670,14 +1822,19 @@ namespace CoTy.Support
             //
             public void Append(string s)
             {
-                //Console.WriteLine ("APPENDING {0} head={1} tail={2}", s, head, tail);
-                history[head] = s;
-                head = (head + 1) % history.Length;
-                if (head == tail)
-                    tail = (tail + 1 % history.Length);
-                if (count != history.Length)
-                    count++;
-                //Console.WriteLine ("DONE: head={1} tail={2}", s, head, tail);
+                //G.C.WriteLine ("APPENDING {0} head={1} tail={2}", s, head, tail);
+                this.history[this.head] = s;
+                this.head = (this.head + 1) % this.history.Length;
+                if (this.head == this.tail)
+                {
+                    this.tail = (this.tail + 1 % this.history.Length);
+                }
+
+                if (this.count != this.history.Length)
+                {
+                    this.count++;
+                }
+                //G.C.WriteLine ("DONE: head={1} tail={2}", s, head, tail);
             }
 
             //
@@ -1687,47 +1844,64 @@ namespace CoTy.Support
             //
             public void Update(string s)
             {
-                history[cursor] = s;
+                this.history[this.cursor] = s;
             }
 
             public void RemoveLast()
             {
-                head = head - 1;
-                if (head < 0)
-                    head = history.Length - 1;
+                this.head = this.head - 1;
+                if (this.head < 0)
+                {
+                    this.head = this.history.Length - 1;
+                }
             }
 
             public void Accept(string s)
             {
-                int t = head - 1;
+                var t = this.head - 1;
                 if (t < 0)
-                    t = history.Length - 1;
+                {
+                    t = this.history.Length - 1;
+                }
 
-                history[t] = s;
+                this.history[t] = s;
             }
 
             public bool PreviousAvailable()
             {
-                //Console.WriteLine ("h={0} t={1} cursor={2}", head, tail, cursor);
-                if (count == 0)
+                //G.C.WriteLine ("h={0} t={1} cursor={2}", head, tail, cursor);
+                if (this.count == 0)
+                {
                     return false;
-                int next = cursor - 1;
-                if (next < 0)
-                    next = count - 1;
+                }
 
-                if (next == head)
+                var next = this.cursor - 1;
+                if (next < 0)
+                {
+                    next = this.count - 1;
+                }
+
+                if (next == this.head)
+                {
                     return false;
+                }
 
                 return true;
             }
 
             public bool NextAvailable()
             {
-                if (count == 0)
+                if (this.count == 0)
+                {
                     return false;
-                int next = (cursor + 1) % history.Length;
-                if (next == head)
+                }
+
+                var next = (this.cursor + 1) % this.history.Length;
+                if (next == this.head)
+                {
                     return false;
+                }
+
                 return true;
             }
 
@@ -1739,55 +1913,69 @@ namespace CoTy.Support
             public string Previous()
             {
                 if (!PreviousAvailable())
+                {
                     return null;
+                }
 
-                cursor--;
-                if (cursor < 0)
-                    cursor = history.Length - 1;
+                this.cursor--;
+                if (this.cursor < 0)
+                {
+                    this.cursor = this.history.Length - 1;
+                }
 
-                return history[cursor];
+                return this.history[this.cursor];
             }
 
             public string Next()
             {
                 if (!NextAvailable())
+                {
                     return null;
+                }
 
-                cursor = (cursor + 1) % history.Length;
-                return history[cursor];
+                this.cursor = (this.cursor + 1) % this.history.Length;
+                return this.history[this.cursor];
             }
 
             public void CursorToEnd()
             {
-                if (head == tail)
+                if (this.head == this.tail)
+                {
                     return;
+                }
 
-                cursor = head;
+                this.cursor = this.head;
             }
 
             public void Dump()
             {
-                Console.WriteLine("Head={0} Tail={1} Cursor={2} count={3}", head, tail, cursor, count);
-                for (int i = 0; i < history.Length; i++)
+                G.C.WriteLine($"Head={this.head} Tail={this.tail} Cursor={this.cursor} count={this.count}");
+                for (var i = 0; i < this.history.Length; i++)
                 {
-                    Console.WriteLine(" {0} {1}: {2}", i == cursor ? "==>" : "   ", i, history[i]);
+                    G.C.WriteLine($" {(i == this.cursor ? "==>" : "   ")} {i}: {this.history[i]}");
                 }
                 //log.Flush ();
             }
 
             public string SearchBackward(string term)
             {
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < this.count; i++)
                 {
-                    int slot = cursor - i - 1;
+                    var slot = this.cursor - i - 1;
                     if (slot < 0)
-                        slot = history.Length + slot;
-                    if (slot >= history.Length)
-                        slot = 0;
-                    if (history[slot] != null && history[slot].IndexOf(term) != -1)
                     {
-                        cursor = slot;
-                        return history[slot];
+                        slot = this.history.Length + slot;
+                    }
+
+                    if (slot >= this.history.Length)
+                    {
+                        slot = 0;
+                    }
+
+                    if (this.history[slot] != null && this.history[slot].IndexOf(term) != -1)
+                    {
+                        this.cursor = slot;
+                        return this.history[slot];
                     }
                 }
 
@@ -1798,22 +1986,26 @@ namespace CoTy.Support
     }
 
 #if DEMO
-	class Demo {
-		static void Main ()
+	class Demo
+	{
+		static void MainX ()
 		{
-			LineEditor le = new LineEditor ("foo") {
-				HeuristicsMode = "csharp"
-			};
-			le.AutoCompleteEvent += delegate (string a, int pos){
-				string prefix = "";
-				var completions = new string [] { "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten" };
-				return new Mono.Terminal.LineEditor.Completion (prefix, completions);
-			};
+		    var le = new LineEditor("foo")
+		    {
+		        HeuristicsMode = "csharp"
+		    };
+		    le.AutoCompleteEvent += (a, pos) =>
+		    {
+		        var prefix = "";
+		        var completions = new[] {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"};
+		        return new LineEditor.Completion(prefix, completions);
+		    };
 			
 			string s;
 			
-			while ((s = le.Edit ("shell> ", "")) != null){
-				Console.WriteLine ("----> [{0}]", s);
+			while ((s = le.Edit ("shell> ", "")) != null)
+			{
+				G.C.WriteLine ($"----> [{s}]");
 			}
 		}
 	}

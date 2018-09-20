@@ -11,6 +11,9 @@ namespace CoTy.Objects
         public static readonly Symbol Assign = Get("=>");
         public static readonly Symbol LeftParent = Get("(");
         public static readonly Symbol RightParent = Get(")");
+        public static readonly Symbol LeftBrace = Get("{");
+        public static readonly Symbol RightBrace = Get("}");
+        public static readonly Symbol Pusher = Get("^");
 
         private readonly int hashCode;
 
@@ -35,11 +38,11 @@ namespace CoTy.Objects
             return symbol;
         }
 
-        public override void Lambda(IScope scope, IStack stack)
+        public override void Eval(IScope scope, IStack stack)
         {
             scope.GetValue(this, out var value);
 
-            value.Apply(scope, stack);
+            value.Eval(scope, stack);
         }
 
         public override int GetHashCode() => this.hashCode;

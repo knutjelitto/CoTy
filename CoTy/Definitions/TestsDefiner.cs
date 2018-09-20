@@ -15,7 +15,7 @@ namespace CoTy.Definitions
                    "assert",
                    (scope, stack, actual, expected) =>
                    {
-                       expected.Apply(scope, stack);
+                       expected.Eval(scope, stack);
                        var expectedValue = stack.Pop();
 
                        Outcome(expectedValue, actual, scope, stack);
@@ -30,7 +30,7 @@ namespace CoTy.Definitions
 
         private static void Outcome(object expectedValue, object actual, IScope scope, IStack stack)
         {
-            actual.Apply(scope, stack);
+            actual.Eval(scope, stack);
             var actualValue = stack.Pop();
 
             var equals = actualValue.Equals(expectedValue);

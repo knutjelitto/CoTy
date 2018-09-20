@@ -18,7 +18,7 @@ namespace CoTy.Objects
             return new Builtin(name, eval);
         }
 
-        public override void Lambda(IScope scope, IStack stack)
+        public override void Eval(IScope scope, IStack stack)
         {
             Value(scope, stack);
         }

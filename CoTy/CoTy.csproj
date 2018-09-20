@@ -13,24 +13,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Code\startup.coty" />
-    <None Remove="Code\tests.coty" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Code\startup.coty" />
-    <EmbeddedResource Include="Code\tests.coty" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="System.Reactive" Version="4.1.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Definitions\testing.coty">
+    <None Update="Code\maybe.coty">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Definitions\Tests\integer.coty">
+    <None Update="Code\startup.coty">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\tests\comparisons.coty">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\tests\testing.coty">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\tests\integer.coty">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

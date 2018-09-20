@@ -74,6 +74,11 @@ namespace CoTy.Objects
             return x.Value + y;
         }
 
+        public static Integer operator -(Integer x)
+        {
+            return From(- x.Value);
+        }
+
         public static Integer operator -(Integer x, Integer y)
         {
             return From(x.Value - y.Value);

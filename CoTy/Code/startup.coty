@@ -1,11 +1,22 @@
-﻿(=: x (x 1 >) (1 x upto 'mul collapse) (1) if) =: fac
-(dup (1 >) (1 swap upto 'mul collapse) (1) if) =: fac2
+﻿{=: x {x 1 gt?} {1 x upto *} {1} if} =: fac
+{dup {1 gt?} {1 swap upto *} {1} if} =: fac2
 
-('succ select) =: ++
-('pred select) =: --
+{'succ select} =: ++
+{'pred select} =: --
 
-('add collapse) =: +
-('mul collapse) =: *
+{'add collapse} =: +
+{neutral 'mul reduce} =: *
 
-(neutral 'sub reduce) =: -
-(neutral 'div reduce) =: /
+{first-rest swap} =: rest-first
+
+{
+	=: x
+
+	{x single?} 
+	{neutral x sub}
+	{x rest-first 'sub reduce} if
+} =: -
+
+{neutral 'div reduce} =: /
+
+;;

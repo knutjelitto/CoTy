@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-
+using System.Linq;
 using CoTy.Errors;
 using CoTy.Inputs;
 using CoTy.Objects;
@@ -14,9 +14,8 @@ namespace CoTy.Definitions
 
         public override void Define(IScope into)
         {
-            Define(into, "apply", (scope, stack, value) => value.Apply(scope, stack));
-            Define(into, "lambda", (scope, stack, value) => value.Lambda(scope, stack));
-            Define(into, "quote", (scope, stack, value) => Closure.From(scope, value));
+            Define(into, "eval", (scope, stack, value) => value.Eval(scope, stack));
+            Define(into, "quote", (scope, stack, value) => Block.From(scope, Enumerable.Repeat(value, 1)));
             Define(into, "flatten", 
                    (IScope scope, IStack stack, dynamic values) =>
                    {
@@ -29,31 +28,30 @@ namespace CoTy.Definitions
                    "if",
                    (scope, stack, condition, ifTrue, ifElse) =>
                    {
-                       condition.Apply(scope, stack);
+                       condition.Eval(scope, stack);
                        var result = stack.Pop();
 
                        if (result is bool boolean && boolean)
                        {
-                           ifTrue.Apply(scope, stack);
+                           ifTrue.Eval(scope, stack);
                        }
                        else
                        {
-                           ifElse.Apply(scope, stack);
+                           ifElse.Eval(scope, stack);
                        }
                    });
             Define(into, "load", (scope, stack, symbol) => Load(scope, stack, GetSymbol(symbol)));
         }
 
-
-        private static void Load(IScope scope, IStack stack, Symbol symbol)
+        public static void Load(IScope scope, IStack stack, Symbol symbol)
         {
             var name = symbol.ToString();
 
-            var path = Path.Combine(Environment.CurrentDirectory, "Modules", name);
+            var path = Path.Combine(Environment.CurrentDirectory, "Code", name);
 
             if (!Path.HasExtension(path))
             {
-                path = Path.ChangeExtension(Path.Combine(Environment.CurrentDirectory, "Modules", symbol.ToString()), ".coty");
+                path = Path.ChangeExtension(path, ".coty");
             }
 
             path = path.Replace("/", "\\");
@@ -87,7 +85,7 @@ namespace CoTy.Definitions
                 {
                     try
                     {
-                        value.Lambda(scope, stack);
+                        value.Eval(scope, stack);
                     }
                     catch (CotyException cotyException)
                     {

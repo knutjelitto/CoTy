@@ -63,7 +63,7 @@ namespace CoTy.Definitions
             {
                 stack.Check(1);
                 var value = stack.Pop();
-                value.Apply(scope, stack);
+                value.Eval(scope, stack);
                 value = stack.Pop();
                 var result = operation(value);
                 stack.Push(result);
@@ -79,9 +79,9 @@ namespace CoTy.Definitions
                 stack.Check(2);
                 var value2 = stack.Pop();
                 var value1 = stack.Pop();
-                value1.Apply(scope, stack);
+                value1.Eval(scope, stack);
                 value1 = stack.Pop();
-                value2.Apply(scope, stack);
+                value2.Eval(scope, stack);
                 value2 = stack.Pop();
                 var result = operation(value1, value2);
                 stack.Push(result);

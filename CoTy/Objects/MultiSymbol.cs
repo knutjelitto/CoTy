@@ -20,7 +20,7 @@ namespace CoTy.Objects
 
         private List<Symbol> Symbols => Value;
 
-        public override void Lambda(IScope scope, IStack stack)
+        public override void Eval(IScope scope, IStack stack)
         {
             stack.Check(Symbols.Count);
             foreach (var symbol in Symbols)
@@ -28,11 +28,6 @@ namespace CoTy.Objects
                 var value = stack.Pop();
                 this.action(scope, symbol, value);
             }
-        }
-
-        public override void Apply(IScope scope, IStack stack)
-        {
-            // does nothing -- can't be applied
         }
 
         public override bool Equals(object obj)

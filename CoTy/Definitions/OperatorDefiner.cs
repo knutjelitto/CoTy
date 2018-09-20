@@ -12,10 +12,12 @@ namespace CoTy.Definitions
             Define(into, "eq?", (dynamic value1, dynamic value2) => Equals(value1, value2));
             Define(into, "ne?", (dynamic value1, dynamic value2) => !Equals(value1, value2));
 
-            Define(into, "<", (dynamic value1, dynamic value2) => value1.CompareTo(value2) < 0);
-            Define(into, "<=", (dynamic value1, dynamic value2) => value1.CompareTo(value2) <= 0);
-            Define(into, ">", (dynamic value1, dynamic value2) => value1.CompareTo(value2) > 0);
-            Define(into, ">=", (dynamic value1, dynamic value2) => value1.CompareTo(value2) >= 0);
+            Define(into, "compare", (dynamic value1, dynamic value2) => (Integer)value1.CompareTo(value2));
+
+            Define(into, "lt?", (dynamic value1, dynamic value2) => value1.CompareTo(value2) < 0);
+            Define(into, "le?", (dynamic value1, dynamic value2) => value1.CompareTo(value2) <= 0);
+            Define(into, "gt?", (dynamic value1, dynamic value2) => value1.CompareTo(value2) > 0);
+            Define(into, "ge?", (dynamic value1, dynamic value2) => value1.CompareTo(value2) >= 0);
 
             Define(into, "add", (dynamic value1, dynamic value2) => value1 + value2);
             Define(into, "sub", (dynamic value1, dynamic value2) => value1 - value2);

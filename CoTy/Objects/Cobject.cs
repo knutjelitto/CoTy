@@ -1,34 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
 
 namespace CoTy.Objects
 {
-    public abstract class Cobject : DynamicObject, IEnumerable<object>
+    public abstract class Cobject : DynamicObject
     {
-        public virtual void Lambda(IScope scope, IStack stack)
+        public virtual void Eval(IScope scope, IStack stack)
         {
-#if false
-            stack.Push(Sequence.From(this));
-#else
             stack.Push(this);
-#endif
-        }
-
-        public virtual void Apply(IScope scope, IStack stack)
-        {
-            Lambda(scope, stack);
-        }
-
-        public virtual IEnumerator<object> GetEnumerator()
-        {
-            yield return this;
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
 
 #if false

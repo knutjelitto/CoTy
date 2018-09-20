@@ -22,8 +22,10 @@ namespace CoTy
             var testActivation = testLexical.Chain(Binder.From("test"));
             var stack = Stack.From();
 
-            //LanguageDefiner.Execute(ReadResource("tests"), testActivation, stack);
-            LanguageDefiner.Execute(ReadResource("startup"), rootActivation, stack);
+            LanguageDefiner.Load(testActivation, stack, Symbol.Get("tests/comparisons"));
+            stack.Clear();
+            LanguageDefiner.Load(rootActivation, stack, Symbol.Get("startup"));
+            //LanguageDefiner.Execute(ReadResource("startup"), rootActivation, stack);
             while (true)
             {
                 LanguageDefiner.Execute(new ConsoleStream(stack.Dump), rootActivation, stack);

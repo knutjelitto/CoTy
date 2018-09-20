@@ -40,18 +40,28 @@ namespace CoTy.Inputs
                         current.Advance();
                         yield return Symbol.RightParent;
                         break;
+                    case '{':
+                        current.Advance();
+                        yield return Symbol.LeftBrace;
+                        break;
+                    case '}':
+                        current.Advance();
+                        yield return Symbol.RightBrace;
+                        break;
+                    //case var eq when eq == '=' && current.Next && current.Next.Item == ':':
+                    //    current.Advance();
+                    //    current.Advance();
+                    //    yield return Symbol.Bind;
+                    //    break;
+                    //case var eq when eq == '=' && current.Next && current.Next.Item == '>':
+                    //    current.Advance();
+                    //    current.Advance();
+                    //    yield return Symbol.Assign;
+                    //    break;
                     case '\'':
                         current.Advance();
                         yield return Symbol.Quoter;
                         break;
-                    //case ':':
-                    //    current.Advance();
-                    //    yield return Symbol.Bind;
-                    //    break;
-                    //case '~':
-                    //    current.Advance();
-                    //    yield return Symbol.Assign;
-                    //    break;
                     case '"':
                         yield return ScanString(ref current);
                         break;
@@ -71,7 +81,7 @@ namespace CoTy.Inputs
 
         private bool IsStructure(char c)
         {
-            return "()\"\'".Contains(c);
+            return "(){}\"\'".Contains(c);
         }
 
         private bool MoreToScan(Cursor<char> current)
@@ -81,7 +91,7 @@ namespace CoTy.Inputs
 
         private bool IsLineComment(Cursor<char> current)
         {
-            return current && current.Item == '/' && current.Next && current.Next.Item == '/';
+            return current && current.Item == ';' && current.Next && current.Next.Item == ';';
         }
 
         private Cursor<char> Skip(Cursor<char> current)
@@ -93,7 +103,7 @@ namespace CoTy.Inputs
                     current = current.Next;
                 }
 
-                if (current && current.Item == ';' && current.Next.Item == ';')
+                if (IsLineComment(current))
                 {
                     while (current && current.Item != '\n')
                     {
