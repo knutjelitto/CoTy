@@ -16,6 +16,14 @@ namespace CoTy.Objects
             stack.Push(Closure.From(scope, Value));
         }
 
+        public override void Apply(IScope scope, IStack stack)
+        {
+            foreach (var value in Value)
+            {
+                value.Lambda(scope, stack);
+            }
+        }
+
         public static Sequence From(params object[] values)
         {
             return From(values.AsEnumerable());

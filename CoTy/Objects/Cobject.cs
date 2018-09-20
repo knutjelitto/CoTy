@@ -9,7 +9,11 @@ namespace CoTy.Objects
     {
         public virtual void Lambda(IScope scope, IStack stack)
         {
+#if false
+            stack.Push(Sequence.From(this));
+#else
             stack.Push(this);
+#endif
         }
 
         public virtual void Apply(IScope scope, IStack stack)

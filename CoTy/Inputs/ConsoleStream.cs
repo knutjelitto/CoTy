@@ -42,9 +42,12 @@ namespace CoTy.Inputs
             if (!G.C.IsInputRedirected)
             {
                 this.beforePrompt();
-                G.C.Write($"{new string('-', this.nesting + 1)}>");
+                return G.C.GetLine($"{new string('-', this.nesting + 1)}>");
             }
-            return G.C.ReadLine();
+            else
+            {
+                return Console.ReadLine();
+            }
         }
     }
 }

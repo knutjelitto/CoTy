@@ -49,7 +49,7 @@ namespace CoTy.Objects
 
         public override string ToString()
         {
-            return "[" + string.Join(" ", Value) + "]";
+            return "(" + string.Join(" ", Value) + ")closed";
         }
     }
 }

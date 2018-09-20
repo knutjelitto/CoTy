@@ -13,6 +13,8 @@ namespace CoTy.Support
         private readonly int right;
         private readonly int bottom;
 
+        private readonly LineEditor line;
+
         public static void Setup(int left, int top, int width, int height)
         {
             var handle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -31,6 +33,8 @@ namespace CoTy.Support
             this.height = height;
             this.right = this.left + this.width;
             this.bottom = this.top + this.height;
+
+            this.line = new LineEditor("coty") { HeuristicsMode = "coty" };
         }
 
         public bool IsInputRedirected => Console.IsInputRedirected;
@@ -102,9 +106,15 @@ namespace CoTy.Support
             Console.MoveBufferArea(this.left, this.top + 1, this.width, this.height - 1, this.left, this.top);
         }
 
-        public string ReadLine()
+        public string GetLine(string prompt)
         {
-            return Console.ReadLine();
+            string s;
+            if ((s = this.line.Edit("->", "")) != null)
+            {
+                return s;
+            }
+
+            return string.Empty;
         }
 
         private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;

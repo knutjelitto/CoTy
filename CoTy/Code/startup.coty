@@ -4,8 +4,8 @@
 ('succ select) =: ++
 ('pred select) =: --
 
-(neutral 'add reduce) =: +
-(neutral 'mul reduce) =: *
+('add collapse) =: +
+('mul collapse) =: *
 
 (neutral 'sub reduce) =: -
 (neutral 'div reduce) =: /

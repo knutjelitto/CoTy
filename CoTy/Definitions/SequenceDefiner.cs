@@ -13,7 +13,8 @@ namespace CoTy.Definitions
 
         public override void Define(IScope into)
         {
-            Define(into, "<>", (scope, stack, value1, value2) => Sequence.From(value1.Enumerate().Concat(value2.Enumerate())));
+            Define(into, ",", (scope, stack, value1, value2) => Sequence.From(value1.Enumerate().Concat(value2.Enumerate())));
+            Define(into, ",,", (scope, stack, value1, value2, value3) => Sequence.From(value1.Enumerate().Concat(value2.Enumerate()).Concat(value3.Enumerate())));
 
             Define(into,
                    "up",
