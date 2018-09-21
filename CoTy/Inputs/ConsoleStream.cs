@@ -39,7 +39,7 @@ namespace CoTy.Inputs
 
         private string GetLine()
         {
-            if (!G.C.IsInputRedirected)
+            if (!Console.IsInputRedirected)
             {
                 this.beforePrompt();
                 return G.C.GetLine($"{new string('-', this.nesting + 1)}>");

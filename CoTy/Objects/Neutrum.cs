@@ -1,4 +1,6 @@
-﻿namespace CoTy.Objects
+﻿using System.Linq;
+
+namespace CoTy.Objects
 {
     public class Neutrum : Cobject
     {
@@ -8,24 +10,24 @@
         {
         }
 
-        public static string operator +(Neutrum neutral, string value)
+        public static object operator +(Neutrum neutral, object value)
         {
             return value;
         }
 
-        public static Integer operator +(Neutrum neutral, Integer value)
+        public static object operator *(Neutrum neutral, object value)
         {
             return value;
         }
 
         public static Integer operator -(Neutrum neutral, Integer value)
         {
-            return - value;
+            return -value;
         }
 
-        public static Integer operator *(Neutrum neutral, Integer value)
+        public static object operator -(Neutrum neutral, string value)
         {
-            return value;
+            return string.Join(string.Empty, value.Reverse());
         }
 
         public static object operator /(Neutrum neutral, Integer value)

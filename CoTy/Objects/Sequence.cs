@@ -8,7 +8,7 @@ namespace CoTy.Objects
     {
         public static readonly Sequence Empty = From();
 
-        protected Sequence(IEnumerable<object> objs)
+        private Sequence(IEnumerable<object> objs)
             : base(objs)
         {
         }
@@ -26,16 +26,6 @@ namespace CoTy.Objects
         public static Sequence From(IEnumerator<object> rest)
         {
             return new Sequence(Loop(rest));
-        }
-
-        public bool AllSymbols()
-        {
-            return Value.All(value => value is Symbol);
-        }
-
-        public bool IsEmpty()
-        {
-            return !Value.Any();
         }
 
         public override bool Equals(object obj)

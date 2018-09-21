@@ -9,33 +9,33 @@ using CoTy.Support;
 
 namespace CoTy.Definitions
 {
-    public class LanguageDefiner : Definer
+    public class CoreLanguage : Core
     {
-        public LanguageDefiner() : base("language") { }
+        public CoreLanguage() : base("language") { }
 
-        public override void Define(IScope into)
+        public override void Define(Maker into)
         {
-            Define(into, "eval", (scope, stack, value) => value.Eval(scope, stack));
-            Define(into, "quote", (scope, stack, value) => Block.From(scope, Enumerable.Repeat(value, 1)));
-            Define(into,
-                   "if",
-                   (scope, stack, condition, ifTrue, ifElse) =>
-                   {
-                       condition.Eval(scope, stack);
-                       var result = stack.Pop();
+            into.Define("eval", (scope, stack, value) => value.Eval(scope, stack));
+            into.Define("quote", (scope, stack, value) => Block.From(scope, Enumerable.Repeat(value, 1)));
+            into.Define(
+                "if",
+                (scope, stack, condition, ifTrue, ifElse) =>
+                {
+                    condition.Eval(scope, stack);
+                    var result = stack.Pop();
 
-                       if (result is bool boolean && boolean)
-                       {
-                           ifTrue.Eval(scope, stack);
-                       }
-                       else
-                       {
-                           ifElse.Eval(scope, stack);
-                       }
-                   });
-            Define(into, "load", (scope, stack, symbol) => Load(scope, stack, GetSymbol(symbol)));
-            Define(into, "read", (scope, stack, symbol) => Read(scope, GetSymbol(symbol)));
-            Define(into, "merge", (scope, stack, block) => Merge(scope, stack, (dynamic)block));
+                    if (result is bool boolean && boolean)
+                    {
+                        ifTrue.Eval(scope, stack);
+                    }
+                    else
+                    {
+                        ifElse.Eval(scope, stack);
+                    }
+                });
+            into.Define("load", (scope, stack, symbol) => Load(scope, stack, symbol.GetSymbol()));
+            into.Define("read", (scope, stack, symbol) => Read(scope, symbol.GetSymbol()));
+            into.Define("merge", (scope, stack, block) => Merge(scope, stack, (dynamic) block));
         }
 
         public static void Merge(IScope scope, IStack stack, Block block)
@@ -93,11 +93,6 @@ namespace CoTy.Definitions
         {
             var block = Read(scope, symbol);
             Merge(scope, stack, block);
-        }
-
-        public static void Execute(string stream, IScope scope, IStack stack)
-        {
-            Execute(new CharStream(stream), scope, stack);
         }
 
         public static void Execute(ItemStream<char> charStream, IScope scope, IStack stack)

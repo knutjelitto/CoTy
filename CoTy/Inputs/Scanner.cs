@@ -40,14 +40,14 @@ namespace CoTy.Inputs
                         current.Advance();
                         yield return Symbol.RightParent;
                         break;
-                    case '{':
-                        current.Advance();
-                        yield return Symbol.LeftBrace;
-                        break;
-                    case '}':
-                        current.Advance();
-                        yield return Symbol.RightBrace;
-                        break;
+                    //case '{':
+                    //    current.Advance();
+                    //    yield return Symbol.LeftBrace;
+                    //    break;
+                    //case '}':
+                    //    current.Advance();
+                    //    yield return Symbol.RightBrace;
+                    //    break;
                     //case var eq when eq == '=' && current.Next && current.Next.Item == ':':
                     //    current.Advance();
                     //    current.Advance();
@@ -81,7 +81,7 @@ namespace CoTy.Inputs
 
         private bool IsStructure(char c)
         {
-            return "(){}\"\'".Contains(c);
+            return "()\"\'".Contains(c);
         }
 
         private bool MoreToScan(Cursor<char> current)

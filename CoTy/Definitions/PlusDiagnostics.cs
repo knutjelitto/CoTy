@@ -3,13 +3,16 @@ using CoTy.Support;
 
 namespace CoTy.Definitions
 {
-    public class DiagnosticsDefiner : Definer
+    public class PlusDiagnostics : Core
     {
-        public DiagnosticsDefiner() : base("diagnostics") { }
+        public PlusDiagnostics() : base("diagnostics") { }
 
-        public override void Define(IScope into)
+        public override void Define(Maker into)
         {
-            Define(into, "cx",
+            into.Define("cs", (scope, stack) => stack.Clear());
+            into.Define("gs", (scope, stack) => stack.Get());
+            into.Define(
+                   "cx",
                    (scope, stack) =>
                    {
                        foreach (var binder in scope.Binders)

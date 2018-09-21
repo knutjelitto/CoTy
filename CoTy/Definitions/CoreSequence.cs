@@ -5,30 +5,19 @@ using CoTy.Objects;
 
 namespace CoTy.Definitions
 {
-    public class SequenceDefiner : Definer
+    public class CoreSequence : Core
     {
-        public SequenceDefiner() : base("sequence")
+        public CoreSequence() : base("sequence")
         {
         }
 
-        public override void Define(IScope into)
+        public override void Define(Maker into)
         {
-            Define(into,
-                   "any?",
-                   value => !(value is IEnumerable<object> enumerable) || enumerable.Any());
+            into.Define("any?", value => !(value is IEnumerable<object> enumerable) || enumerable.Any());
+            into.Define("empty?", value => value is IEnumerable<object> enumerable && !enumerable.Any());
+            into.Define("atomic?", value => !(value is IEnumerable<object>));
 
-            Define(into,
-                   "empty?",
-                   value => value is IEnumerable<object> enumerable && !enumerable.Any());
-
-            Define(into,
-                   "atomic?",
-                   value =>
-                   {
-                       return !(value is IEnumerable<object>);
-                   });
-
-            Define(into,
+            into.Define(
                    "single?",
                    value =>
                    {
@@ -42,25 +31,18 @@ namespace CoTy.Definitions
                        return true;
                    });
 
-            Define(into,
+            into.Define(
                    "first-rest",
                    (scope, stack, value) =>
                    {
                        if (value is IEnumerable<object> enumerable)
                        {
-                           using (var enumerator = enumerable.GetEnumerator())
-                           {
-                               if (enumerator.MoveNext())
-                               {
-                                   stack.Push(enumerator.Current);
-                                   stack.Push(Sequence.From(enumerator));
-                               }
-                               else
-                               {
-                                   stack.Push(Sequence.Empty);
-                                   stack.Push(Sequence.Empty);
-                               }
-                           }
+                           // ReSharper disable once PossibleMultipleEnumeration
+                           var first = enumerable.FirstOrDefault() ?? Sequence.Empty;
+                           // ReSharper disable once PossibleMultipleEnumeration
+                           var rest = Sequence.From(enumerable.Skip(1));
+                           stack.Push(first);
+                           stack.Push(rest);
                        }
                        else
                        {
@@ -69,65 +51,10 @@ namespace CoTy.Definitions
                        }
                    });
 
-            Define(into, ",", (scope, stack, value1, value2) => Sequence.From(value1.Enumerate().Concat(value2.Enumerate())));
-            Define(into, ",,", (scope, stack, value1, value2, value3) => Sequence.From(value1.Enumerate().Concat(value2.Enumerate()).Concat(value3.Enumerate())));
+            into.Define(",", (scope, stack, value1, value2) => Sequence.From(value1.Enumerate().Concat(value2.Enumerate())));
+            into.Define(",,", (scope, stack, value1, value2, value3) => Sequence.From(value1.Enumerate().Concat(value2.Enumerate()).Concat(value3.Enumerate())));
 
-            Define(into,
-                   "up",
-                   (dynamic value) =>
-                   {
-                       return Sequence.From(Loop((Integer) value));
-
-                       IEnumerable<object> Loop(Integer current)
-                       {
-                           while (true)
-                           {
-                               yield return current;
-
-                               value = ++current;
-                           }
-
-                           // ReSharper disable once IteratorNeverReturns
-                       }
-                   });
-
-            Define(into,
-                   "upto",
-                   (dynamic start, dynamic limit) =>
-                   {
-                       return Sequence.From(Loop((Integer) start, (Integer) limit));
-
-                       IEnumerable<object> Loop(Integer current, Integer _limit)
-                       {
-                           while (current.CompareTo(_limit) <= 0)
-                           {
-                               yield return current;
-
-                               current = ++current;
-                           }
-                       }
-                   });
-
-
-            Define(into,
-                   "range",
-                   (dynamic start, dynamic count) =>
-                   {
-                       return Sequence.From(Loop(start, (Integer) count));
-
-                       IEnumerable<object> Loop(dynamic current, Integer _count)
-                       {
-                           while (Integer.Zero.CompareTo(_count) < 0)
-                           {
-                               yield return current;
-
-                               current = ++current;
-                               --_count;
-                           }
-                       }
-                   });
-
-            Define(into,
+            into.Define(
                    "take",
                    (object values, dynamic count) =>
                    {
@@ -152,7 +79,7 @@ namespace CoTy.Definitions
                        }
                    });
 
-            Define(into,
+            into.Define(
                    "skip",
                    (object values, dynamic count) =>
                    {
@@ -174,7 +101,25 @@ namespace CoTy.Definitions
                        }
                    });
 
-            Define(into,
+            into.Define(
+                   "range",
+                   (dynamic start, dynamic count) =>
+                   {
+                       return Sequence.From(Loop(start, (Integer)count));
+
+                       IEnumerable<object> Loop(dynamic current, Integer _count)
+                       {
+                           while (Integer.Zero.CompareTo(_count) < 0)
+                           {
+                               yield return current;
+
+                               current = ++current;
+                               --_count;
+                           }
+                       }
+                   });
+
+            into.Define(
                    "forever",
                    value =>
                    {
@@ -191,7 +136,7 @@ namespace CoTy.Definitions
                        }
                    });
 
-            Define(into,
+            into.Define(
                    "repeat",
                    (object value, dynamic count) =>
                    {
@@ -208,7 +153,7 @@ namespace CoTy.Definitions
                        }
                    });
 
-            Define(into,
+            into.Define(
                    "collapse",
                    (scope, stack, values, action) =>
                    {
@@ -232,7 +177,7 @@ namespace CoTy.Definitions
                        }
                    });
 
-            Define(into,
+            into.Define(
                    "reduce",
                    (scope, stack, values, seed, action) =>
                    {
@@ -244,12 +189,12 @@ namespace CoTy.Definitions
                        }
                    });
 
-            Define(into,
+            into.Define(
                    "select",
                    (scope, stack, values, action) =>
                    {
                        var result =
-                           (values is IEnumerable<object> sequence)
+                           values is IEnumerable<object> sequence
                                ? Sequence.From(sequence.Select(value => Eval(value, action)))
                                : Eval(values, action);
 
@@ -263,7 +208,28 @@ namespace CoTy.Definitions
                        }
                    });
 
-            Define(into,
+
+            into.Define(
+                   "where",
+                   (scope, stack, values, predicate) =>
+                   {
+                       var sequence = values is IEnumerable<object> enumerable
+                                          ? enumerable
+                                          : Enumerable.Repeat(values, 1);
+
+                       var result = Sequence.From(sequence.Where(value => Eval(value, predicate)));
+
+                       stack.Push(result);
+
+                       bool Eval(object _value, object _predicate)
+                       {
+                           stack.Push(_value);
+                           _predicate.Eval(scope, stack);
+                           return stack.Pop() is bool b && b;
+                       }
+                   });
+
+            into.Define(
                    "foreach",
                    (scope, stack, sequence, action) =>
                    {
@@ -274,7 +240,7 @@ namespace CoTy.Definitions
                        }
                    });
 
-            Define(into,
+            into.Define(
                    "count",
                    (scope, stack, values) =>
                    {

@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CoTy.Objects
 {
-    public sealed class BlockLiteral : Cobject<List<object>>
+    public sealed class BlockLiteral : Cobject<List<object>>, IEnumerable<object>
     {
         private BlockLiteral(List<object> values) : base(values)
         {
@@ -19,9 +20,29 @@ namespace CoTy.Objects
             stack.Push(Block.From(scope, Value));
         }
 
+        public IEnumerator<object> GetEnumerator()
+        {
+            return Value.GetEnumerator();
+        }
+
+        public bool AllSymbols()
+        {
+            return Value.All(value => value is Symbol);
+        }
+
+        public bool IsEmpty()
+        {
+            return !Value.Any();
+        }
+
         public override string ToString()
         {
-            return "{" + string.Join(" ", Value) + "}";
+            return $"({string.Join(" ", Value)})";
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

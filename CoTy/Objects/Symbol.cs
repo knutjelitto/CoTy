@@ -8,12 +8,12 @@ namespace CoTy.Objects
 
         public static readonly Symbol Quoter = Get("'");
         public static readonly Symbol BindTo = Get("=:");
-        public static readonly Symbol ToBind = Get(":=");
+        //public static readonly Symbol ToBind = Get(":=");
         public static readonly Symbol Assign = Get("=>");
         public static readonly Symbol LeftParent = Get("(");
         public static readonly Symbol RightParent = Get(")");
-        public static readonly Symbol LeftBrace = Get("{");
-        public static readonly Symbol RightBrace = Get("}");
+        //public static readonly Symbol LeftBrace = Get("{");
+        //public static readonly Symbol RightBrace = Get("}");
 
         private readonly int hashCode;
 

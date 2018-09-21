@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace CoTy.Support
 {
-    public class CoWriter
+    public class CoWriter : IWindow
     {
         private readonly int Left;
         private readonly int Top;
@@ -23,7 +23,8 @@ namespace CoTy.Support
             mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
             SetConsoleMode(handle, mode);
 
-            G.C = new CoWriter(left, top, width, height);
+            var shift = 0;
+            G.C = new CoWriter(left + shift, top, width - shift, height);
             G.C.SetCursorPosition(0,0);
         }
 
@@ -39,33 +40,26 @@ namespace CoTy.Support
             this.line = new LineEditor("coty") { HeuristicsMode = "coty" };
         }
 
-        public bool IsInputRedirected => Console.IsInputRedirected;
-
-        public int CursorLeft
+        int IWindow.WindowWidth => this.Width;
+        int IWindow.WindowHeight => this.Height;
+        int IWindow.BufferWidth => this.Width;
+        int IWindow.BufferHeight => this.Height;
+        int IWindow.CursorLeft
         {
             get => Console.CursorLeft - this.Left;
             set => Console.CursorLeft = value + this.Left;
         }
-
-        public int WindowWidth => this.Width;
-        public int WindowHeight => this.Height;
-
-
-        public int CursorTop
+        int IWindow.CursorTop
         {
             get => Console.CursorTop - this.Top;
             set => Console.CursorTop = value + this.Top;
         }
-
-        public int BufferHeight => this.Height;
-
-        public ConsoleColor ForegroundColor
+        ConsoleColor IWindow.ForegroundColor
         {
             get => Console.ForegroundColor;
             set => Console.ForegroundColor = value;
         }
-
-        public ConsoleColor BackgroundColor
+        ConsoleColor IWindow.BackgroundColor
         {
             get => Console.BackgroundColor;
             set => Console.BackgroundColor = value;
@@ -91,6 +85,8 @@ namespace CoTy.Support
                 {
                     Console.SetCursorPosition(this.Left, Console.CursorTop + 1);
                 }
+
+                rest = this.Width;
             }
 
             if (s.Length > 0)

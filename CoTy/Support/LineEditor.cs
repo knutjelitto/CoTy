@@ -465,7 +465,7 @@ namespace CoTy.Support
 				//Handler.Control ('T', CmdDebug),
 
 				// quote
-				Handler.Control ('Q', delegate { HandleChar (G.C.ReadKey (true).KeyChar); })
+				Handler.Control ('Q', delegate { HandleChar (G.C.ReadKey(true).KeyChar); })
             };
 
             this.rendered_text = new StringBuilder();
@@ -518,12 +518,14 @@ namespace CoTy.Support
             }
         }
 
+#if false
         private void CmdDebug()
         {
             this.history.Dump();
             G.C.WriteLine();
             Render();
         }
+#endif
 
         private void Render()
         {
@@ -1803,7 +1805,7 @@ namespace CoTy.Support
                 {
                     using (var sw = File.CreateText(this.histfile))
                     {
-                        var start = (this.count == this.history.Length) ? this.head : this.tail;
+                        var start = this.count == this.history.Length ? this.head : this.tail;
                         for (var i = start; i < start + this.count; i++)
                         {
                             var p = i % this.history.Length;
@@ -1827,7 +1829,7 @@ namespace CoTy.Support
                 this.head = (this.head + 1) % this.history.Length;
                 if (this.head == this.tail)
                 {
-                    this.tail = (this.tail + 1 % this.history.Length);
+                    this.tail = this.tail + 1 % this.history.Length;
                 }
 
                 if (this.count != this.history.Length)
@@ -1947,6 +1949,7 @@ namespace CoTy.Support
                 this.cursor = this.head;
             }
 
+#if false
             public void Dump()
             {
                 G.C.WriteLine($"Head={this.head} Tail={this.tail} Cursor={this.cursor} count={this.count}");
@@ -1956,6 +1959,7 @@ namespace CoTy.Support
                 }
                 //log.Flush ();
             }
+#endif
 
             public string SearchBackward(string term)
             {
@@ -1972,7 +1976,7 @@ namespace CoTy.Support
                         slot = 0;
                     }
 
-                    if (this.history[slot] != null && this.history[slot].IndexOf(term) != -1)
+                    if (this.history[slot] != null && this.history[slot].IndexOf(term, StringComparison.Ordinal) != -1)
                     {
                         this.cursor = slot;
                         return this.history[slot];

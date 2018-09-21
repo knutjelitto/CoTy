@@ -2,6 +2,6 @@
 {
     public static class G
     {
-        public static CoWriter C;
+        public static IWindow C;
     }
 }

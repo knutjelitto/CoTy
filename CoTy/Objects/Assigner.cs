@@ -6,10 +6,10 @@ using CoTy.Support;
 // ReSharper disable RedundantAssignment
 namespace CoTy.Objects
 {
-    public class Assigner : MultiSymbol
+    public class Assigner : SymbolsActioner
     {
         private Assigner(IEnumerable<Symbol> objs)
-            : base(objs, Symbol.Assign, (scope, symbol, value) =>scope.Update(symbol, value))
+            : base(objs, Symbol.Assign)
         {
         }
 
@@ -21,6 +21,11 @@ namespace CoTy.Objects
         public static Assigner From(params Symbol[] objs)
         {
             return From(objs.AsEnumerable());
+        }
+
+        protected override void ActionOnValue(IScope scope, Symbol symbol, object value)
+        {
+            scope.Update(symbol, value);
         }
     }
 }

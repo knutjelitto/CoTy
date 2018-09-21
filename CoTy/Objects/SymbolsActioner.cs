@@ -1,24 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using CoTy.Support;
 
 namespace CoTy.Objects
 {
-    public abstract class MultiSymbol : Cobject<List<Symbol>>
+    public abstract class SymbolsActioner : Cobject<List<Symbol>>
     {
         private readonly Symbol literal;
-        private readonly Action<IScope, Symbol, object> action;
 
-        protected MultiSymbol(IEnumerable<Symbol> objs, Symbol literal, Action<IScope, Symbol, object> action)
+        protected SymbolsActioner(IEnumerable<Symbol> objs, Symbol literal)
             : base(objs.Reverse().ToList())
         {
             this.literal = literal;
-            this.action = action;
         }
 
         private List<Symbol> Symbols => Value;
+
+        protected abstract void ActionOnValue(IScope scope, Symbol symbol, object value);
 
         public override void Eval(IScope scope, IStack stack)
         {
@@ -26,13 +25,13 @@ namespace CoTy.Objects
             foreach (var symbol in Symbols)
             {
                 var value = stack.Pop();
-                this.action(scope, symbol, value);
+                ActionOnValue(scope, symbol, value);
             }
         }
 
         public override bool Equals(object obj)
         {
-            return GetType() == obj.GetType() && obj is MultiSymbol other && Symbols.SequenceEqual(other.Symbols);
+            return GetType() == obj.GetType() && obj is SymbolsActioner other && Symbols.SequenceEqual(other.Symbols);
         }
 
         public override int GetHashCode()

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CoTy.Errors;
 
 namespace CoTy.Objects
 {
@@ -31,5 +32,25 @@ namespace CoTy.Objects
             return enumerable;
         }
 
+        public static bool TryGetSymbol(this object This, out Symbol symbol)
+        {
+            if (!(This is Block block) || !block.TryGetQuotedSymbol(out symbol))
+            {
+                symbol = null;
+                return false;
+            }
+
+            return true;
+        }
+
+        public static Symbol GetSymbol(this object This)
+        {
+            if (!TryGetSymbol(This, out var symbol))
+            {
+                throw new BinderException($"`{This}´ can't be a symbol");
+            }
+
+            return symbol;
+        }
     }
 }

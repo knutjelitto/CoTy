@@ -4,35 +4,14 @@ using CoTy.Objects;
 
 namespace CoTy.Definitions
 {
-    public abstract class Definer : Cobject
+    public abstract class Core : Cobject
     {
-        protected Definer(string name)
+        protected Core(string name)
         {
             Name = name;
         }
 
         public string Name { get; }
-
-        protected static bool TryGetSymbol(object candidate, out Symbol symbol)
-        {
-            if (!(candidate is Block block) || !block.TryGetQuotedSymbol(out symbol))
-            {
-                symbol = null;
-                return false;
-            }
-
-            return true;
-        }
-
-        protected static Symbol GetSymbol(object candidate)
-        {
-            if (!TryGetSymbol(candidate, out var symbol))
-            {
-                throw new BinderException($"`{candidate}´ can't be a symbol");
-            }
-
-            return symbol;
-        }
 
         private static void Enter(IScope into, Symbol name, Action<IScope, IStack> action)
         {
@@ -40,7 +19,7 @@ namespace CoTy.Definitions
             into.Define(name, builtin, true, true);
         }
 
-        public abstract void Define(IScope into);
+        public abstract void Define(Maker into);
 
         /* ---------------------------------------------------------------------------------------------------------------------- */
 

@@ -35,11 +35,6 @@ namespace CoTy.Inputs
                 return sequence;
             }
 
-            if (TryParseBlock(current, out var block))
-            {
-                return block;
-            }
-
             if (TryParseDefiner(current, out var binder))
             {
                 return binder;
@@ -49,16 +44,6 @@ namespace CoTy.Inputs
             {
                 return assigner;
             }
-
-#if false
-            if (current && current.Item is Symbol symbol && current.Next && Equals(current.Next.Item, Symbol.ToBind))
-            {
-                current.Advance();  // skip symbol
-                current.Advance();  // Symbol.ToBind
-                var value = ParseObject(current);
-                return Define.From(symbol, value);
-            }
-#endif
 
             if (Equals(current.Item, Symbol.Quoter))
             {
@@ -74,11 +59,6 @@ namespace CoTy.Inputs
             if (Equals(current.Item, Symbol.RightParent))
             {
                 throw new ParserException($"unbalanced `{Symbol.RightParent}´ in input");
-            }
-
-            if (Equals(current.Item, Symbol.RightBrace))
-            {
-                throw new ParserException($"unbalanced `{Symbol.RightBrace}´ in input");
             }
 
             var @object = current.Item;
@@ -170,7 +150,7 @@ namespace CoTy.Inputs
             }
         }
 
-        private bool TryParseSequence(Cursor<object> current, out Sequence sequence)
+        private bool TryParseSequence(Cursor<object> current, out BlockLiteral sequence)
         {
             if (!Equals(current.Item, Symbol.LeftParent))
             {
@@ -191,7 +171,7 @@ namespace CoTy.Inputs
                     }
                 }
 
-                sequence = Sequence.From(Loop().ToList());
+                sequence = BlockLiteral.From(Loop().ToList());
 
                 if (!current)
                 {
@@ -199,43 +179,6 @@ namespace CoTy.Inputs
                 }
 
                 Debug.Assert(Equals(current.Item, Symbol.RightParent));
-
-                current.Advance();
-
-                return true;
-
-            }
-        }
-
-        private bool TryParseBlock(Cursor<object> current, out BlockLiteral sequence)
-        {
-            if (!Equals(current.Item, Symbol.LeftBrace))
-            {
-                sequence = null;
-                return false;
-
-            }
-
-            using (Scanner.LevelUp())
-            {
-                current.Advance();
-
-                IEnumerable<object> Loop()
-                {
-                    while (current && !Equals(current.Item, Symbol.RightBrace))
-                    {
-                        yield return ParseObject(current);
-                    }
-                }
-
-                sequence = BlockLiteral.From(Loop());
-
-                if (!current)
-                {
-                    throw new ParserException($"unbalanced `{Symbol.LeftBrace}´ in input");
-                }
-
-                Debug.Assert(Equals(current.Item, Symbol.RightBrace));
 
                 current.Advance();
 

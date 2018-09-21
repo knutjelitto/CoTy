@@ -23,11 +23,15 @@ namespace CoTy
             var testScope = testBase.Chain(Binder.From("test"));
             var stack = Stack.From();
 
-            Capsuled(() =>  LanguageDefiner.Load(testScope, stack, Symbol.Get("tests.comparisons")));
-            Capsuled(() => LanguageDefiner.Load(rootScope, stack, Symbol.Get("startup")));
+            Capsuled(() =>  CoreLanguage.Load(testScope, stack, Symbol.Get("tests.comparisons")));
+            Capsuled(() => CoreLanguage.Load(rootScope, stack, Symbol.Get("startup")));
             while (true)
             {
-                Capsuled(() => LanguageDefiner.Execute(new ConsoleStream(stack.Dump), rootScope, stack));
+                Capsuled(
+                    () =>
+                    {
+                        CoreLanguage.Execute(new ConsoleStream(stack.Dump), rootScope, stack);
+                    });
             }
             // ReSharper disable once FunctionNeverReturns
         }
@@ -41,6 +45,10 @@ namespace CoTy
             catch (CotyException cotyException)
             {
                 G.C.WriteLine($"{cotyException.Message}");
+            }
+            catch (Exception anyException)
+            {
+                G.C.WriteLine($"{anyException.Message}");
             }
         }
 
@@ -58,16 +66,16 @@ namespace CoTy
 
         private static IScope MakeRootFrame(out IBinder root)
         {
-            var modules = new Definitions.Definer[]
+            var modules = new Core[]
             {
-                new LanguageDefiner(),
-                new BindingDefiner(),
-                new StackDefiner(),
-                new OperatorDefiner(),
-                new SequenceDefiner(),
-                new SystemDefiner(),
-                new ConsoleDefiner(),
-                new DiagnosticsDefiner(),
+                new CoreLanguage(),
+                new CoreBinder(),
+                new CoreStack(),
+                new CoreOperator(),
+                new CoreSequence(),
+                new CoreSystem(),
+                new PlusConsole(),
+                new PlusDiagnostics(),
             };
 
             root = Binder.From("root");
@@ -81,7 +89,7 @@ namespace CoTy
                 scope = scope.Chain(binder);
                 root.Define(binder.Name, binder);
 
-                module.Define(scope);
+                module.Define(new Definitions.Maker(scope));;
             }
 
             return scope;
@@ -92,7 +100,7 @@ namespace CoTy
             var testing = Binder.From("testing");
             root.Define(testing.Name, testing);
             var withTest = rootLexical.Chain(testing);
-            new TestsDefiner().Define(withTest);
+            new PlusTest().Define(new Definitions.Maker(withTest));
             return withTest;
         }
 
