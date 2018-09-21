@@ -22,6 +22,13 @@ namespace CoTy.Definitions
                    value => value is IEnumerable<object> enumerable && !enumerable.Any());
 
             Define(into,
+                   "atomic?",
+                   value =>
+                   {
+                       return !(value is IEnumerable<object>);
+                   });
+
+            Define(into,
                    "single?",
                    value =>
                    {

@@ -44,9 +44,9 @@ namespace CoTy.Objects
         {
             if (Value.Count == 1)
             {
-                return $"{this.literal}{Value[0]}";
+                return $"{this.literal} {Value[0]}";
             }
-            return $"{this.literal}({string.Join(" ", Value.AsEnumerable().Reverse())})";
+            return $"{this.literal} ({string.Join(" ", Value.AsEnumerable().Reverse())})";
         }
     }
 }

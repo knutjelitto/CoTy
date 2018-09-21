@@ -24,6 +24,8 @@ namespace CoTy.Objects
             return From(values.AsEnumerable());
         }
 
+        public static IStack Empty => From();
+
         public int Count => Value.Count;
 
         public void Push(object value)

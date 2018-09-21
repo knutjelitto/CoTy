@@ -19,11 +19,30 @@ namespace CoTy.Objects
 
         public override void Eval(IScope scope, IStack stack)
         {
-            var localScope = Scope.Chain(Binder.From("local"));
+            Eval(stack);
+        }
+
+        public IBinder Eval(IStack stack)
+        {
+            var binder = Binder.From("local");
+            var localScope = Scope.Chain(binder);
             foreach (var value in Value)
             {
                 value.Eval(localScope, stack);
             }
+            return binder;
+        }
+
+        public bool TryGetQuotedSymbol(out Symbol symbol)
+        {
+            if (Value.FirstOrDefault() is Symbol soleSymbol && !Value.Skip(1).Any())
+            {
+                symbol = soleSymbol;
+                return true;
+            }
+
+            symbol = null;
+            return false;
         }
 
         public override string ToString()

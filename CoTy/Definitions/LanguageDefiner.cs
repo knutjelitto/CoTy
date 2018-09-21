@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+
 using CoTy.Errors;
 using CoTy.Inputs;
 using CoTy.Objects;
@@ -16,14 +17,6 @@ namespace CoTy.Definitions
         {
             Define(into, "eval", (scope, stack, value) => value.Eval(scope, stack));
             Define(into, "quote", (scope, stack, value) => Block.From(scope, Enumerable.Repeat(value, 1)));
-            Define(into, "flatten", 
-                   (IScope scope, IStack stack, dynamic values) =>
-                   {
-                       foreach (var value in values)
-                       {
-                           stack.Push(value);
-                       }
-                   });
             Define(into,
                    "if",
                    (scope, stack, condition, ifTrue, ifElse) =>
@@ -41,30 +34,65 @@ namespace CoTy.Definitions
                        }
                    });
             Define(into, "load", (scope, stack, symbol) => Load(scope, stack, GetSymbol(symbol)));
+            Define(into, "read", (scope, stack, symbol) => Read(scope, GetSymbol(symbol)));
+            Define(into, "merge", (scope, stack, block) => Merge(scope, stack, (dynamic)block));
         }
 
-        public static void Load(IScope scope, IStack stack, Symbol symbol)
+        public static void Merge(IScope scope, IStack stack, Block block)
         {
-            var name = symbol.ToString();
+            var binder = block.Eval(stack);
+            
+            foreach (var symbol in binder.Symbols)
+            {
+                scope.Define(symbol, binder.Find(symbol).Value);
+            }
+        }
+
+        public static Block Read(IScope scope, Symbol symbol)
+        {
+            var name = symbol.ToString().Replace('.', Path.DirectorySeparatorChar);
 
             var path = Path.Combine(Environment.CurrentDirectory, "Code", name);
 
-            if (!Path.HasExtension(path))
-            {
-                path = Path.ChangeExtension(path, ".coty");
-            }
-
-            path = path.Replace("/", "\\");
+            path = string.Concat(path, ".coty");
 
             var content = File.ReadAllText(path);
 
             var binder = Binder.From(symbol);
-            var localScope =  scope.Chain(binder);
-            var localStack = Stack.From();
+            var localScope = scope.Chain(binder);
+            var localStack = Stack.Empty;
 
-            Execute(content, localScope, localStack);
+            return Read(localScope, localStack, content);
+        }
 
-            scope.Define(symbol, binder);
+        public static Block Read(IScope scope, IStack stack, string stream)
+        {
+            return Read(scope, stack, new CharStream(stream));
+        }
+
+        public static Block Read(IScope scope, IStack stack, ItemStream<char> charStream)
+        {
+            return Read(scope, stack, new Parser(charStream));
+        }
+
+        public static Block Read(IScope scope, IStack stack, ItemStream<object> itemStream)
+        {
+            try
+            {
+                return Block.From(scope, itemStream);
+            }
+            catch (CotyException cotyException)
+            {
+                G.C.WriteLine($"{cotyException.Message}");
+
+                throw;
+            }
+        }
+
+        public static void Load(IScope scope, IStack stack, Symbol symbol)
+        {
+            var block = Read(scope, symbol);
+            Merge(scope, stack, block);
         }
 
         public static void Execute(string stream, IScope scope, IStack stack)

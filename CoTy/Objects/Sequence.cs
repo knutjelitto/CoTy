@@ -28,18 +28,6 @@ namespace CoTy.Objects
             return new Sequence(Loop(rest));
         }
 
-        public bool TryGetQuotedSymbol(out Symbol symbol)
-        {
-            if (Value.FirstOrDefault() is Symbol soleSymbol && !Value.Skip(1).Any())
-            {
-                symbol = soleSymbol;
-                return true;
-            }
-
-            symbol = null;
-            return false;
-        }
-
         public bool AllSymbols()
         {
             return Value.All(value => value is Symbol);

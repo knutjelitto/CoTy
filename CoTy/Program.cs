@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using CoTy.Definitions;
+using CoTy.Errors;
 using CoTy.Inputs;
 using CoTy.Objects;
 using CoTy.Support;
@@ -16,21 +17,31 @@ namespace CoTy
 
             Woo.Doo();
 
-            var rootLexical = MakeRootFrame(out var root);
-            var testLexical = WithTest(root, rootLexical);
-            var rootActivation = rootLexical.Chain(Binder.From("prompt"));
-            var testActivation = testLexical.Chain(Binder.From("test"));
+            var rootBase = MakeRootFrame(out var root);
+            var testBase = WithTest(root, rootBase);
+            var rootScope = rootBase.Chain(Binder.From("prompt"));
+            var testScope = testBase.Chain(Binder.From("test"));
             var stack = Stack.From();
 
-            LanguageDefiner.Load(testActivation, stack, Symbol.Get("tests/comparisons"));
-            stack.Clear();
-            LanguageDefiner.Load(rootActivation, stack, Symbol.Get("startup"));
-            //LanguageDefiner.Execute(ReadResource("startup"), rootActivation, stack);
+            Capsuled(() =>  LanguageDefiner.Load(testScope, stack, Symbol.Get("tests.comparisons")));
+            Capsuled(() => LanguageDefiner.Load(rootScope, stack, Symbol.Get("startup")));
             while (true)
             {
-                LanguageDefiner.Execute(new ConsoleStream(stack.Dump), rootActivation, stack);
+                Capsuled(() => LanguageDefiner.Execute(new ConsoleStream(stack.Dump), rootScope, stack));
             }
             // ReSharper disable once FunctionNeverReturns
+        }
+
+        private static void Capsuled(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (CotyException cotyException)
+            {
+                G.C.WriteLine($"{cotyException.Message}");
+            }
         }
 
         private static void SetupConsole()

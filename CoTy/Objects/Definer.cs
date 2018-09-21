@@ -8,7 +8,7 @@ namespace CoTy.Objects
     public class Definer : MultiSymbol
     {
         private Definer(IEnumerable<Symbol> objs)
-            : base(objs, Symbol.Bind, (scope, symbol, value) => scope.Define(symbol, value))
+            : base(objs, Symbol.BindTo, (scope, symbol, value) => scope.Define(symbol, value))
         {
         }
 

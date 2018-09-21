@@ -1,20 +1,23 @@
-﻿{=: x {x 1 gt?} {1 x upto *} {1} if} =: fac
+﻿{eq?} =: ==
+
+{=: x {x 1 gt?} {1 x upto *} {1} if} =: fac
 {dup {1 gt?} {1 swap upto *} {1} if} =: fac2
 
 {'succ select} =: ++
 {'pred select} =: --
 
 {'add collapse} =: +
+
 {neutral 'mul reduce} =: *
 
-{first-rest swap} =: rest-first
-
 {
-	=: x
-
-	{x single?} 
-	{neutral x sub}
-	{x rest-first 'sub reduce} if
+	{dup atomic?}
+	{neutral swap sub}
+	{
+		{dup single?}
+		{first-rest drop neutral swap sub}
+		{first-rest swap 'sub reduce} if
+	} if
 } =: -
 
 {neutral 'div reduce} =: /

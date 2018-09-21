@@ -50,21 +50,15 @@ namespace CoTy.Inputs
                 return assigner;
             }
 
-            if (Equals(current.Item, Symbol.RightParent))
+#if false
+            if (current && current.Item is Symbol symbol && current.Next && Equals(current.Next.Item, Symbol.ToBind))
             {
-                throw new ParserException($"unbalanced `{Symbol.RightParent}´ in input");
+                current.Advance();  // skip symbol
+                current.Advance();  // Symbol.ToBind
+                var value = ParseObject(current);
+                return Define.From(symbol, value);
             }
-
-            if (Equals(current.Item, Symbol.RightBrace))
-            {
-                throw new ParserException($"unbalanced `{Symbol.RightBrace}´ in input");
-            }
-
-            if (Equals(current.Item, Symbol.Pusher))
-            {
-                current.Advance();
-                return Pusher.From();
-            }
+#endif
 
             if (Equals(current.Item, Symbol.Quoter))
             {
@@ -77,6 +71,16 @@ namespace CoTy.Inputs
                 return BlockLiteral.From(Enumerable.Repeat(ParseObject(current), 1));
             }
 
+            if (Equals(current.Item, Symbol.RightParent))
+            {
+                throw new ParserException($"unbalanced `{Symbol.RightParent}´ in input");
+            }
+
+            if (Equals(current.Item, Symbol.RightBrace))
+            {
+                throw new ParserException($"unbalanced `{Symbol.RightBrace}´ in input");
+            }
+
             var @object = current.Item;
             current.Advance();
 
@@ -85,7 +89,7 @@ namespace CoTy.Inputs
 
         private bool TryParseDefiner(Cursor<object> current, out Definer binder)
         {
-            if (!Equals(current.Item, Symbol.Bind))
+            if (!Equals(current.Item, Symbol.BindTo))
             {
                 binder = null;
                 return false;

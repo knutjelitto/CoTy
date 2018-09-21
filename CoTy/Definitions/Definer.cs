@@ -15,7 +15,7 @@ namespace CoTy.Definitions
 
         protected static bool TryGetSymbol(object candidate, out Symbol symbol)
         {
-            if (!(candidate is Sequence sequence) || !sequence.TryGetQuotedSymbol(out symbol))
+            if (!(candidate is Block block) || !block.TryGetQuotedSymbol(out symbol))
             {
                 symbol = null;
                 return false;
