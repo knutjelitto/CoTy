@@ -23,7 +23,7 @@ namespace CoTy.Definitions
 
         /* ---------------------------------------------------------------------------------------------------------------------- */
 
-        protected void Define(IScope into, string name, Func<object> operation)
+        protected void Define(IScope into, string name, Func<Cobject> operation)
         {
             Enter(into, name, Action);
 
@@ -34,7 +34,7 @@ namespace CoTy.Definitions
             }
         }
 
-        protected void Define(IScope into, string name, Func<object, object> operation)
+        protected void Define(IScope into, string name, Func<Cobject, Cobject> operation)
         {
             Enter(into, name, Action);
 
@@ -49,7 +49,7 @@ namespace CoTy.Definitions
             }
         }
 
-        protected void Define(IScope into, string name, Func<object, object, object> operation)
+        protected void Define(IScope into, string name, Func<Cobject, Cobject, Cobject> operation)
         {
             Enter(into, name, Action);
 
@@ -67,7 +67,7 @@ namespace CoTy.Definitions
             }
         }
 
-        protected void Define(IScope into, string name, Func<IScope, IStack, object> operation)
+        protected void Define(IScope into, string name, Func<IScope, IStack, Cobject> operation)
         {
             Enter(into, name, Action);
 
@@ -79,7 +79,7 @@ namespace CoTy.Definitions
             }
         }
 
-        protected void Define(IScope into, string name, Func<IScope, IStack, object, object> operation)
+        protected void Define(IScope into, string name, Func<IScope, IStack, Cobject, Cobject> operation)
         {
             Enter(into, name, Action);
 
@@ -92,7 +92,7 @@ namespace CoTy.Definitions
             }
         }
 
-        protected void Define(IScope into, string name, Func<IScope, IStack, object, object, object> operation)
+        protected void Define(IScope into, string name, Func<IScope, IStack, Cobject, Cobject, Cobject> operation)
         {
             Enter(into, name, Action);
 
@@ -106,7 +106,7 @@ namespace CoTy.Definitions
             }
         }
 
-        protected void Define(IScope into, string name, Func<IScope, IStack, object, object, object, object> operation)
+        protected void Define(IScope into, string name, Func<IScope, IStack, Cobject, Cobject, Cobject, Cobject> operation)
         {
             Enter(into, name, Action);
 
@@ -131,7 +131,7 @@ namespace CoTy.Definitions
             }
         }
 
-        protected void Define(IScope into, string name, Action<object> operation)
+        protected void Define(IScope into, string name, Action<Cobject> operation)
         {
             Enter(into, name, Action);
 
@@ -153,7 +153,7 @@ namespace CoTy.Definitions
             }
         }
 
-        protected void Define(IScope into, string name, Action<IScope, IStack, object> operation)
+        protected void Define(IScope into, string name, Action<IScope, IStack, Cobject> operation)
         {
             Enter(into, name, Action);
 
@@ -165,7 +165,7 @@ namespace CoTy.Definitions
             }
         }
 
-        protected void Define(IScope into, string name, Action<IScope, IStack, object, object> operation)
+        protected void Define(IScope into, string name, Action<IScope, IStack, Cobject, Cobject> operation)
         {
             Enter(into, name, Action);
 
@@ -178,7 +178,7 @@ namespace CoTy.Definitions
             }
         }
 
-        protected void Define(IScope into, string name, Action<IScope, IStack, object, object, object> operation)
+        protected void Define(IScope into, string name, Action<IScope, IStack, Cobject, Cobject, Cobject> operation)
         {
             Enter(into, name, Action);
 

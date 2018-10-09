@@ -22,13 +22,13 @@ namespace CoTy.Definitions
                 });
             into.Define(
                 "assert-true",
-                (scope, stack, actual) => { Outcome(true, actual, scope, stack); });
+                (scope, stack, actual) => { Outcome(Bool.True, actual, scope, stack); });
             into.Define(
                 "assert-false",
-                (scope, stack, actual) => { Outcome(false, actual, scope, stack); });
+                (scope, stack, actual) => { Outcome(Bool.False, actual, scope, stack); });
         }
 
-        private static void Outcome(object expectedValue, object actual, IScope scope, IStack stack)
+        private static void Outcome(Cobject expectedValue, Cobject actual, IScope scope, IStack stack)
         {
             actual.Eval(scope, stack);
             var actualValue = stack.Pop();

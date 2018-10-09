@@ -8,7 +8,7 @@ using CoTy.Errors;
 
 namespace CoTy.Inputs
 {
-    public class Scanner : ItemStream<object>
+    public class Scanner : ItemStream<Cobject>
     {
         private readonly ItemSource<char> source;
 
@@ -22,7 +22,7 @@ namespace CoTy.Inputs
             return this.source.LevelUp();
         }
 
-        public override IEnumerator<object> GetEnumerator()
+        public override IEnumerator<Cobject> GetEnumerator()
         {
             var current = new Cursor<char>(this.source);
 
@@ -119,7 +119,7 @@ namespace CoTy.Inputs
             return current;
         }
 
-        private string ScanString(ref Cursor<char> current)
+        private Chars ScanString(ref Cursor<char> current)
         { 
             Debug.Assert(current.Item == '"');
 
@@ -128,7 +128,7 @@ namespace CoTy.Inputs
             current = current.Next;
             while (current && current.Item != '"')
             {
-                if (current.Item == '\\' && current.Next.Item == '"')
+                if (current.Item == '\\' && current.Next && current.Next.Item == '"')
                 {
                     accu.Append('"');
                     current = current.Next;
@@ -139,13 +139,13 @@ namespace CoTy.Inputs
                 }
                 current = current.Next;
             }
-            if (current.Item != '"')
+            if (!current)
             {
                 throw new ScannerException("EOT in string literal");
             }
             current = current.Next;
 
-            return accu.ToString();
+            return Chars.From(accu.ToString());
         }
 
         private string ScanGrumble(ref Cursor<char> current)

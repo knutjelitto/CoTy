@@ -4,16 +4,16 @@ using System.Linq;
 
 namespace CoTy.Objects
 {
-    public sealed class Block : Cobject<List<object>>, IEnumerable<object>
+    public sealed class Block : Cobject<List<Cobject>>, IEnumerable<Cobject>
     {
-        private Block(IScope scope, List<object> values) : base(values)
+        private Block(IScope scope, List<Cobject> values) : base(values)
         {
             Scope = scope;
         }
 
         public IScope Scope { get; }
 
-        public static Block From(IScope scope, IEnumerable<object> values)
+        public static Block From(IScope scope, IEnumerable<Cobject> values)
         {
             return new Block(scope, values.ToList());
         }
@@ -46,7 +46,7 @@ namespace CoTy.Objects
             return false;
         }
 
-        public IEnumerator<object> GetEnumerator()
+        public IEnumerator<Cobject> GetEnumerator()
         {
             return Value.GetEnumerator();
         }

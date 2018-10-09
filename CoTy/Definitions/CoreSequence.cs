@@ -13,29 +13,29 @@ namespace CoTy.Definitions
 
         public override void Define(Maker into)
         {
-            into.Define("any?", value => !(value is IEnumerable<object> enumerable) || enumerable.Any());
-            into.Define("empty?", value => value is IEnumerable<object> enumerable && !enumerable.Any());
-            into.Define("atomic?", value => !(value is IEnumerable<object>));
+            into.Define("any?", value => Bool.From(!(value is IEnumerable<Cobject> enumerable) || enumerable.Any()));
+            into.Define("empty?", value => Bool.From(value is IEnumerable<Cobject> enumerable && !enumerable.Any()));
+            into.Define("atomic?", value => Bool.From(!(value is IEnumerable<Cobject>)));
 
             into.Define(
                    "single?",
                    value =>
                    {
-                       if (value is IEnumerable<object> enumerable)
+                       if (value is IEnumerable<Cobject> enumerable)
                        {
                            using (var enumerator = enumerable.GetEnumerator())
                            {
-                               return enumerator.MoveNext() && !enumerator.MoveNext();
+                               return Bool.From(enumerator.MoveNext() && !enumerator.MoveNext());
                            }
                        }
-                       return true;
+                       return Bool.True;
                    });
 
             into.Define(
                    "first-rest",
                    (scope, stack, value) =>
                    {
-                       if (value is IEnumerable<object> enumerable)
+                       if (value is IEnumerable<Cobject> enumerable)
                        {
                            // ReSharper disable once PossibleMultipleEnumeration
                            var first = enumerable.FirstOrDefault() ?? Sequence.Empty;
@@ -56,11 +56,11 @@ namespace CoTy.Definitions
 
             into.Define(
                    "take",
-                   (object values, dynamic count) =>
+                   (Cobject values, Cobject count) =>
                    {
-                       return Sequence.From(Loop(values, (Integer) count));
+                       return Sequence.From(Loop(values, (Integer)(dynamic)count));
 
-                       IEnumerable<object> Loop(object _values, Integer _count)
+                       IEnumerable<Cobject> Loop(Cobject _values, Integer _count)
                        {
                            foreach (var value in _values.Enumerate())
                            {
@@ -81,11 +81,11 @@ namespace CoTy.Definitions
 
             into.Define(
                    "skip",
-                   (object values, dynamic count) =>
+                   (Cobject values, Cobject count) =>
                    {
-                       return Sequence.From(Loop(values, (Integer) count));
+                       return Sequence.From(Loop(values, (Integer) (dynamic)count));
 
-                       IEnumerable<object> Loop(object _values, Integer _count)
+                       IEnumerable<Cobject> Loop(Cobject _values, Integer _count)
                        {
                            foreach (var value in _values.Enumerate())
                            {
@@ -103,11 +103,11 @@ namespace CoTy.Definitions
 
             into.Define(
                    "range",
-                   (dynamic start, dynamic count) =>
+                   (Cobject start, Cobject count) =>
                    {
-                       return Sequence.From(Loop(start, (Integer)count));
+                       return Sequence.From(Loop(start, (Integer)(dynamic)count));
 
-                       IEnumerable<object> Loop(dynamic current, Integer _count)
+                       IEnumerable<Cobject> Loop(dynamic current, Integer _count)
                        {
                            while (Integer.Zero.CompareTo(_count) < 0)
                            {
@@ -125,7 +125,7 @@ namespace CoTy.Definitions
                    {
                        return Sequence.From(Loop(value));
 
-                       IEnumerable<object> Loop(object _value)
+                       IEnumerable<Cobject> Loop(Cobject _value)
                        {
                            while (true)
                            {
@@ -138,11 +138,11 @@ namespace CoTy.Definitions
 
             into.Define(
                    "repeat",
-                   (object value, dynamic count) =>
+                   (Cobject value, Cobject count) =>
                    {
-                       return Sequence.From(Loop(value, (Integer) count));
+                       return Sequence.From(Loop(value, (Integer)(dynamic)count));
 
-                       IEnumerable<object> Loop(object _value, Integer _count)
+                       IEnumerable<Cobject> Loop(Cobject _value, Integer _count)
                        {
                            while (Integer.Zero.CompareTo(_count) < 0)
                            {
@@ -173,7 +173,7 @@ namespace CoTy.Definitions
 
                        if (first)
                        {
-                           stack.Push(Sequence.From());
+                           stack.Push(Sequence.Empty);
                        }
                    });
 
@@ -194,13 +194,13 @@ namespace CoTy.Definitions
                    (scope, stack, values, action) =>
                    {
                        var result =
-                           values is IEnumerable<object> sequence
+                           values is IEnumerable<Cobject> sequence
                                ? Sequence.From(sequence.Select(value => Eval(value, action)))
                                : Eval(values, action);
 
                        stack.Push(result);
 
-                       object Eval(object _value, object _action)
+                       Cobject Eval(Cobject _value, Cobject _action)
                        {
                            stack.Push(_value);
                            _action.Eval(scope, stack);
@@ -213,7 +213,7 @@ namespace CoTy.Definitions
                    "where",
                    (scope, stack, values, predicate) =>
                    {
-                       var sequence = values is IEnumerable<object> enumerable
+                       var sequence = values is IEnumerable<Cobject> enumerable
                                           ? enumerable
                                           : Enumerable.Repeat(values, 1);
 
@@ -221,11 +221,11 @@ namespace CoTy.Definitions
 
                        stack.Push(result);
 
-                       bool Eval(object _value, object _predicate)
+                       bool Eval(Cobject _value, Cobject _predicate)
                        {
                            stack.Push(_value);
                            _predicate.Eval(scope, stack);
-                           return stack.Pop() is bool b && b;
+                           return stack.Pop() is Bool b && b.Value;
                        }
                    });
 

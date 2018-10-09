@@ -2,7 +2,7 @@
 {
     public class Binding : Cobject
     {
-        public Binding(IBinder binder, object value, bool isSealed, bool isOpaque)
+        public Binding(IBinder binder, Cobject value, Bool isSealed, Bool isOpaque)
         {
             Binder = binder;
             Value = value;
@@ -11,8 +11,8 @@
         }
 
         public IBinder Binder { get; }
-        public object Value { get; set; }
-        public bool IsSealed { get; set; }
-        public bool IsOpaque { get; set; }
+        public Cobject Value { get; set; }
+        public Bool IsSealed { get; set; }
+        public Bool IsOpaque { get; set; }
     }
 }

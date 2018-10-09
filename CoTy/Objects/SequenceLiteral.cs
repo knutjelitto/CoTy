@@ -4,15 +4,25 @@ using System.Linq;
 
 namespace CoTy.Objects
 {
-    public sealed class BlockLiteral : Cobject<List<object>>, IEnumerable<object>
+    public sealed class SequenceLiteral : Cobject<List<Cobject>>, IEnumerable<Cobject>
     {
-        private BlockLiteral(List<object> values) : base(values)
+        private SequenceLiteral(List<Cobject> values) : base(values)
         {
         }
 
-        public static BlockLiteral From(IEnumerable<object> values)
+        public static SequenceLiteral From(IEnumerable<Cobject> values)
         {
-            return new BlockLiteral(values.ToList());
+            return new SequenceLiteral(values.ToList());
+        }
+
+        public static SequenceLiteral From(params Cobject[] values)
+        {
+            return From(values.AsEnumerable());
+        }
+
+        public static SequenceLiteral Quote(Cobject value)
+        {
+            return From(Enumerable.Repeat(value, 1));
         }
 
         public override void Eval(IScope scope, IStack stack)
@@ -20,7 +30,7 @@ namespace CoTy.Objects
             stack.Push(Block.From(scope, Value));
         }
 
-        public IEnumerator<object> GetEnumerator()
+        public IEnumerator<Cobject> GetEnumerator()
         {
             return Value.GetEnumerator();
         }

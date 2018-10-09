@@ -37,8 +37,8 @@ namespace CoTy
 
             action(xcontext, xstack);
 
-            xstack.Push(10);
-            xstack.Push(10);
+            xstack.Push(Integer.From(10));
+            xstack.Push(Integer.From(10));
 
             action(xcontext, xstack);
         }

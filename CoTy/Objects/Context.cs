@@ -44,7 +44,7 @@ namespace CoTy.Objects
             return TryFind(symbol, out var _);
         }
 
-        public void Define(Symbol symbol, object value, bool isSealed = false, bool isOpaque = false)
+        public void Define(Symbol symbol, Cobject value, bool isSealed = false, bool isOpaque = false)
         {
             if (TryFind(symbol, out var binding))
             {
@@ -53,7 +53,7 @@ namespace CoTy.Objects
                     throw new BinderException($"`{symbol}´ already defined in current scope");
                 }
 
-                if (binding.IsOpaque)
+                if (binding.IsOpaque.Value)
                 {
                     throw new BinderException($"`{symbol}´ is marked as opaque and can't be redefined");
                 }
@@ -62,11 +62,11 @@ namespace CoTy.Objects
             this.Binder.Define(symbol, value, isSealed, isOpaque);
         }
 
-        public void Update(Symbol symbol, object value)
+        public void Update(Symbol symbol, Cobject value)
         {
             var binding = Find(symbol);
 
-            if (binding.IsSealed)
+            if (binding.IsSealed.Value)
             {
                 throw new BinderException($"`{symbol}´ is marked as sealed and can't be updated");
             }
@@ -78,7 +78,7 @@ namespace CoTy.Objects
         {
             var binding = Find(symbol);
 
-            if (binding.IsOpaque)
+            if (binding.IsOpaque.Value)
             {
                 throw new BinderException($"`{symbol}´ is marked as opaque and can't be removed");
             }
@@ -87,7 +87,7 @@ namespace CoTy.Objects
         }
 
 
-        public void GetValue(Symbol symbol, out object value)
+        public void GetValue(Symbol symbol, out Cobject value)
         {
             value = Find(symbol).Value;
         }

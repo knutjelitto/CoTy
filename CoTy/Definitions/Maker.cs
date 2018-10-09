@@ -18,7 +18,7 @@ namespace CoTy.Definitions
             this.into.Define(name, builtin, true, true);
         }
 
-        public void Define(string name, Func<object> operation)
+        public void Define(string name, Func<Cobject> operation)
         {
             Enter(name, Action);
 
@@ -29,7 +29,7 @@ namespace CoTy.Definitions
             }
         }
 
-        public void Define(string name, Func<object, object> operation)
+        public void Define(string name, Func<Cobject, Cobject> operation)
         {
             Enter(name, Action);
 
@@ -44,7 +44,7 @@ namespace CoTy.Definitions
             }
         }
 
-        public void Define(string name, Func<object, object, object> operation)
+        public void Define(string name, Func<Cobject, Cobject, Cobject> operation)
         {
             Enter(name, Action);
 
@@ -62,7 +62,7 @@ namespace CoTy.Definitions
             }
         }
 
-        public void Define(string name, Func<IScope, IStack, object> operation)
+        public void Define(string name, Func<IScope, IStack, Cobject> operation)
         {
             Enter(name, Action);
 
@@ -74,7 +74,7 @@ namespace CoTy.Definitions
             }
         }
 
-        public void Define(string name, Func<IScope, IStack, object, object> operation)
+        public void Define(string name, Func<IScope, IStack, Cobject, Cobject> operation)
         {
             Enter(name, Action);
 
@@ -87,7 +87,7 @@ namespace CoTy.Definitions
             }
         }
 
-        public void Define(string name, Func<IScope, IStack, object, object, object> operation)
+        public void Define(string name, Func<IScope, IStack, Cobject, Cobject, Cobject> operation)
         {
             Enter(name, Action);
 
@@ -101,7 +101,7 @@ namespace CoTy.Definitions
             }
         }
 
-        public void Define(string name, Func<IScope, IStack, object, object, object, object> operation)
+        public void Define(string name, Func<IScope, IStack, Cobject, Cobject, Cobject, Cobject> operation)
         {
             Enter(name, Action);
 
@@ -126,7 +126,7 @@ namespace CoTy.Definitions
             }
         }
 
-        public void Define(string name, Action<object> operation)
+        public void Define(string name, Action<Cobject> operation)
         {
             Enter(name, Action);
 
@@ -148,7 +148,7 @@ namespace CoTy.Definitions
             }
         }
 
-        public void Define(string name, Action<IScope, IStack, object> operation)
+        public void Define(string name, Action<IScope, IStack, Cobject> operation)
         {
             Enter(name, Action);
 
@@ -160,7 +160,7 @@ namespace CoTy.Definitions
             }
         }
 
-        public void Define(string name, Action<IScope, IStack, object, object> operation)
+        public void Define(string name, Action<IScope, IStack, Cobject, Cobject> operation)
         {
             Enter(name, Action);
 
@@ -173,7 +173,7 @@ namespace CoTy.Definitions
             }
         }
 
-        public void Define(string name, Action<IScope, IStack, object, object, object> operation)
+        public void Define(string name, Action<IScope, IStack, Cobject, Cobject, Cobject> operation)
         {
             Enter(name, Action);
 

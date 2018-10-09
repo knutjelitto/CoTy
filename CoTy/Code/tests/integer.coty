@@ -1,1 +1,49 @@
-﻿"hello integer" println
+﻿"integer" println
+
+-2 (-1 -1 +) assert
+-1 (-1  0 +) assert
+ 0 (-1  1 +) assert
+
+-1 ( 0 -1 +) assert
+ 0 ( 0  0 +) assert
+ 1 ( 0  1 +) assert
+
+ 0 ( 1 -1 +) assert
+ 1 ( 1  0 +) assert
+ 2 ( 1  1 +) assert
+
+ 0 (-1 -1 -) assert
+-1 (-1  0 -) assert
+-2 (-1  1 -) assert
+
+ 1 ( 0 -1 -) assert
+ 0 ( 0  0 -) assert
+-1 ( 0  1 -) assert
+
+ 2 ( 1 -1 -) assert
+ 1 ( 1  0 -) assert
+ 0 ( 1  1 -) assert
+
+true  (1 1 ==) assert
+false (1 2 ==) assert
+false (2 1 ==) assert
+
+false (1 1 !=) assert
+true  (2 1 !=) assert
+true  (1 2 !=) assert
+
+false (1 1 < ) assert
+true  (1 2 < ) assert
+false (2 1 < ) assert
+
+true  (1 1 <=) assert
+true  (1 2 <=) assert
+false (2 1 <=) assert
+
+false (1 1 > ) assert
+false (1 2 > ) assert
+true  (2 1 > ) assert
+
+true  (1 1 >=) assert
+false (1 2 >=) assert
+true  (2 1 >=) assert

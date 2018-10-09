@@ -8,18 +8,18 @@ using CoTy.Support;
 // ReSharper disable MemberCanBePrivate.Global
 namespace CoTy.Objects
 {
-    public class Stack : Cobject<List<object>>, IStack
+    public class Stack : Cobject<List<Cobject>>, IStack
     {
-        private Stack(IEnumerable<object> values) : base(new List<object>(values))
+        private Stack(IEnumerable<Cobject> values) : base(new List<Cobject>(values))
         {
         }
 
-        public static IStack From(IEnumerable<object> values)
+        public static IStack From(IEnumerable<Cobject> values)
         {
             return new Stack(values);
         }
 
-        public static IStack From(params object[] values)
+        public static IStack From(params Cobject[] values)
         {
             return From(values.AsEnumerable());
         }
@@ -28,12 +28,12 @@ namespace CoTy.Objects
 
         public int Count => Value.Count;
 
-        public void Push(object value)
+        public void Push(Cobject value)
         {
             Value.Add(value);
         }
 
-        public object Pop()
+        public Cobject Pop()
         {
             Check(1);
 

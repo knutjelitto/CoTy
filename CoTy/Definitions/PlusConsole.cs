@@ -1,7 +1,4 @@
-﻿using System;
-
-using CoTy.Objects;
-using CoTy.Support;
+﻿using CoTy.Support;
 
 namespace CoTy.Definitions
 {

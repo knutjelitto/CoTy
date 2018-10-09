@@ -6,7 +6,7 @@ namespace CoTy.Objects
 {
     public static class ObjectExtensions
     {
-        public static void Eval(this object This, IScope scope, IStack stack)
+        public static void Eval(this Cobject This, IScope scope, IStack stack)
         {
             if (This is Cobject cvalue)
             {
@@ -18,10 +18,10 @@ namespace CoTy.Objects
             }
         }
 
-        public static IEnumerable<object> Enumerate(this object This)
+        public static IEnumerable<Cobject> Enumerate(this Cobject This)
         {
             // ReSharper disable once UsePatternMatching
-            var enumerable = This as IEnumerable<object>;
+            var enumerable = This as IEnumerable<Cobject>;
 
             // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
             if (enumerable == null)
@@ -32,7 +32,7 @@ namespace CoTy.Objects
             return enumerable;
         }
 
-        public static bool TryGetSymbol(this object This, out Symbol symbol)
+        public static bool TryGetSymbol(this Cobject This, out Symbol symbol)
         {
             if (!(This is Block block) || !block.TryGetQuotedSymbol(out symbol))
             {
@@ -43,7 +43,7 @@ namespace CoTy.Objects
             return true;
         }
 
-        public static Symbol GetSymbol(this object This)
+        public static Symbol GetSymbol(this Cobject This)
         {
             if (!TryGetSymbol(This, out var symbol))
             {

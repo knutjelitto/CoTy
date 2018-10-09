@@ -1,0 +1,44 @@
+﻿"string" println
+
+;; string operators
+
+""   ( ""  "" +) assert
+"a"  ( "" "a" +) assert
+"a"  ("a"  "" +) assert
+"aa" ("a" "a" +) assert
+
+""      ( ""   5 *) assert
+"aaaaa" ("a"  5  *) assert
+""      (  5  "" *) assert
+"aaaaa" (  5 "a" *) assert
+
+;; string comparisons
+
+true  ("1" "1" ==) assert
+false ("1" "2" ==) assert
+false ("2" "1" ==) assert
+
+false ("1" "1" !=) assert
+true  ("2" "1" !=) assert
+true  ("1" "2" !=) assert
+
+true  (""  "1" < ) assert
+false ("1" "1" < ) assert
+true  ("1" "2" < ) assert
+false ("2" "1" < ) assert
+
+true  (""  "1" <=) assert
+true  ("1" "1" <=) assert
+true  ("1" "2" <=) assert
+false ("2" "1" <=) assert
+
+false (""  "1" > ) assert
+false ("1" "1" > ) assert
+false ("1" "2" > ) assert
+true  ("2" "1" > ) assert
+
+false (""  "1" >=) assert
+true  ("1" "1" >=) assert
+false ("1" "2" >=) assert
+true  ("2" "1" >=) assert
+

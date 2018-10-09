@@ -1,28 +1,7 @@
-﻿(eq?) =: ==
+﻿fac		:= (=: x (x 1 >) (1 x range *) (1) if)
+fac2	:= (dup (1 >) (1 swap range *) (1) if)
 
-(=: x (x 1 gt?) (1 x upto *) (1) if) =: fac
-(dup (1 gt?) (1 swap upto *) (1) if) =: fac2
 
-('succ select) =: ++
-('pred select) =: --
-
-(neutral 'add reduce) =: +
-
-(neutral 'mul reduce) =: *
-
-(
-	(dup atomic?)
-	(neutral swap sub)
-	(
-		(dup single?)
-		(first-rest drop neutral swap sub)
-		(first-rest swap 'sub reduce) if
-	) if
-) =: -
-
-(neutral 'div reduce) =: /
-
-(=:(a b c d) a b c ,, d ,) =: ,,,
-(, ,,,) =: ,,,,
+,,,		:= (=:(a b c d) (a b c d) 'eval select)
 
 ;;

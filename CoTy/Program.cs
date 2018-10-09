@@ -23,8 +23,11 @@ namespace CoTy
             var testScope = testBase.Chain(Binder.From("test"));
             var stack = Stack.From();
 
-            Capsuled(() =>  CoreLanguage.Load(testScope, stack, Symbol.Get("tests.comparisons")));
+            Capsuled(() =>  CoreLanguage.Load(testScope, stack, Symbol.Get("tests.all")));
             Capsuled(() => CoreLanguage.Load(rootScope, stack, Symbol.Get("startup")));
+#if true
+            Repl(rootScope, stack);
+#else
             while (true)
             {
                 Capsuled(
@@ -33,8 +36,24 @@ namespace CoTy
                         CoreLanguage.Execute(new ConsoleStream(stack.Dump), rootScope, stack);
                     });
             }
+#endif
             // ReSharper disable once FunctionNeverReturns
         }
+
+        private static void Repl(IScope scope, IStack stack)
+        {
+            while (true)
+            {
+                stack.Dump();
+                var line = G.C.GetLine(":");
+                Capsuled(
+                    () =>
+                    {
+                        CoreLanguage.Execute(new CharStream(line), scope, stack);
+                    });
+            }
+        }
+
 
         private static void Capsuled(Action action)
         {
@@ -64,7 +83,7 @@ namespace CoTy
             CoWriter.Setup(0, 0, width, height);
         }
 
-        private static IScope MakeRootFrame(out IBinder root)
+        private static IScope MakeRootFrame(out Binder root)
         {
             var modules = new Core[]
             {

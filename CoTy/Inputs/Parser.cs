@@ -7,7 +7,7 @@ using CoTy.Objects;
 
 namespace CoTy.Inputs
 {
-    public class Parser : ItemStream<object>
+    public class Parser : ItemStream<Cobject>
     {
         private Scanner Scanner { get; }
 
@@ -17,9 +17,9 @@ namespace CoTy.Inputs
             Scanner = new Scanner(source);
         }
 
-        public override IEnumerator<object> GetEnumerator()
+        public override IEnumerator<Cobject> GetEnumerator()
         {
-            var current = new Cursor<object>(new ItemSource<object>(Scanner));
+            var current = new Cursor<Cobject>(new ItemSource<Cobject>(Scanner));
 
             // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
             while (current)
@@ -28,7 +28,7 @@ namespace CoTy.Inputs
             }
         }
 
-        private object ParseObject(Cursor<object> current)
+        private Cobject ParseObject(Cursor<Cobject> current)
         {
             if (TryParseSequence(current, out var sequence))
             {
@@ -45,6 +45,16 @@ namespace CoTy.Inputs
                 return assigner;
             }
 
+            if (current.Item is Symbol symbol && current.Next && Equals(current.Next.Item, Symbol.ToBind))
+            {
+                current.Advance();  // symbol
+                current.Advance();  // ':='
+
+                var value = ParseObject(current);
+
+                return Special.Define(symbol, value);
+            }
+
             if (Equals(current.Item, Symbol.Quoter))
             {
                 current.Advance();
@@ -53,7 +63,7 @@ namespace CoTy.Inputs
                     throw new ParserException($"dangling `{Symbol.Quoter}´ at end of input");
                 }
 
-                return BlockLiteral.From(Enumerable.Repeat(ParseObject(current), 1));
+                return SequenceLiteral.Quote(ParseObject(current));
             }
 
             if (Equals(current.Item, Symbol.RightParent))
@@ -67,11 +77,11 @@ namespace CoTy.Inputs
             return @object;
         }
 
-        private bool TryParseDefiner(Cursor<object> current, out Definer binder)
+        private bool TryParseDefiner(Cursor<Cobject> current, out Special definer)
         {
             if (!Equals(current.Item, Symbol.BindTo))
             {
-                binder = null;
+                definer = null;
                 return false;
             }
 
@@ -79,29 +89,13 @@ namespace CoTy.Inputs
             {
                 current.Advance();
 
-                if (TryParseSequence(current, out var sequence))
+                if (TryParseSymbolSequence(current, out var sequence))
                 {
-                    if (sequence.IsEmpty())
-                    {
-                        throw new ParserException($"definer objects sequence `{sequence}´ should contain at least one symbol");
-                    }
-                    if (!sequence.AllSymbols())
-                    {
-                        throw new ParserException($"definer objects sequence `{sequence}´ should only contain symbols");
-                    }
-
-                    binder = Definer.From(sequence.Cast<Symbol>());
+                    definer = Special.MultiDefine(sequence);
                 }
                 else
                 {
-                    if (!(current.Item is Symbol symbol))
-                    {
-                        throw new ParserException($"definer object `{current.Item}´ should be a symbol");
-                    }
-
-                    binder = Definer.From(symbol);
-
-                    current.Advance();
+                    definer = Special.SingleDefine(ParseSingleSymbol(current));
                 }
 
                 return true;
@@ -109,7 +103,7 @@ namespace CoTy.Inputs
         }
 
 
-        private bool TryParseAssigner(Cursor<object> current, out Assigner assigner)
+        private bool TryParseAssigner(Cursor<Cobject> current, out Special assigner)
         {
             if (!Equals(current.Item, Symbol.Assign))
             {
@@ -121,36 +115,52 @@ namespace CoTy.Inputs
             {
                 current.Advance();
 
-                if (TryParseSequence(current, out var sequence))
+                if (TryParseSymbolSequence(current, out var sequence))
                 {
-                    if (sequence.IsEmpty())
-                    {
-                        throw new ParserException($"assigner objects sequence `{sequence}´ should contain at least one symbol");
-                    }
-                    if (!sequence.AllSymbols())
-                    {
-                        throw new ParserException($"assigner objects sequence `{sequence}´ should only contain symbols");
-                    }
-
-                    assigner = Assigner.From(sequence.Cast<Symbol>());
+                    assigner =  Special.MultiAssign(sequence);
                 }
                 else
                 {
-                    if (!(current.Item is Symbol symbol))
-                    {
-                        throw new ParserException($"assigner object `{current.Item}´ should be a symbol");
-                    }
-
-                    assigner = Assigner.From(symbol);
-
-                    current.Advance();
+                    assigner = Special.MultiAssign(ParseSingleSymbol(current));
                 }
 
                 return true;
             }
         }
 
-        private bool TryParseSequence(Cursor<object> current, out BlockLiteral sequence)
+        private bool TryParseSymbolSequence(Cursor<Cobject> current, out SequenceLiteral sequence)
+        {
+            if (TryParseSequence(current, out sequence))
+            {
+                if (sequence.IsEmpty())
+                {
+                    throw new ParserException($"objects sequence `{sequence}´ should contain at least one symbol");
+                }
+                if (!sequence.AllSymbols())
+                {
+                    throw new ParserException($"objects sequence `{sequence}´ should only contain symbols");
+                }
+
+                return true;
+            }
+
+            sequence = null;
+            return false;
+        }
+
+        private Symbol ParseSingleSymbol(Cursor<Cobject> current)
+        {
+            if (!(current.Item is Symbol symbol))
+            {
+                throw new ParserException($"current `{current.Item}´ should be a symbol");
+            }
+
+            current.Advance();
+
+            return symbol;
+        }
+
+        private bool TryParseSequence(Cursor<Cobject> current, out SequenceLiteral sequence)
         {
             if (!Equals(current.Item, Symbol.LeftParent))
             {
@@ -163,7 +173,7 @@ namespace CoTy.Inputs
             {
                 current.Advance();
 
-                IEnumerable<object> Loop()
+                IEnumerable<Cobject> Loop()
                 {
                     while (current && !Equals(current.Item, Symbol.RightParent))
                     {
@@ -171,7 +181,7 @@ namespace CoTy.Inputs
                     }
                 }
 
-                sequence = BlockLiteral.From(Loop().ToList());
+                sequence = SequenceLiteral.From(Loop().ToList());
 
                 if (!current)
                 {

@@ -9,40 +9,37 @@ namespace CoTy.Definitions
 
         public override void Define(Maker into)
         {
-            into.Define("eq?", (dynamic value1, dynamic value2) => Equals(value1, value2));
-            into.Define("ne?", (dynamic value1, dynamic value2) => !Equals(value1, value2));
+            into.Define("==", (Cobject value1, Cobject value2) => Bool.From(Equals(value1, value2)));
+            into.Define("!=", (Cobject value1, Cobject value2) => Bool.From(!Equals(value1, value2)));
 
-            into.Define("compare", (dynamic value1, dynamic value2) => (Integer)value1.CompareTo(value2));
+            into.Define("compare", (Cobject value1, Cobject value2) => (Integer)((dynamic)value1).CompareTo((dynamic)value2));
 
-            into.Define("lt?", (dynamic value1, dynamic value2) => value1.CompareTo(value2) < 0);
-            into.Define("le?", (dynamic value1, dynamic value2) => value1.CompareTo(value2) <= 0);
-            into.Define("gt?", (dynamic value1, dynamic value2) => value1.CompareTo(value2) > 0);
-            into.Define("ge?", (dynamic value1, dynamic value2) => value1.CompareTo(value2) >= 0);
+            into.Define("<", (Cobject value1, Cobject value2) => Bool.From(((dynamic)value1).CompareTo((dynamic)value2) < 0));
+            into.Define("<=", (Cobject value1, Cobject value2) => Bool.From(((dynamic)value1).CompareTo((dynamic)value2) <= 0));
+            into.Define(">", (Cobject value1, Cobject value2) => Bool.From(((dynamic)value1).CompareTo((dynamic)value2) > 0));
+            into.Define(">=", (Cobject value1, Cobject value2) => Bool.From(((dynamic)value1).CompareTo((dynamic)value2) >= 0));
 
-            into.Define("add", (dynamic value1, dynamic value2) => value1 + value2);
-            into.Define("sub", (dynamic value1, dynamic value2) => value1 - value2);
-            into.Define("mul", (dynamic value1, dynamic value2) => value1 * value2);
-            into.Define("div", (dynamic value1, dynamic value2) => value1 / value2);
-            into.Define("mod", (dynamic value1, dynamic value2) => value1 % value2);
+            into.Define("+", (Cobject value1, Cobject value2) => (dynamic)value1 + (dynamic)value2);
+            into.Define("-", (Cobject value1, Cobject value2) => (dynamic)value1 - (dynamic)value2);
+            into.Define("*", (Cobject value1, Cobject value2) => (dynamic)value1 * (dynamic)value2);
+            into.Define("/", (Cobject value1, Cobject value2) => (dynamic)value1 / (dynamic)value2);
+            into.Define("%", (Cobject value1, Cobject value2) => (dynamic)value1 % (dynamic)value2);
 
-            into.Define("succ", (dynamic value) => ++value);
-            into.Define("pred", (dynamic value) => --value);
-
-            into.Define("not", (dynamic value) => !value);
-            into.Define("and", (dynamic value1, dynamic value2) => value1 & value2);
-            into.Define("or", (dynamic value1, dynamic value2) => value1 | value2);
-            into.Define("xor", (dynamic value1, dynamic value2) => value1 ^ value2);
+            into.Define("not", (Cobject value) => !(dynamic)value);
+            into.Define("and", (Cobject value1, Cobject value2) => (dynamic)value1 & (dynamic)value2);
+            into.Define("or", (Cobject value1, Cobject value2) => (dynamic)value1 | (dynamic)value2);
+            into.Define("xor", (Cobject value1, Cobject value2) => (dynamic)value1 ^ (dynamic)value2);
 
             into.Define("neutral", () => Neutrum.Neutral);
 
-            into.Define("bool?", value => value is bool);
-            into.Define("true", () => true);
-            into.Define("false", () => false);
+            into.Define("bool?", (Cobject value) => Bool.From(value is Bool));
+            into.Define("true", () => Bool.True);
+            into.Define("false", () => Bool.False);
 
-            into.Define("integer", (dynamic value) => (Integer)value);
-            into.Define("integer?", value => value is Integer);
+            into.Define("integer", (Cobject value) => (Integer)(dynamic)value);
+            into.Define("integer?", (Cobject value) => Bool.From(value is Integer));
 
-            into.Define("sequence?", value => value is IEnumerable<object>);
+            into.Define("sequence?", (Cobject value) => Bool.From(value is IEnumerable<Cobject>));
         }
     }
 }

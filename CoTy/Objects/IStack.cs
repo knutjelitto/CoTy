@@ -11,8 +11,8 @@
         void Dup();
         Sequence Get();
         void Over();
-        object Pop();
-        void Push(object value);
+        Cobject Pop();
+        void Push(Cobject value);
         void Swap();
     }
 }

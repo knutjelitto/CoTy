@@ -17,24 +17,24 @@ namespace CoTy.Objects
 
         public IEnumerable<Symbol> Symbols => this.symbols;
 
-        public static IBinder From(Symbol name)
+        public static Binder From(Symbol name)
         {
             return new Binder(name);
         }
 
-        public void Define(Symbol symbol, object value, bool isSealed = false, bool isOpaque = false)
+        public void Define(Symbol symbol, Cobject value, bool isSealed = false, bool isOpaque = false)
         {
             if (TryFind(symbol, out var binding))
             {
                 throw new BinderException($"`{symbol}´ already defined in current scope");
             }
 
-            binding = new Binding(this, value, isSealed, isOpaque);
+            binding = new Binding(this, value, Bool.From(isSealed), Bool.From(isOpaque));
             this.bindings.Add(symbol, binding);
             this.symbols.Add(symbol);
         }
 
-        public void GetValue(Symbol symbol, out object value)
+        public void GetValue(Symbol symbol, out Cobject value)
         {
             value = Find(symbol).Value;
         }
@@ -63,7 +63,7 @@ namespace CoTy.Objects
         {
             var binding = Find(symbol);
 
-            if (binding.IsOpaque)
+            if (binding.IsOpaque.Value)
             {
                 throw new BinderException($"`{symbol}´ is marked as opaque and can't be removed");
             }
@@ -72,11 +72,11 @@ namespace CoTy.Objects
             this.symbols.Remove(symbol);
         }
 
-        public void Update(Symbol symbol, object value)
+        public void Update(Symbol symbol, Cobject value)
         {
             var binding = Find(symbol);
 
-            if (binding.IsSealed)
+            if (binding.IsSealed.Value)
             {
                 throw new BinderException($"`{symbol}´ is marked as sealed and can't be updated");
             }

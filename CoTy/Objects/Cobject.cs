@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq.Expressions;
 
 namespace CoTy.Objects
 {
@@ -118,6 +119,6 @@ namespace CoTy.Objects
             Value = value;
         }
 
-        protected TClr Value { get; }
+        public TClr Value { get; }
     }
 }

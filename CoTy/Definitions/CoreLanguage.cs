@@ -24,7 +24,7 @@ namespace CoTy.Definitions
                     condition.Eval(scope, stack);
                     var result = stack.Pop();
 
-                    if (result is bool boolean && boolean)
+                    if (result is Bool boolean && boolean.Value)
                     {
                         ifTrue.Eval(scope, stack);
                     }
@@ -75,7 +75,7 @@ namespace CoTy.Definitions
             return Read(scope, stack, new Parser(charStream));
         }
 
-        public static Block Read(IScope scope, IStack stack, ItemStream<object> itemStream)
+        public static Block Read(IScope scope, IStack stack, ItemStream<Cobject> itemStream)
         {
             try
             {
@@ -100,7 +100,7 @@ namespace CoTy.Definitions
             Execute(new Parser(charStream), scope, stack);
         }
 
-        public static void Execute(ItemStream<object> stream, IScope scope, IStack stack)
+        public static void Execute(ItemStream<Cobject> stream, IScope scope, IStack stack)
         {
             try
             {
