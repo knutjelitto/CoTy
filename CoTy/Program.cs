@@ -25,18 +25,8 @@ namespace CoTy
 
             Capsuled(() =>  CoreLanguage.Load(testScope, stack, Symbol.Get("tests.all")));
             Capsuled(() => CoreLanguage.Load(rootScope, stack, Symbol.Get("startup")));
-#if true
+
             Repl(rootScope, stack);
-#else
-            while (true)
-            {
-                Capsuled(
-                    () =>
-                    {
-                        CoreLanguage.Execute(new ConsoleStream(stack.Dump), rootScope, stack);
-                    });
-            }
-#endif
             // ReSharper disable once FunctionNeverReturns
         }
 
