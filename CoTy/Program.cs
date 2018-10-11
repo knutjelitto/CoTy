@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Coty;
 using CoTy.Definitions;
 using CoTy.Errors;
 using CoTy.Inputs;
@@ -13,6 +14,12 @@ namespace CoTy
         // ReSharper disable once UnusedParameter.Local
         private static void Main(string[] args)
         {
+            //TerminalGuiDemo.DemoMain();
+            Prompted();
+        }
+
+        private static void Prompted()
+        {
             SetupConsole();
 
             Woo.Doo();
@@ -23,11 +30,10 @@ namespace CoTy
             var testScope = testBase.Chain(Binder.From("test"));
             var stack = Stack.From();
 
-            Capsuled(() =>  CoreLanguage.Load(testScope, stack, Symbol.Get("tests.all")));
+            Capsuled(() => CoreLanguage.Load(testScope, stack, Symbol.Get("tests.all")));
             Capsuled(() => CoreLanguage.Load(rootScope, stack, Symbol.Get("startup")));
 
             Repl(rootScope, stack);
-            // ReSharper disable once FunctionNeverReturns
         }
 
         private static void Repl(IScope scope, IStack stack)
@@ -36,6 +42,10 @@ namespace CoTy
             {
                 stack.Dump();
                 var line = G.C.GetLine(":");
+                if (line == null)
+                {
+                    break;
+                }
                 Capsuled(
                     () =>
                     {

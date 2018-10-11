@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CoTy.Support
 {
-    public class Hash
+    public static class Hash
     {
         public static int Up(params object[] args)
         {

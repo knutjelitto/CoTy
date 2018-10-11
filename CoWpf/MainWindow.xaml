@@ -7,11 +7,13 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="1000">
     <Grid>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="4*" MinHeight="100"/>
             <RowDefinition Height="4"/>
             <RowDefinition Height="*" MinHeight="100"/>
         </Grid.RowDefinitions>
+        
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" MinWidth="100"/>
@@ -23,7 +25,9 @@
             <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Blue" />
             <TextBox Grid.Column="2">BBB</TextBox>
         </Grid>
+        
         <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Blue"/>
+        
         <TextBox Grid.Row="2">CCC</TextBox>
 
     </Grid>

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using CoTy.Objects;
 using CoTy.Support;
 
@@ -12,6 +13,33 @@ namespace CoTy
     {
         public static void Doo()
         {
+            CallSiteBinder binder = new SimpleOperationBinder();
+
+            var dynamicExpression = Expression.Dynamic(
+                binder,
+                typeof(object),
+                new Expression[] {Expression.Constant(5), Expression.Constant(2)});
+
+            var compileDelegate = Expression.Lambda<Func<object>>(dynamicExpression).Compile();
+
+            var result = compileDelegate();
+
+            Console.WriteLine($"result is {result}");
+        }
+
+        private class SimpleOperationBinder : BinaryOperationBinder
+        {
+            public SimpleOperationBinder() : base(ExpressionType.Add)
+            {
+            }
+
+            public override DynamicMetaObject FallbackBinaryOperation(DynamicMetaObject target, DynamicMetaObject arg, DynamicMetaObject errorSuggestion)
+            {
+                return new DynamicMetaObject(
+                    Expression.Convert(Expression.Constant(3), typeof(object)),
+                    BindingRestrictions.GetExpressionRestriction(Expression.Constant(true))
+                    );
+            }
         }
 
         public static void Doo3()
