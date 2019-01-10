@@ -20,7 +20,7 @@ namespace CoTy.Objects
 
         public static IEnumerable<Cobject> Enumerate(this Cobject This)
         {
-            // ReSharper disable once UsePatternMatching
+            /*// ReSharper disable once UsePatternMatching*/
             var enumerable = This as IEnumerable<Cobject>;
 
             // ReSharper disable once ConvertIfStatementToNullCoalescingExpression

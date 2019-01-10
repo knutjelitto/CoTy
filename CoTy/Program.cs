@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Coty;
 using CoTy.Definitions;
 using CoTy.Errors;
 using CoTy.Inputs;
