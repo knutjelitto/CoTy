@@ -17,6 +17,8 @@ namespace NuEarl.Structure
             return terminal;
         }
 
+        public Symbol Empty => NuEarl.Structure.Empty.Instance;
+
         private T Define<T>(T symbol) where T : Symbol
         {
             CheckIsUndefined(symbol);

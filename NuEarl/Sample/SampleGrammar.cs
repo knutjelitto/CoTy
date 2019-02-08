@@ -1,4 +1,5 @@
-﻿using NuEarl.Structure;
+﻿using System.Collections;
+using NuEarl.Structure;
 
 namespace NuEarl.Sample
 {
@@ -7,20 +8,33 @@ namespace NuEarl.Sample
         public SampleGrammar()
         {
             /*
-            <expression> ::= <expression> + <term>
-                           | <expression> - <term>
-                           | <term>
-            <term>       ::= <term> * <factor>
-                           | <term> / <factor>
-                           | <factor>
-            <factor>     ::= ( <expression> ) 
-                           | <number>
+            expression  := expression "+" term
+                         | expression "-" term
+                         | term
+            term        := term "*" factor
+                         | term "/" factor
+                         | factor
+            factor      := "+"
+                         | "-"
+                         | "(" expression ")"
+                         | number
+            number      := digit+
+            digit       := "0" .. "9"
             */
 
-            var expression = Nonterminal("expression");
-            var term = Nonterminal("term");
-            var factor = Nonterminal("factor");
-            var number = Terminal("number");
+            var expression = Nonterminal("E");
+            var term = Nonterminal("T");
+            var factor = Nonterminal("F");
+            var number = Nonterminal("number");
+
+            var addOp = Terminal("+");
+            var subOp = Terminal("-");
+            var mulOp = Terminal("*");
+            var divOp = Terminal("/");
+            var lParent = Terminal("(");
+            var rParent = Terminal(")");
+
+            var x = 00000;
 
             Start = expression;
 

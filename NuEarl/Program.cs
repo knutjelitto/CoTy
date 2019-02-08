@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using NuEarl.Regular;
 using NuEarl.Sample;
 
 namespace NuEarl
@@ -11,12 +12,14 @@ namespace NuEarl
         {
             var p = new Program();
 
-            p.Sample();
+            //p.Sample();
+            p.Nfa2Dfa();
 
             p.AnyKey();
         }
 
-        public void Sample()
+        // ReSharper disable once UnusedMember.Local
+        private void Sample()
         {
             var sample = new SampleGrammar();
 
@@ -26,7 +29,14 @@ namespace NuEarl
             }
         }
 
-        public void AnyKey()
+        private void Nfa2Dfa()
+        {
+            var t = new TestNFA();
+
+            t.Test();
+        }
+
+        private void AnyKey()
         {
             Console.Write("any key ...");
             Console.ReadKey(true);
