@@ -19,7 +19,7 @@ namespace Pliant.Runtime
 
         public int Location { get; private set; }
 
-        public IReadOnlyChart Chart { get { return _chart; } }
+        public IReadOnlyChart Chart { get { return this._chart; } }
 
         public ParseEngineOptions Options { get; private set; }
 
@@ -41,10 +41,10 @@ namespace Pliant.Runtime
 
         public ParseEngine(IGrammar grammar, ParseEngineOptions options)
         {
-            _dottedRuleRegistry = new GrammarSeededDottedRuleRegistry(grammar);
-            StateFactory = new StateFactory(_dottedRuleRegistry);
+            this._dottedRuleRegistry = new GrammarSeededDottedRuleRegistry(grammar);
+            StateFactory = new StateFactory(this._dottedRuleRegistry);
             Options = options;
-            _nodeSet = new ForestNodeSet();
+            this._nodeSet = new ForestNodeSet();
             Grammar = grammar;
             Initialize();
         }
@@ -55,7 +55,7 @@ namespace Pliant.Runtime
 
         public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
-            var earleySets = _chart.EarleySets;
+            var earleySets = this._chart.EarleySets;
             var currentIndex = earleySets.Count - 1;
             var currentEarleySet = earleySets[currentIndex];
             var scanStates = currentEarleySet.Scans;
@@ -65,24 +65,23 @@ namespace Pliant.Runtime
                 return EmptyLexerRules;
             }
 
-            var hashCode = 0;
-            var count = 0;
-
-            if (_expectedLexerRuleIndicies == null)
+            if (this._expectedLexerRuleIndicies == null)
             {
-                _expectedLexerRuleIndicies = new BitArray(Grammar.LexerRules.Count);
+                this._expectedLexerRuleIndicies = new BitArray(Grammar.LexerRules.Count);
             }
             else
             {
-                _expectedLexerRuleIndicies.SetAll(false);
+                this._expectedLexerRuleIndicies.SetAll(false);
             }
+
+            var hashCode = HashCode.InitIncrementalHash();
+            var count = 0;
 
             // compute the lexer rule hash for caching the list of lexer rules
             // compute the unique lexer rule count 
             // set bits in the rule index bit array corresponding to the position of the lexer rule in the list of rules
-            for (int s = 0; s < scanStates.Count; s++)
+            foreach (var scanState in scanStates)
             {
-                var scanState = scanStates[s];
                 var postDotSymbol = scanState.DottedRule.PostDotSymbol;
                 if (postDotSymbol == null || postDotSymbol.SymbolType != SymbolType.LexerRule)
                 {
@@ -97,24 +96,24 @@ namespace Pliant.Runtime
                     continue;
                 }
 
-                if (_expectedLexerRuleIndicies[index])
+                if (this._expectedLexerRuleIndicies[index])
                 {
                     continue;
                 }
 
                 count++;
-                _expectedLexerRuleIndicies[index] = true;
-                hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, hashCode == 0);                                    
+                this._expectedLexerRuleIndicies[index] = true;
+                hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode);
             }
 
-            if (_expectedLexerRuleCache == null)
+            if (this._expectedLexerRuleCache == null)
             {
-                _expectedLexerRuleCache = new Dictionary<int, ILexerRule[]>();
+                this._expectedLexerRuleCache = new Dictionary<int, ILexerRule[]>();
             }
 
             // if the hash is found in the cached lexer rule lists, return the cached array
             ILexerRule[] cachedLexerRules = null;
-            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
+            if (this._expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
             {
                 return cachedLexerRules;
             }
@@ -124,14 +123,14 @@ namespace Pliant.Runtime
             var returnItemIndex = 0;
             for (var i = 0; i < Grammar.LexerRules.Count; i++)
             {
-                if (_expectedLexerRuleIndicies[i])
+                if (this._expectedLexerRuleIndicies[i])
                 {
                     array[returnItemIndex] = Grammar.LexerRules[i];
                     returnItemIndex++;
                 }
             }
 
-            _expectedLexerRuleCache.Add(hashCode, array);
+            this._expectedLexerRuleCache.Add(hashCode, array);
 
             return array;
         }
@@ -143,7 +142,7 @@ namespace Pliant.Runtime
                 throw new Exception("Unable to parse expression.");
             }
 
-            var lastSet = _chart.EarleySets[_chart.Count - 1];
+            var lastSet = this._chart.EarleySets[this._chart.Count - 1];
             var start = Grammar.Start;
 
             // PERF: Avoid Linq expressions due to lambda allocation
@@ -161,7 +160,7 @@ namespace Pliant.Runtime
 
         public bool IsAccepted()
         {
-            var lastEarleySet = _chart.EarleySets[_chart.Count - 1];
+            var lastEarleySet = this._chart.EarleySets[this._chart.Count - 1];
             var startStateSymbol = Grammar.Start;
 
             // PERF: Avoid LINQ Any due to lambda allocation
@@ -180,15 +179,15 @@ namespace Pliant.Runtime
         private void Initialize()
         {
             Location = 0;
-            _chart = new Chart();
-            _expectedLexerRuleCache = null;
-            _expectedLexerRuleIndicies = null;
+            this._chart = new Chart();
+            this._expectedLexerRuleCache = null;
+            this._expectedLexerRuleIndicies = null;
             var startProductions = Grammar.StartProductions();
             for (var s = 0; s < startProductions.Count; s++)
             {
                 var startProduction = startProductions[s];
                 var startState = StateFactory.NewState(startProduction, 0, 0);
-                if (_chart.Enqueue(0, startState))
+                if (this._chart.Enqueue(0, startState))
                 {
                     Log(StartLogName, 0, startState);
                 }
@@ -200,7 +199,7 @@ namespace Pliant.Runtime
         {
             ScanPass(Location, token);
 
-            var tokenRecognized = _chart.EarleySets.Count > Location + 1;
+            var tokenRecognized = this._chart.EarleySets.Count > Location + 1;
             if (!tokenRecognized)
             {
                 return false;
@@ -209,7 +208,7 @@ namespace Pliant.Runtime
             Location++;
             ReductionPass(Location);
 
-            _nodeSet.Clear();
+            this._nodeSet.Clear();
             return true;
         }
 
@@ -220,7 +219,7 @@ namespace Pliant.Runtime
                 ScanPass(Location, tokens[i]);
             }
 
-            var tokenRecognized = _chart.EarleySets.Count > Location + 1;
+            var tokenRecognized = this._chart.EarleySets.Count > Location + 1;
 
             if (!tokenRecognized)
             {
@@ -230,13 +229,13 @@ namespace Pliant.Runtime
             Location++;
             ReductionPass(Location);
 
-            _nodeSet.Clear();
+            this._nodeSet.Clear();
             return true;
         }        
 
         private void ScanPass(int location, IToken token)
         {
-            var earleySet = _chart.EarleySets[location];
+            var earleySet = this._chart.EarleySets[location];
             for (int s = 0; s < earleySet.Scans.Count; s++)
             {
                 var scanState = earleySet.Scans[s];
@@ -252,12 +251,12 @@ namespace Pliant.Runtime
 
             if (token.TokenType == lexerRule.TokenType)
             {
-                var dottedRule = _dottedRuleRegistry.GetNext(scan.DottedRule);
-                if (_chart.Contains(j + 1, StateType.Normal, dottedRule, i))
+                var dottedRule = this._dottedRuleRegistry.GetNext(scan.DottedRule);
+                if (this._chart.Contains(j + 1, StateType.Normal, dottedRule, i))
                 {
                     return;
                 }
-                var tokenNode = _nodeSet.AddOrGetExistingTokenNode(token);
+                var tokenNode = this._nodeSet.AddOrGetExistingTokenNode(token);
                 var parseNode = CreateParseNode(
                     dottedRule,
                     scan.Origin,
@@ -266,7 +265,7 @@ namespace Pliant.Runtime
                     j + 1);
                 var nextState = StateFactory.NewState(dottedRule, scan.Origin, parseNode);
 
-                if (_chart.Enqueue(j + 1, nextState))
+                if (this._chart.Enqueue(j + 1, nextState))
                 {
                     LogScan(j + 1, nextState, token);
                 }
@@ -275,7 +274,7 @@ namespace Pliant.Runtime
 
         private void ReductionPass(int location)
         {
-            var earleySet = _chart.EarleySets[location];
+            var earleySet = this._chart.EarleySets[location];
             var resume = true;
 
             var p = 0;
@@ -329,14 +328,14 @@ namespace Pliant.Runtime
 
         private void PredictProduction(int j, IProduction production)
         {
-            var dottedRule = _dottedRuleRegistry.Get(production, 0);
-            if (_chart.Contains(j, StateType.Normal, dottedRule, 0))
+            var dottedRule = this._dottedRuleRegistry.Get(production, 0);
+            if (this._chart.Contains(j, StateType.Normal, dottedRule, 0))
             {
                 return;
             }
             // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
             var predictedState = StateFactory.NewState(dottedRule, j);
-            if (_chart.Enqueue(j, predictedState))
+            if (this._chart.Enqueue(j, predictedState))
             {
                 Log(PredictionLogName, j, predictedState);
             }
@@ -345,7 +344,7 @@ namespace Pliant.Runtime
         private void PredictAycockHorspool(INormalState evidence, int j)
         {
             var nullParseNode = CreateNullParseNode(evidence.DottedRule.PostDotSymbol, j);
-            var dottedRule = _dottedRuleRegistry.GetNext(evidence.DottedRule);
+            var dottedRule = this._dottedRuleRegistry.GetNext(evidence.DottedRule);
 
             var evidenceParseNode = evidence.ParseNode as IInternalForestNode;
             IForestNode parseNode = null;
@@ -369,13 +368,13 @@ namespace Pliant.Runtime
                     j);
             }
 
-            if (_chart.Contains(j, StateType.Normal, dottedRule, evidence.Origin))
+            if (this._chart.Contains(j, StateType.Normal, dottedRule, evidence.Origin))
             {
                 return;
             }
 
             var aycockHorspoolState = StateFactory.NewState(dottedRule, evidence.Origin, parseNode);
-            if (_chart.Enqueue(j, aycockHorspoolState))
+            if (this._chart.Enqueue(j, aycockHorspoolState))
             {
                 Log(PredictionLogName, j, aycockHorspoolState);
             }
@@ -388,7 +387,7 @@ namespace Pliant.Runtime
                 completed.ParseNode = CreateNullParseNode(completed.DottedRule.Production.LeftHandSide, k);
             }
 
-            var earleySet = _chart.EarleySets[completed.Origin];
+            var earleySet = this._chart.EarleySets[completed.Origin];
             var searchSymbol = completed.DottedRule.Production.LeftHandSide;
 
             if (Options.OptimizeRightRecursion)
@@ -409,7 +408,7 @@ namespace Pliant.Runtime
 
         private void LeoComplete(ITransitionState transitionState, IState completed, int k)
         {
-            var earleySet = _chart.EarleySets[transitionState.Index];
+            var earleySet = this._chart.EarleySets[transitionState.Index];
             var rootTransitionState = earleySet.FindTransitionState(
                 transitionState.DottedRule.PreDotSymbol);
 
@@ -426,7 +425,7 @@ namespace Pliant.Runtime
                 transitionState.Origin,
                 virtualParseNode);
 
-            if (_chart.Enqueue(k, topmostItem))
+            if (this._chart.Enqueue(k, topmostItem))
             {
                 Log(CompleteLogName, k, topmostItem);
             }
@@ -435,7 +434,7 @@ namespace Pliant.Runtime
         private void EarleyComplete(INormalState completed, int k)
         {
             var j = completed.Origin;
-            var sourceEarleySet = _chart.EarleySets[j];
+            var sourceEarleySet = this._chart.EarleySets[j];
 
             for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
             {
@@ -445,7 +444,7 @@ namespace Pliant.Runtime
                     continue;
                 }
 
-                var dottedRule = _dottedRuleRegistry.GetNext(prediction.DottedRule);
+                var dottedRule = this._dottedRuleRegistry.GetNext(prediction.DottedRule);
                 var origin = prediction.Origin;
 
                 // this will not create a node if the state already exists
@@ -456,14 +455,14 @@ namespace Pliant.Runtime
                     completed.ParseNode,
                     k);
 
-                if (_chart.Contains(k, StateType.Normal, dottedRule, origin))
+                if (this._chart.Contains(k, StateType.Normal, dottedRule, origin))
                 {
                     continue;
                 }
 
                 var nextState = StateFactory.NewState(dottedRule, origin, parseNode);
 
-                if (_chart.Enqueue(k, nextState))
+                if (this._chart.Enqueue(k, nextState))
                 {
                     Log(CompleteLogName, k, nextState);
                 }
@@ -487,7 +486,7 @@ namespace Pliant.Runtime
             ref ITransitionState previousTransitionState,
             HashSet<IState> visited)
         {
-            var earleySet = _chart.EarleySets[k];
+            var earleySet = this._chart.EarleySets[k];
 
             // if Ii contains a transitive item of the for [B -> b., A, k]
             var transitionState = earleySet.FindTransitionState(searchSymbol);
@@ -558,7 +557,7 @@ namespace Pliant.Runtime
                   k);
             }
 
-            if (_chart.Enqueue(k, currentTransitionState))
+            if (this._chart.Enqueue(k, currentTransitionState))
             {
                 Log(TransitionLogName, k, currentTransitionState);
             }
@@ -620,7 +619,7 @@ namespace Pliant.Runtime
 
         private IForestNode CreateNullParseNode(ISymbol symbol, int location)
         {
-            var symbolNode = _nodeSet.AddOrGetExistingSymbolNode(symbol, location, location);
+            var symbolNode = this._nodeSet.AddOrGetExistingSymbolNode(symbol, location, location);
             var token = new Token(string.Empty, location, EmptyTokenType);
             var nullNode = new TokenForestNode(token, location, location);
             symbolNode.AddUniqueFamily(nullNode);
@@ -652,7 +651,7 @@ namespace Pliant.Runtime
             IInternalForestNode internalNode = null;
             if (anyPostDotRuleNull)
             {
-                internalNode = _nodeSet
+                internalNode = this._nodeSet
                     .AddOrGetExistingSymbolNode(
                         nextDottedRule.Production.LeftHandSide,
                         origin,
@@ -660,7 +659,7 @@ namespace Pliant.Runtime
             }
             else
             {
-                internalNode = _nodeSet
+                internalNode = this._nodeSet
                     .AddOrGetExistingIntermediateNode(
                         nextDottedRule,
                         origin,
@@ -686,13 +685,13 @@ namespace Pliant.Runtime
         private VirtualForestNode CreateVirtualParseNode(IState completed, int k, ITransitionState rootTransitionState)
         {
             VirtualForestNode virtualParseNode = null;
-            if (!_nodeSet.TryGetExistingVirtualNode(
+            if (!this._nodeSet.TryGetExistingVirtualNode(
                 k,
                 rootTransitionState,
                 out virtualParseNode))
             {
                 virtualParseNode = new VirtualForestNode(k, rootTransitionState, completed.ParseNode);
-                _nodeSet.AddNewVirtualNode(virtualParseNode);
+                this._nodeSet.AddNewVirtualNode(virtualParseNode);
             }
             else
             {

@@ -9,15 +9,15 @@ namespace Pliant.Grammars
     {
         private readonly int _hashCode;
         
-        public IProduction Production { get; private set; }
+        public IProduction Production { get; }
 
-        public int Position { get; private set; }
+        public int Position { get; }
 
-        public ISymbol PreDotSymbol { get; private set; }
+        public ISymbol PreDotSymbol { get; }
 
-        public ISymbol PostDotSymbol { get; private set; }
+        public ISymbol PostDotSymbol { get; }
 
-        public bool IsComplete { get; private set; }
+        public bool IsComplete { get; }
 
         public DottedRule(IProduction production, int position)
         {
@@ -26,7 +26,7 @@ namespace Pliant.Grammars
 
             Production = production;
             Position = position;
-            _hashCode = ComputeHashCode(Production, Position);
+            this._hashCode = ComputeHashCode(Production, Position);
             PostDotSymbol = GetPostDotSymbol(position, production);
             PreDotSymbol = GetPreDotSymbol(position, production);
             IsComplete = IsCompleted(position, production);
@@ -39,7 +39,7 @@ namespace Pliant.Grammars
 
         public override int GetHashCode()
         {
-            return _hashCode;
+            return this._hashCode;
         }
 
         public override bool Equals(object obj)

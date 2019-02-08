@@ -13,17 +13,17 @@ namespace Pliant.Runtime
 {
     public class MarpaParseEngine : IParseEngine
     {
-        private PreComputedGrammar _preComputedGrammar;
+        private readonly PreComputedGrammar _preComputedGrammar;
 
-        public DeterministicChart Chart { get; private set; }
+        public DeterministicChart Chart { get; }
         
         public int Location { get; private set; }
 
-        public IGrammar Grammar => _preComputedGrammar.Grammar;
+        public IGrammar Grammar => this._preComputedGrammar.Grammar;
 
         public MarpaParseEngine(PreComputedGrammar preComputedGrammar)
         {
-            _preComputedGrammar = preComputedGrammar;
+            this._preComputedGrammar = preComputedGrammar;
             Chart = new DeterministicChart();
             Initialize();
         }
@@ -34,7 +34,7 @@ namespace Pliant.Runtime
 
         private void Initialize()
         {
-            var start = _preComputedGrammar.Start;
+            var start = this._preComputedGrammar.Start;
             AddEimPair(0, start, 0);
         }
 
@@ -62,50 +62,47 @@ namespace Pliant.Runtime
                 return EmptyLexerRules;
             }
 
-            var hashCode = 0;
-            var count = 0;
-
-            if (_expectedLexerRuleIndicies == null)
+            if (this._expectedLexerRuleIndicies == null)
             {
-                _expectedLexerRuleIndicies = new BitArray(Grammar.LexerRules.Count);
+                this._expectedLexerRuleIndicies = new BitArray(Grammar.LexerRules.Count);
             }
             else
             {
-                _expectedLexerRuleIndicies.SetAll(false);
+                this._expectedLexerRuleIndicies.SetAll(false);
             }
 
+            var hashCode = HashCode.InitIncrementalHash();
+            var count = 0;
+
             var frameSet = frameSets[frameSets.Count - 1];
-            for (var i = 0; i < frameSet.States.Count; i++)
+            foreach (var stateFrame in frameSet.States)
             {
-                var stateFrame = frameSet.States[i];
-                for (int j = 0; j < stateFrame.DottedRuleSet.ScanKeys.Count; j++)
+                foreach (var lexerRule in stateFrame.DottedRuleSet.ScanKeys)
                 {
-                    var lexerRule = stateFrame.DottedRuleSet.ScanKeys[j];
                     var index = Grammar.GetLexerRuleIndex(lexerRule);
                     if (index < 0)
                     {
                         continue;
                     }
 
-                    if (_expectedLexerRuleIndicies[index])
+                    if (this._expectedLexerRuleIndicies[index])
                     {
                         continue;
                     }
 
-                    _expectedLexerRuleIndicies[index] = true;
-                    hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, count == 0);
+                    this._expectedLexerRuleIndicies[index] = true;
+                    hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode);
                     count++;
                 }
             }
 
-            if (_expectedLexerRuleCache == null)
+            if (this._expectedLexerRuleCache == null)
             {
-                _expectedLexerRuleCache = new Dictionary<int, ILexerRule[]>();
+                this._expectedLexerRuleCache = new Dictionary<int, ILexerRule[]>();
             }
 
             // if the hash is found in the cached lexer rule lists, return the cached array
-            ILexerRule[] cachedLexerRules = null;
-            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
+            if (this._expectedLexerRuleCache.TryGetValue(hashCode, out var cachedLexerRules))
             {
                 return cachedLexerRules;
             }
@@ -115,14 +112,14 @@ namespace Pliant.Runtime
             var returnItemIndex = 0;
             for (var i = 0; i < Grammar.LexerRules.Count; i++)
             {
-                if (_expectedLexerRuleIndicies[i])
+                if (this._expectedLexerRuleIndicies[i])
                 {
                     array[returnItemIndex] = Grammar.LexerRules[i];
                     returnItemIndex++;
                 }
             }
 
-            _expectedLexerRuleCache.Add(hashCode, array);
+            this._expectedLexerRuleCache.Add(hashCode, array);
 
             return array;
         }
@@ -143,9 +140,9 @@ namespace Pliant.Runtime
 
         public bool Pulse(IReadOnlyList<IToken> tokens)
         {
-            for (var i = 0; i < tokens.Count; i++)
+            foreach (var token in tokens)
             {
-                ScanPass(Location, tokens[i]);
+                ScanPass(Location, token);
             }
 
             var tokenRecognized = Chart.Sets.Count > Location + 1;
@@ -196,10 +193,8 @@ namespace Pliant.Runtime
 
         private bool AnyPreComputedStateAccepted(IReadOnlyList<IDottedRule> states)
         {
-            for (var j = 0; j < states.Count; j++)
+            foreach (var preComputedState in states)
             {
-                var preComputedState = states[j];
-                var isCompleted = preComputedState.Position == preComputedState.Production.RightHandSide.Count;
                 if (!preComputedState.IsComplete)
                 {
                     continue;
@@ -212,15 +207,15 @@ namespace Pliant.Runtime
 
                 return true;
             }
+
             return false;
         }
 
         private void ScanPass(int iLoc, IToken token)
         {
             var iES = Chart.Sets[iLoc];
-            for (var i = 0; i < iES.States.Count; i++)
+            foreach (var workEIM in iES.States)
             {
-                var workEIM = iES.States[i];
                 var fromAH = workEIM.DottedRuleSet;
                 var origLoc = workEIM.Origin;
 
@@ -238,15 +233,13 @@ namespace Pliant.Runtime
         {
             var iES = Chart.Sets[iLoc];
             var processed = SharedPools.Default<HashSet<ISymbol>>().AllocateAndClear();
-            for (var i = 0; i < iES.States.Count; i++)
+            foreach (var workEIM in iES.States)
             {
-                var workEIM = iES.States[i];
                 var workAH = workEIM.DottedRuleSet;
                 var origLoc = workEIM.Origin;
 
-                for (var j = 0; j < workAH.Data.Count; j++)
+                foreach (var dottedRule in workAH.Data)
                 {
-                    var dottedRule = workAH.Data[j];
                     if (!dottedRule.IsComplete)
                     {
                         continue;
@@ -276,9 +269,8 @@ namespace Pliant.Runtime
             }
             else
             {
-                for (var i = 0; i < frameSet.States.Count; i++)
+                foreach (var stateFrame in frameSet.States)
                 {
-                    var stateFrame = frameSet.States[i];
                     EarleyReductionOperation(iLoc, stateFrame, lhsSym);
                 }
             }
@@ -294,9 +286,8 @@ namespace Pliant.Runtime
             var cachedCountPool = SharedPools.Default<Dictionary<ISymbol, int>>();
             var cachedCount = cachedCountPool.AllocateAndClear();
 
-            for (var i = 0; i < frameSet.States.Count; i++)
+            foreach (var stateFrame in frameSet.States)
             {
-                var stateFrame = frameSet.States[i];
                 var frame = stateFrame.DottedRuleSet;
                 var frameData = frame.Data;
                 var stateFrameDataCount = frameData.Count;
@@ -316,15 +307,14 @@ namespace Pliant.Runtime
                     }
 
                     // leo eligibile items are right recursive directly or indirectly                    
-                    if (!_preComputedGrammar.Grammar.IsRightRecursive(
-                        preComputedState.Production.LeftHandSide))
+                    if (!this._preComputedGrammar.Grammar.IsRightRecursive(
+                            preComputedState.Production.LeftHandSide))
                     {
                         continue;
                     }
 
                     // to determine if the item is leo unique, cache it here
-                    var count = 0;
-                    if (!cachedCount.TryGetValue(postDotSymbol, out count))
+                    if (!cachedCount.TryGetValue(postDotSymbol, out var count))
                     {
                         cachedCount[postDotSymbol] = 1;
                         cachedTransitions[postDotSymbol] = CreateTopCachedItem(stateFrame, postDotSymbol);
@@ -444,7 +434,7 @@ namespace Pliant.Runtime
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool IsStartState(IDottedRule state)
         {
-            var start = _preComputedGrammar.Grammar.Start;
+            var start = this._preComputedGrammar.Grammar.Start;
             return state.Production.LeftHandSide.Equals(start);
         }
     }

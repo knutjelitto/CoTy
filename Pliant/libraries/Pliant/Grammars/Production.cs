@@ -1,29 +1,27 @@
-﻿using Pliant.Collections;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
 using Pliant.Diagnostics;
 using Pliant.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Pliant.Grammars
 {
-    public class Production : IProduction
+    public sealed class Production : IProduction
     {
-        public INonTerminal LeftHandSide { get; private set; }
+        public INonTerminal LeftHandSide { get; }
 
-        private List<ISymbol> _rightHandSide;
+        public IReadOnlyList<ISymbol> RightHandSide { get; }
 
-        public IReadOnlyList<ISymbol> RightHandSide { get { return _rightHandSide; } }
+        public bool IsEmpty => RightHandSide.Count == 0;
 
-        public bool IsEmpty { get { return _rightHandSide.Count == 0; } }
-        
         public Production(INonTerminal leftHandSide, List<ISymbol> rightHandSide)
         {
             Assert.IsNotNull(leftHandSide, nameof(leftHandSide));
             Assert.IsNotNull(rightHandSide, nameof(rightHandSide));
             LeftHandSide = leftHandSide;
-            _rightHandSide = new List<ISymbol>(new List<ISymbol>(rightHandSide));
-            _hashCode = ComputeHashCode();
+            RightHandSide = new List<ISymbol>(new List<ISymbol>(rightHandSide));
+            this._hashCode = ComputeHashCode();
         }
 
         public Production(INonTerminal leftHandSide, params ISymbol[] rightHandSide)
@@ -31,43 +29,37 @@ namespace Pliant.Grammars
             Assert.IsNotNull(leftHandSide, nameof(leftHandSide));
             Assert.IsNotNull(rightHandSide, nameof(rightHandSide));
             LeftHandSide = leftHandSide;
-            _rightHandSide = new List<ISymbol>(new List<ISymbol>(rightHandSide));
-            _hashCode = ComputeHashCode();
+            RightHandSide = new List<ISymbol>(new List<ISymbol>(rightHandSide));
+            this._hashCode = ComputeHashCode();
         }
                 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is Production that)
             {
-                return false;
-            }
-
-            var production = obj as Production;
-            if (production == null)
-            {
-                return false;
-            }
-
-            if (!LeftHandSide.Equals(production.LeftHandSide))
-            {
-                return false;
-            }
-
-            var rightHandSideCount = RightHandSide.Count;
-            if (rightHandSideCount != production.RightHandSide.Count)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < rightHandSideCount; i++)
-            {
-                if (!RightHandSide[i].Equals(production.RightHandSide[i]))
+                if (!LeftHandSide.Equals(that.LeftHandSide))
                 {
                     return false;
                 }
+
+                var rightHandSideCount = RightHandSide.Count;
+                if (rightHandSideCount != that.RightHandSide.Count)
+                {
+                    return false;
+                }
+
+                for (var i = 0; i < rightHandSideCount; i++)
+                {
+                    if (!RightHandSide[i].Equals(that.RightHandSide[i]))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         // PERF: Cache Costly Hash Code Computation
@@ -75,19 +67,14 @@ namespace Pliant.Grammars
 
         public override int GetHashCode()
         {
-            return _hashCode;
+            return this._hashCode;
         }
 
         private int ComputeHashCode()
         {
-            var hash = HashCode.ComputeIncrementalHash(LeftHandSide.GetHashCode(), 0, true);
-            
-            for (var s = 0; s < RightHandSide.Count; s++)
-            {
-                var symbol = RightHandSide[s];
-                hash = HashCode.ComputeIncrementalHash(symbol.GetHashCode(), hash);
-            }
-            return hash;
+            var hash = HashCode.ComputeIncrementalHash(LeftHandSide.GetHashCode(), HashCode.InitIncrementalHash());
+
+            return RightHandSide.Aggregate(hash, (accumulator, symbol) => HashCode.ComputeIncrementalHash(symbol.GetHashCode(), accumulator));
         }
 
         public override string ToString()

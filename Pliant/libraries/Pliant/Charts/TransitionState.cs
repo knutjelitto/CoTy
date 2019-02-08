@@ -5,11 +5,11 @@ namespace Pliant.Charts
 {
     public class TransitionState : StateBase, ITransitionState
     {
-        public ISymbol Recognized { get; private set; }
+        public ISymbol Recognized { get; }
 
-        public INormalState Reduction { get; private set; }
+        public INormalState Reduction { get; }
 
-        public int Index { get; private set; }
+        public int Index { get; }
 
         public ITransitionState NextTransition { get; set; }
                 

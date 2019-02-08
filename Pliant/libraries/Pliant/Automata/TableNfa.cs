@@ -181,12 +181,7 @@ namespace Pliant.Automata
 
             private static int ComputeHashCode(int[] states)
             {
-                var hashCode = 0;
-                for (int i = 0; i < states.Length; i++)
-                {
-                    hashCode = HashCode.ComputeIncrementalHash(states[i].GetHashCode(), hashCode, i == 0);
-                }
-                return hashCode;
+                return states.Aggregate(HashCode.Incremental(), (hash, state) => hash.Add(state.GetHashCode()));
             }
 
             public override int GetHashCode()

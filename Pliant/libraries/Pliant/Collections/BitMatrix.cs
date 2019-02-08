@@ -1,12 +1,14 @@
 ﻿using Pliant.Utilities;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Pliant.Collections
 {
-    public class BitMatrix
+    public class BitMatrix : IEnumerable<BitArray>
     {
-        private BitArray[] _matrix;
+        private readonly BitArray[] _matrix;
 
         public BitMatrix(int count)
         {
@@ -85,6 +87,16 @@ namespace Pliant.Collections
             return stringBuilder.ToString();
         }
 
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public IEnumerator<BitArray> GetEnumerator()
+        {
+            return this._matrix.AsEnumerable().GetEnumerator();
+        }
+
         public override bool Equals(object obj)
         {
             if (((object)obj) == null)
@@ -116,13 +128,7 @@ namespace Pliant.Collections
 
         public override int GetHashCode()
         {
-            var hashCode = 0;
-            for (var i = 0; i < Length; i++)
-            {
-                hashCode = HashCode.ComputeIncrementalHash(this[i].GetHashCode(), hashCode, i == 0);
-            }
-
-            return hashCode;
+            return this.Aggregate(HashCode.InitIncrementalHash(), (accumulator, t) => HashCode.ComputeIncrementalHash(t.GetHashCode(), accumulator));
         }
     }
 }
