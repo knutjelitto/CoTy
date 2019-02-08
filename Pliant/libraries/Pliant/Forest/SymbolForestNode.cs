@@ -33,15 +33,11 @@ namespace Pliant.Forest
         public override bool Equals(object obj)
         {
             if (obj == null)
-            {
                 return false;
-            }
 
             var symbolNode = obj as ISymbolForestNode;
             if (symbolNode == null)
-            {
                 return false;
-            }
 
             return Location == symbolNode.Location
                 && NodeType == symbolNode.NodeType

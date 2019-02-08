@@ -45,9 +45,7 @@ namespace Pliant.Grammars
             if (symbol.SymbolType == SymbolType.NonTerminal)
             {
                 if (!Reductions.ContainsKey(symbol))
-                {
                     _reductions.Add(symbol, target);
-                }
             }
             else if(symbol.SymbolType == SymbolType.LexerRule)
             {
@@ -79,23 +77,15 @@ namespace Pliant.Grammars
         public override bool Equals(object obj)
         {
             if (((object)obj) == null)
-            {
                 return false;
-            }
 
             var dottedRuleSet = obj as DottedRuleSet;
             if (((object)dottedRuleSet) == null)
-            {
                 return false;
-            }
 
             foreach (var item in _cachedData)
-            {
                 if (!dottedRuleSet.Contains(item))
-                {
                     return false;
-                }
-            }
 
             return true;
         }

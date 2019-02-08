@@ -1,43 +1,80 @@
-﻿namespace Pliant.Ebnf
+﻿using Pliant.Utilities;
+
+namespace Pliant.Ebnf
 {
     public class EbnfLexerRuleTerm : EbnfNode
     {
-        private readonly int _hashCode;
-        public EbnfLexerRuleFactor Factor { get; }
+        public EbnfLexerRuleFactor Factor { get; private set; }
+
+        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfLexerRuleTerm; } }
+
+        readonly int _hashCode;
 
         public EbnfLexerRuleTerm(EbnfLexerRuleFactor factor)
         {
             Factor = factor;
-            this._hashCode = Factor.GetHashCode();
+            _hashCode = ComputeHashCode();
+        }
+
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(NodeType.GetHashCode(), Factor.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfLexerRuleTerm>(obj, out var other) &&
-                   Factor.Equals(other.Factor);
-        }
+            if ((object)obj == null)
+                return false;
+            var term = obj as EbnfLexerRuleTerm;
+            if ((object)term == null)
+                return false;
 
-        public override int GetHashCode() => this._hashCode;
+            return term.NodeType == NodeType
+                && term.Factor.Equals(Factor);
+        }
     }
 
-    public sealed class EbnfLexerRuleTermConcatenation : EbnfLexerRuleTerm
+    public class EbnfLexerRuleTermConcatenation : EbnfLexerRuleTerm
     {
-        private readonly int _hashCode;
-        public EbnfLexerRuleTerm Term { get; }
+        public EbnfLexerRuleTerm Term { get; private set; }
+
+        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfLexerRuleTermConcatenation; } }
+
+        readonly int _hashCode;
 
         public EbnfLexerRuleTermConcatenation(EbnfLexerRuleFactor factor, EbnfLexerRuleTerm term)
             : base(factor)
         {
             Term = term;
-            this._hashCode = (Factor, Term).GetHashCode();
+            _hashCode = ComputeHashCode();
+        }
+
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(NodeType.GetHashCode(), Factor.GetHashCode(), Term.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfLexerRuleTermConcatenation>(obj, out var other) &&
-                   (Factor, Term).Equals((other.Factor, other.Term));
-        }
+            if ((object)obj == null)
+                return false;
+            var term = obj as EbnfLexerRuleTermConcatenation;
+            if ((object)term == null)
+                return false;
 
-        public override int GetHashCode() => this._hashCode;
+            return term.NodeType == NodeType
+                && term.Factor.Equals(Factor)
+                && term.Term.Equals(Term);
+        }
     }
 }

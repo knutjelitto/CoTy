@@ -15,10 +15,7 @@ namespace Pliant.Tokens
             get
             {
                 if (_leadingTrivia == null)
-                {
                     return EmptyTriviaArray;
-                }
-
                 return _leadingTrivia;
             }
         }
@@ -28,10 +25,7 @@ namespace Pliant.Tokens
             get
             {
                 if (_trailingTrivia == null)
-                {
                     return EmptyTriviaArray;
-                }
-
                 return _trailingTrivia;
             }
         }
@@ -93,15 +87,9 @@ namespace Pliant.Tokens
         {
             var pool = SharedPools.Default<List<ITrivia>>();
             if(_leadingTrivia != null)
-            {
                 pool.ClearAndFree(_leadingTrivia);
-            }
-
-            if (_trailingTrivia != null)
-            {
+            if(_trailingTrivia != null)
                 pool.ClearAndFree(_trailingTrivia);
-            }
-
             LexerRule = lexerRule as ILexerRule;
             ConcreteLexerRule = lexerRule;
             Position = position;

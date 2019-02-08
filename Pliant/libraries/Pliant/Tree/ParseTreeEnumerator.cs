@@ -62,19 +62,13 @@ namespace Pliant.Tree
         public bool MoveNext()
         {
             if (_status == ParseTreeEnumeratorState.Done)
-            {
                 return false;
-            }
 
             if (_forestRoot.NodeType == ForestNodeType.Intermediate)
-            {
                 _visitor.Visit(_forestRoot as IIntermediateForestNode);
-            }
             else if (_forestRoot.NodeType == ForestNodeType.Symbol)
-            {
                 _visitor.Visit(_forestRoot as ISymbolForestNode);
-            }
-
+            
             if (_visitor.Root == null)
             {    _status = ParseTreeEnumeratorState.Done;
                 return false;
@@ -112,9 +106,7 @@ namespace Pliant.Tree
             public override void Visit(IIntermediateForestNode intermediateNode)
             {
                 if (!_visited.Add(intermediateNode))
-                {
                     return;
-                }
 
                 var childIndex = GetOrSetChildIndex(intermediateNode);
                 var path = intermediateNode.Children[childIndex];
@@ -125,9 +117,7 @@ namespace Pliant.Tree
             public override void Visit(ISymbolForestNode symbolNode)
             {
                 if (!_visited.Add(symbolNode))
-                {
                     return;
-                }
 
                 int childIndex = GetOrSetChildIndex(symbolNode);
 
@@ -155,14 +145,9 @@ namespace Pliant.Tree
                 if (isRoot)
                 {
                     if (_count > 0 && _lock == null)
-                    {
                         Root = null;
-                    }
                     else
-                    {
                         Root = top;
-                    }
-
                     _count++;
                     _visited.Clear();
                 }
@@ -179,15 +164,11 @@ namespace Pliant.Tree
 
                 var isLocked = !object.ReferenceEquals(null, _lock);
                 if (!isLocked)
-                {
                     _lock = symbolNode;
-                }
 
                 var isCurrentNodeLocked = object.ReferenceEquals(_lock, symbolNode);
                 if(!isCurrentNodeLocked)
-                {
                     return childIndex;
-                }
 
                 childIndex++;
                 if (childIndex >= symbolNode.Children.Count)

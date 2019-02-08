@@ -1,26 +1,36 @@
-﻿using System.Diagnostics;
+﻿using Pliant.Utilities;
+using System;
 
 namespace Pliant.Tokens
 {
-    public sealed class TokenType
+    public class TokenType
     {
-        public string Id { get; }
+        public string Id { get; private set; }
         private readonly int _hashCode;
-
         public TokenType(string id)
         {
             Id = id;
-            this._hashCode = Id.GetHashCode();
+            _hashCode = ComputeHashCode(Id);
+        }
+
+        private static int ComputeHashCode(string id)
+        {
+            return id.GetHashCode();
         }
 
         public override bool Equals(object obj)
         {
-            return obj is TokenType other && Id == other.Id;
+            if ((object)obj == null)
+                return false;
+            var other = obj as TokenType;
+            if ((object)other == null)
+                return false;
+            return other.Id.Equals(Id);
         }
 
         public override int GetHashCode()
         {
-            return this._hashCode;
+            return _hashCode;
         }
 
         public override string ToString()
@@ -35,7 +45,7 @@ namespace Pliant.Tokens
 
         public static bool operator !=(TokenType first, TokenType second)
         {
-            return !first.Equals(second);
+            return !(first == second);
         }
     }
 }

@@ -31,9 +31,7 @@ namespace Pliant.Grammars
             {
                 var terminal = _terminals[t];
                 if (terminal.IsMatch(character))
-                {
                     return true;
-                }
             }
             return false;
         }
@@ -41,10 +39,7 @@ namespace Pliant.Grammars
         public override IReadOnlyList<Interval> GetIntervals()
         {
             if(_intervals == null)
-            {
                 _intervals = CreateIntervals(_terminals);
-            }
-
             return _intervals;
         }
     }

@@ -39,10 +39,7 @@ namespace Pliant.Grammars
         {
             var rangeTerminal = obj as RangeTerminal;
             if (rangeTerminal == null)
-            {
                 return false;
-            }
-
             return rangeTerminal.End == End
                 && rangeTerminal.Start == Start;
         }
@@ -50,10 +47,7 @@ namespace Pliant.Grammars
         public override IReadOnlyList<Interval> GetIntervals()
         {
             if(_intervals == null)
-            {
                 _intervals = new[] { new Interval(Start, End) };
-            }
-
             return _intervals;
         }
     }

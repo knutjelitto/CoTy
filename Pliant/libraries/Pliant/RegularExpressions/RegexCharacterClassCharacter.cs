@@ -37,16 +37,10 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
-
             var characterClassCharacter = obj as RegexCharacterClassCharacter;
             if ((object)characterClassCharacter == null)
-            {
                 return false;
-            }
-
             return characterClassCharacter.Value.Equals(Value)
                 && characterClassCharacter.IsEscaped.Equals(IsEscaped);
         }
@@ -54,10 +48,7 @@ namespace Pliant.RegularExpressions
         public override string ToString()
         {
             if (IsEscaped)
-            {
                 return $"\\{Value}";
-            }
-
             return Value.ToString();
         }
     }

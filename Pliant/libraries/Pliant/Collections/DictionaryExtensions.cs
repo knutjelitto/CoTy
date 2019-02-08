@@ -14,15 +14,11 @@ namespace Pliant.Collections
         public static TValue AddOrGetExisting<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TValue> generator)
         {
             if (generator == null)
-            {
                 throw new ArgumentNullException(nameof(generator));
-            }
 
             var value = default(TValue);
             if (dictionary.TryGetValue(key, out value))
-            {
                 return value;
-            }
 
             value = generator();
             dictionary.Add(key, value);
@@ -34,9 +30,7 @@ namespace Pliant.Collections
         {            
             var value = default(TValue);
             if (dictionary.TryGetValue(key, out value))
-            {
                 return value;
-            }
 
             value = instance;
             dictionary.Add(key, value);
@@ -48,10 +42,7 @@ namespace Pliant.Collections
         {
             var value = default(TValue);
             if (dictionary.TryGetValue(key, out value))
-            {
                 return value;
-            }
-
             return default(TValue);
         }
     }

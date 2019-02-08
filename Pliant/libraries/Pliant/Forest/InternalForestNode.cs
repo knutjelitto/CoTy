@@ -22,10 +22,7 @@ namespace Pliant.Forest
         public void AddUniqueFamily(IForestNode source, IForestNode trigger)
         {
             if(source == this)
-            {
                 source = Children[0].Children[0];
-            }
-
             AddUniqueAndNode(source, trigger);
         }        
 
@@ -43,23 +40,17 @@ namespace Pliant.Forest
                 var andNode = _children[c];
 
                 if (andNode.Children.Count != childCount)
-                {
                     continue;
-                }
 
                 if (IsMatchedSubTree(firstChild, secondChild, andNode))
-                {
                     return;
-                }
             }
 
             // not found so return new and node
             var newAndNode = new AndForestNode();
             newAndNode.AddChild(firstChild);
             if (childCount > 1)
-            {
                 newAndNode.AddChild(secondChild);
-            }
 
             _children.Add(newAndNode);
         }
@@ -71,14 +62,10 @@ namespace Pliant.Forest
             // if first child matches the compare node, continue
             // otherwise return false
             if (!firstChild.Equals(firstCompareNode))
-            {
                 return false;
-            }
 
             if (secondChild == null)
-            {
                 return true;
-            }
 
             var secondCompareNode = andNode.Children[1];
 

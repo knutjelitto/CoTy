@@ -1,17 +1,16 @@
-﻿using System.Diagnostics;
+﻿using System;
 
 namespace Pliant.Grammars
 {
-    public sealed class LexerRuleType
+    public class LexerRuleType
     {
-        public string Id { get; }
-
+        public string Id { get; private set; }
         private readonly int _hashCode;
 
         public LexerRuleType(string id)
         {
             Id = id;
-            _hashCode = id.GetHashCode();
+            _hashCode = ComputeHashCode(id);
         }
 
         private static int ComputeHashCode(string id)
@@ -21,12 +20,20 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            return obj is LexerRuleType other && Id == other.Id;
+            if (((object)obj) == null)
+                return false;
+
+            var other = obj as LexerRuleType;
+
+            if (((object)other) == null)
+                return false;
+
+            return other.Id == Id;
         }
 
         public override int GetHashCode()
         {
-            return this._hashCode;
+            return _hashCode;
         }
 
         public static bool operator ==(LexerRuleType first, LexerRuleType second)

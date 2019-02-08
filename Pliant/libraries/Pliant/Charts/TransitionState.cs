@@ -5,11 +5,11 @@ namespace Pliant.Charts
 {
     public class TransitionState : StateBase, ITransitionState
     {
-        public ISymbol Recognized { get; }
+        public ISymbol Recognized { get; private set; }
 
-        public INormalState Reduction { get; }
+        public INormalState Reduction { get; private set; }
 
-        public int Index { get; }
+        public int Index { get; private set; }
 
         public ITransitionState NextTransition { get; set; }
                 
@@ -29,15 +29,10 @@ namespace Pliant.Charts
         public override bool Equals(object obj)
         {
             if (obj == null)
-            {
                 return false;
-            }
-
             var transitionState = obj as TransitionState;
             if (transitionState == null)
-            {
                 return false;
-            }
 
             return GetHashCode() == transitionState.GetHashCode()
                 && Recognized.Equals(transitionState.Recognized)
@@ -73,10 +68,7 @@ namespace Pliant.Charts
         {
             var parameterTransitionStateHasNoParseNode = ParseNode == null;
             if (parameterTransitionStateHasNoParseNode)
-            {
                 return Reduction;
-            }
-
             return this;
         }
     }

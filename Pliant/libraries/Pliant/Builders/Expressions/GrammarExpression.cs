@@ -33,18 +33,12 @@ namespace Pliant.Builders.Expressions
         private static List<LexerRuleModel> ToLexerRuleModelList(IReadOnlyList<ILexerRule> lexerRuleList)
         {
             if (lexerRuleList == null)
-            {
                 return null;
-            }
-
             List<LexerRuleModel> modelList = null;
             for (var i = 0; i < lexerRuleList.Count; i++)
             {
                 if (i == 0)
-                {
                     modelList = new List<LexerRuleModel>();
-                }
-
                 modelList.Add(new LexerRuleModel(lexerRuleList[i]));
             }
 
@@ -59,15 +53,10 @@ namespace Pliant.Builders.Expressions
             };
 
             if (productions != null)
-            {
                 foreach (var production in productions)
-                {
                     GrammarModel.Productions.Add(production.ProductionModel);
-                }
-            }
 
             if (ignore != null)
-            {
                 foreach (var ignoreRule in ignore)
                 {
                     GrammarModel.IgnoreSettings.Add(
@@ -76,10 +65,8 @@ namespace Pliant.Builders.Expressions
                     GrammarModel.LexerRules.Add(
                         ignoreRule);
                 }
-            }
 
             if (trivia != null)
-            {
                 foreach (var triviaRule in trivia)
                 {
                     GrammarModel.TriviaSettings.Add(
@@ -87,7 +74,6 @@ namespace Pliant.Builders.Expressions
                     GrammarModel.LexerRules.Add(
                         triviaRule);
                 }
-            }
         }
 
         public IGrammar ToGrammar()

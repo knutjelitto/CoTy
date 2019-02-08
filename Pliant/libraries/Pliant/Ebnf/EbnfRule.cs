@@ -1,25 +1,54 @@
-﻿namespace Pliant.Ebnf
+﻿using Pliant.Utilities;
+using System;
+
+namespace Pliant.Ebnf
 {
     public class EbnfRule : EbnfNode
     {
         private readonly int _hashCode;
-        public EbnfQualifiedIdentifier QualifiedIdentifier { get; }
-        public EbnfExpression Expression { get; }
+
+        public EbnfQualifiedIdentifier QualifiedIdentifier { get; private set; }
+        public EbnfExpression Expression { get; private set; }
 
         public EbnfRule(EbnfQualifiedIdentifier qualifiedIdentifier, EbnfExpression expression)
         {
             QualifiedIdentifier = qualifiedIdentifier;
             Expression = expression;
-            this._hashCode = (QualifiedIdentifier, Expression).GetHashCode();
+            _hashCode = ComputeHashCode();
+        }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfRule;
+            }
+        }
+
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                QualifiedIdentifier.GetHashCode(),
+                Expression.GetHashCode(),
+                NodeType.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfRule>(obj, out var other) &&
-                   (QualifiedIdentifier, Expression).Equals((other.QualifiedIdentifier, other.Expression));
+            if ((object)obj == null)
+                return false;
+            var rule = obj as EbnfRule;
+            if ((object)rule == null)
+                return false;
+            return rule.NodeType == EbnfNodeType.EbnfRule
+                && rule.QualifiedIdentifier.Equals(QualifiedIdentifier)
+                && rule.Expression.Equals(Expression);
         }
-
-        public override int GetHashCode() => this._hashCode;
 
         public override string ToString()
         {

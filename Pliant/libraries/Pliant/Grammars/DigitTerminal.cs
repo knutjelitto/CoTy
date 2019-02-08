@@ -22,10 +22,7 @@ namespace Pliant.Grammars
         public override bool Equals(object obj)
         {
             if (((object)obj) == null)
-            {
                 return false;
-            }
-
             return obj is DigitTerminal;
         }
 

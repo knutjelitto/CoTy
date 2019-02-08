@@ -27,9 +27,7 @@ namespace Pliant.Forest
 
             ISymbolForestNode symbolNode = null;
             if (_symbolNodes.TryGetValue(hash, out symbolNode))
-            {
                 return symbolNode;
-            }
 
             symbolNode = new SymbolForestNode(symbol, origin, location);
             _symbolNodes.Add(hash, symbolNode);
@@ -50,9 +48,7 @@ namespace Pliant.Forest
 
             IIntermediateForestNode intermediateNode = null;
             if (_intermediateNodes.TryGetValue(hash, out intermediateNode))
-            {
                 return intermediateNode;
-            }
 
             intermediateNode = new IntermediateForestNode(dottedRule, origin, location);
             _intermediateNodes.Add(hash, intermediateNode);
@@ -71,10 +67,7 @@ namespace Pliant.Forest
         {
             ITokenForestNode tokenNode = null;
             if (_tokenNodes.TryGetValue(token, out tokenNode))
-            {
                 return tokenNode;
-            }
-
             tokenNode = new TokenForestNode(token, token.Position, token.Value.Length);
             _tokenNodes.Add(token, tokenNode);
             return tokenNode;

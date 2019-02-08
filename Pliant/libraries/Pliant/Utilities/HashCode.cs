@@ -12,7 +12,7 @@ namespace Pliant.Utilities
             unchecked
             {
                 var hash = (int)SEED;
-                hash = (hash * INCREMENTAL) ^ first;
+                hash = hash * INCREMENTAL ^ first;
                 return hash;
             }
         }
@@ -22,8 +22,8 @@ namespace Pliant.Utilities
             unchecked
             {
                 var hash = (int)SEED;
-                hash = (hash * INCREMENTAL) ^ first;
-                hash = (hash * INCREMENTAL) ^ second;
+                hash = hash * INCREMENTAL ^ first;
+                hash = hash * INCREMENTAL ^ second;
                 return hash;
             }
         }
@@ -33,9 +33,9 @@ namespace Pliant.Utilities
             unchecked
             {
                 var hash = (int)SEED;
-                hash = (hash * INCREMENTAL) ^ first;
-                hash = (hash * INCREMENTAL) ^ second;
-                hash = (hash * INCREMENTAL) ^ third;
+                hash = hash * INCREMENTAL ^ first;
+                hash = hash * INCREMENTAL ^ second;
+                hash = hash * INCREMENTAL ^ third;
                 return hash;
             }
         }
@@ -45,25 +45,24 @@ namespace Pliant.Utilities
             unchecked
             {
                 var hash = (int)SEED;
-                hash = (hash * INCREMENTAL) ^ first;
-                hash = (hash * INCREMENTAL) ^ second;
-                hash = (hash * INCREMENTAL) ^ third;
-                hash = (hash * INCREMENTAL) ^ fourth;
+                hash = hash * INCREMENTAL ^ first;
+                hash = hash * INCREMENTAL ^ second;
+                hash = hash * INCREMENTAL ^ third;
+                hash = hash * INCREMENTAL ^ fourth;
                 return hash;
             }
         }
 
-        // ReSharper disable once UnusedMember.Global
         public static int Compute(int first, int second, int third, int fourth, int fifth)
         {
             unchecked
             {
                 var hash = (int)SEED;
-                hash = (hash * INCREMENTAL) ^ first;
-                hash = (hash * INCREMENTAL) ^ second;
-                hash = (hash * INCREMENTAL) ^ third;
-                hash = (hash * INCREMENTAL) ^ fourth;
-                hash = (hash * INCREMENTAL) ^ fifth;
+                hash = hash * INCREMENTAL ^ first;
+                hash = hash * INCREMENTAL ^ second;
+                hash = hash * INCREMENTAL ^ third;
+                hash = hash * INCREMENTAL ^ fourth;
+                hash = hash * INCREMENTAL ^ fifth;
                 return hash;
             }
         }
@@ -73,12 +72,12 @@ namespace Pliant.Utilities
             unchecked
             {
                 var hash = (int)SEED;
-                hash = (hash * INCREMENTAL) ^ first;
-                hash = (hash * INCREMENTAL) ^ second;
-                hash = (hash * INCREMENTAL) ^ third;
-                hash = (hash * INCREMENTAL) ^ fourth;
-                hash = (hash * INCREMENTAL) ^ fifth;
-                hash = (hash * INCREMENTAL) ^ sixth;
+                hash = hash * INCREMENTAL ^ first;
+                hash = hash * INCREMENTAL ^ second;
+                hash = hash * INCREMENTAL ^ third;
+                hash = hash * INCREMENTAL ^ fourth;
+                hash = hash * INCREMENTAL ^ fifth;
+                hash = hash * INCREMENTAL ^ sixth;
                 return hash;
             }
         }
@@ -90,52 +89,21 @@ namespace Pliant.Utilities
                 var hash = (int)SEED;
                 foreach (var item in items)
                 {
-                    hash = (hash * INCREMENTAL) ^ item.GetHashCode();
+                    hash = hash * INCREMENTAL ^ item.GetHashCode();
                 }
                 return hash;
             }
         }
-
-        public struct IncrementalHash
+        
+        public static int ComputeIncrementalHash(int hashCode, int accumulator, bool isFirstValue = false)
         {
-            public static IncrementalHash New() { return new IncrementalHash() {accumulator = unchecked((int)SEED)};}
-
-            public IncrementalHash Add(int hashCode)
+            unchecked
             {
-                unchecked
+                if (isFirstValue)
                 {
-                    return new IncrementalHash() {accumulator = (this.accumulator * INCREMENTAL) ^ hashCode};
+                    accumulator = (int)SEED;
                 }
-            }
-
-            private int accumulator;
-
-            public static implicit operator int(IncrementalHash ih) => ih.accumulator;
-        }
-
-        public static IncrementalHash Incremental()
-        {
-            return IncrementalHash.New();
-        }
-
-        public static IncrementalHash Add(this IncrementalHash ih, int hashCode)
-        {
-            return ih.Add(hashCode);
-        }
-
-        public static int InitIncrementalHash()
-        {
-            unchecked
-            {
-                return (int)SEED;
-            }
-        }
-
-        public static int ComputeIncrementalHash(int hashCode, int accumulator)
-        {
-            unchecked
-            {
-                accumulator = (accumulator * INCREMENTAL) ^ hashCode;
+                accumulator = accumulator * INCREMENTAL ^ hashCode;
                 return accumulator;
             }
         }

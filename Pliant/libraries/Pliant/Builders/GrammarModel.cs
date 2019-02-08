@@ -65,13 +65,8 @@ namespace Pliant.Builders
             {
                 case NotifyCollectionChangedAction.Add:
                     foreach(object item in e.NewItems)
-                    {
-                        if (item is ProductionModel)
-                        {
+                        if(item is ProductionModel)
                             OnAddProduction(item as ProductionModel);
-                        }
-                    }
-
                     break;
 
                 case NotifyCollectionChangedAction.Move:
@@ -79,13 +74,8 @@ namespace Pliant.Builders
 
                 case NotifyCollectionChangedAction.Remove:
                     foreach (object item in e.NewItems)
-                    {
                         if (item is ProductionModel)
-                        {
                             OnRemoveProduction(item as ProductionModel);
-                        }
-                    }
-
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
@@ -122,14 +112,10 @@ namespace Pliant.Builders
             var triviaRules = GetTriviaRulesFromTriviaRulesModel();
 
             if (Start == null)
-            {
                 throw new Exception("Unable to generate Grammar. The grammar definition is missing a Start production");
-            }
 
             if (Start.LeftHandSide == null)
-            {
                 throw new Exception("Unable to generate Grammar. The grammar definition is missing a Left Hand Symbol to the Start production.");
-            }
 
             return new Grammar(
                 Start.LeftHandSide.NonTerminal,
@@ -143,19 +129,13 @@ namespace Pliant.Builders
             if (StartSymbolExists())
             {
                 if (ProductionsAreEmpty())
-                {
                     PopulateMissingProductionsFromStart(Start);
-                }
-
                 AssertStartProductionExistsForStartSymbol(_reachibilityMatrix);
             }
             else if(StartSettingExists())
             {
                 if (ProductionsAreEmpty())
-                {
                     throw new InvalidOperationException("Unable to determine start symbol. No productions exist and a start symbol was not specified.");
-                }
-
                 AssertStartProductionexistsForStartSetting(_reachibilityMatrix);
                 Start = FindProduction(StartSetting.Value);
             }
@@ -168,9 +148,7 @@ namespace Pliant.Builders
             {
                 var productionModel = _productions[p];
                 if (productionModel.LeftHandSide.NonTerminal.Value.Equals(value))
-                {
                     return productionModel;
-                }
             }
             return null;
         }
@@ -179,13 +157,8 @@ namespace Pliant.Builders
         {
             var productions = new List<IProduction>();
             foreach (var productionModel in _productions)
-            {
                 foreach (var production in productionModel.ToProductions())
-                {
                     productions.Add(production);
-                }
-            }
-
             return productions;
         }
 
@@ -207,10 +180,7 @@ namespace Pliant.Builders
                 var setting = settings[i];
                 var lexerRule = GetLexerRuleByName(setting.Value);
                 if (lexerRule == null)
-                {
                     throw new Exception($"lexer rule {setting.Value} not found.");
-                }
-
                 lexerRules.Add(lexerRule);
             }
             return lexerRules;
@@ -223,9 +193,7 @@ namespace Pliant.Builders
                 var lexerRuleModel = _lexerRules[i];
                 var lexerRule = lexerRuleModel.Value;
                 if (lexerRule.TokenType.Id.Equals(value))
-                {
                     return lexerRule;
-                }
             }
             return null;
         }
@@ -242,34 +210,26 @@ namespace Pliant.Builders
             {
                 Productions.Add(production);
                 foreach (var alteration in production.Alterations)
-                {
                     for (var s =0; s< alteration.Symbols.Count; s++)
                     {
                         var symbol = alteration.Symbols[s];
                         if (symbol.ModelType == SymbolModelType.Production)
-                        {
                             PopulateMissingProductionsRecursively(symbol as ProductionModel, visited);
-                        }
                     }
-                }
             }
         }
 
         private void AssertStartProductionExistsForStartSymbol(ReachibilityMatrix reachibilityMatrix)
         {
             if (!reachibilityMatrix.ProudctionExistsForSymbol(Start.LeftHandSide))
-            {
                 throw new Exception("no start production found for start symbol");
-            }
         }
 
         private void AssertStartProductionexistsForStartSetting(ReachibilityMatrix reachibilityMatrix)
         {
             if (!reachibilityMatrix.ProudctionExistsForSymbol(
                 new NonTerminalModel(StartSetting.Value)))
-            {
                 throw new Exception("no start production found for start symbol");
-            }
         }
 
         private bool StartSymbolExists()

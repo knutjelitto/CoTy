@@ -18,25 +18,19 @@ namespace Pliant
         public void OnCompleted()
         {
             if (_onCompleted != null)
-            {
                 _onCompleted();
-            }
         }
 
         public void OnError(Exception error)
         {
             if (_onError != null)
-            {
                 _onError(error);
-            }
         }
 
         public void OnNext(T value)
         {
             if (_onNext != null)
-            {
                 _onNext(value);
-            }
         }
     }
 }

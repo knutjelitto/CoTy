@@ -18,14 +18,10 @@ namespace Pliant.Builders
         public void AddProduction(ProductionModel production)
         {
             if (!_matrix.ContainsKey(production.LeftHandSide.NonTerminal))
-            {
                 _matrix[production.LeftHandSide.NonTerminal] = new UniqueList<NonTerminalModel>();
-            }
 
             if (!_lookup.ContainsKey(production.LeftHandSide.NonTerminal))
-            {
                 _lookup[production.LeftHandSide.NonTerminal] = production;
-            }
 
             foreach (var alteration in production.Alterations)
             {
@@ -34,10 +30,7 @@ namespace Pliant.Builders
                     var symbol = alteration.Symbols[s];
                     if (symbol.ModelType != SymbolModelType.Production
                         || symbol.ModelType != SymbolModelType.Reference)
-                    {
                         continue;
-                    }
-
                     AddProductionToNewOrExistingSymbolSet(production, symbol);
                 }
             }
@@ -52,14 +45,9 @@ namespace Pliant.Builders
         public void RemoveProduction(ProductionModel productionModel)
         {
             if (!_matrix.ContainsKey(productionModel.LeftHandSide.NonTerminal))
-            {
                 _matrix.Remove(productionModel.LeftHandSide.NonTerminal);
-            }
-
             if (!_lookup.ContainsKey(productionModel.LeftHandSide.NonTerminal))
-            {
                 _lookup.Remove(productionModel.LeftHandSide.NonTerminal);
-            }
         }
 
         public void ClearProductions()
@@ -74,9 +62,7 @@ namespace Pliant.Builders
             {
                 var symbolsReachableByLeftHandSide = _matrix[leftHandSide];
                 if (symbolsReachableByLeftHandSide.Count == 0)
-                {
                     return _lookup[leftHandSide];
-                }
             }
             return null;
         }

@@ -18,10 +18,7 @@ namespace Pliant.Automata
             get
             {
                 if (IsStringBuilderAllocated())
-                {
                     DeallocateStringBuilderAndAssignCapture();
-                }
-
                 return _capture;
             }
         }        
@@ -42,10 +39,7 @@ namespace Pliant.Automata
         {
             _capture = null;
             if (IsStringBuilderAllocated())
-            {
                 _stringBuilder.Clear();
-            }
-
             _currentState = ConcreteLexerRule.Start;
         }
 
@@ -60,9 +54,7 @@ namespace Pliant.Automata
         {
             _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
             if(!string.IsNullOrWhiteSpace(_capture))
-            {
                 _stringBuilder.Append(_capture);
-            }
         }
 
         public override bool IsAccepted()
@@ -78,10 +70,7 @@ namespace Pliant.Automata
                 if (edge.Terminal.IsMatch(c))
                 {
                     if (!IsStringBuilderAllocated())
-                    {
                         ReallocateStringBuilderFromCapture();
-                    }
-
                     _currentState = edge.Target;
                     _stringBuilder.Append(c);
                     return true;

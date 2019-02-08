@@ -29,16 +29,10 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
-
             var factor = obj as RegexFactor;
             if (factor == null)
-            {
                 return false;
-            }
-
             return factor.Atom.Equals(Atom);
         }
 
@@ -67,16 +61,10 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
-
             var factor = obj as RegexFactor;
             if ((object)factor == null)
-            {
                 return false;
-            }
-
             return factor.Atom.Equals(Atom);
         }
         

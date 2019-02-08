@@ -27,15 +27,11 @@ namespace Pliant.Forest
         public override bool Equals(object obj)
         {
             if (obj == null)
-            {
                 return false;
-            }
 
             var tokenNode = obj as TokenForestNode;
             if (tokenNode == null)
-            {
                 return false;
-            }
 
             return Location == tokenNode.Location
                 && NodeType == tokenNode.NodeType

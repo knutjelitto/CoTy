@@ -39,16 +39,10 @@ namespace Pliant.Builders
         public override bool Equals(object obj)
         {
             if (null == obj)
-            {
                 return false;
-            }
-
             var nonTerminalModel = obj as NonTerminalModel;
             if (null == nonTerminalModel)
-            {
                 return false;
-            }
-
             return NonTerminal.Equals(nonTerminalModel.NonTerminal);
         }
 

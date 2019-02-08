@@ -163,10 +163,7 @@ namespace Pliant.Builders.Expressions
             var lhsExpression = (lhs as RuleExpression) ?? new RuleExpression(lhs);
             var rhsExpression = (rhs as RuleExpression) ?? new RuleExpression(rhs);
             foreach (var symbolList in rhsExpression.Alterations)
-            {
                 lhsExpression.Alterations.Add(symbolList);
-            }
-
             return lhsExpression;
         }
     }

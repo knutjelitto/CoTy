@@ -31,10 +31,7 @@ namespace Pliant.Collections
         public void Add(T item)
         {
             if (_indexOfDictionary.ContainsKey(item))
-            {
                 return;
-            }
-
             _indexOfDictionary[item] = _innerList.Count;
             _innerList.Add(item);
         }
@@ -64,10 +61,7 @@ namespace Pliant.Collections
         {
             int value;
             if (!_indexOfDictionary.TryGetValue(item, out value))
-            {
                 return -1;
-            }
-
             return value;
         }
 
@@ -104,9 +98,7 @@ namespace Pliant.Collections
             {
                 _innerList.RemoveAt(oldIndex);
                 if (oldIndex < index)
-                {
                     index -= 1;
-                }
             }
             _innerList.Insert(index, item);
             ShiftLeft(Math.Min(index, oldIndex >= 0 ? oldIndex : index));
@@ -116,15 +108,9 @@ namespace Pliant.Collections
         {
             var indexOf = IndexOf(item);
             if (indexOf < 0)
-            {
                 return false;
-            }
-
             if (!_indexOfDictionary.Remove(item))
-            {
                 return false;
-            }
-
             _innerList.RemoveAt(indexOf);
             ShiftLeft(indexOf);
             return true;
@@ -146,9 +132,7 @@ namespace Pliant.Collections
         private void ShiftLeft(int index)
         {
             for (var i = index; i < _innerList.Count; i++)
-            {
                 _indexOfDictionary[_innerList[i]] = i;
-            }
         }
     }
 }

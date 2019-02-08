@@ -49,9 +49,7 @@ namespace Pliant.Builders
         public IEnumerable<IProduction> ToProductions()
         {
             if (Alterations == null || Alterations.Count == 0)
-            {
                 yield return new Production(LeftHandSide.NonTerminal);
-            }
 
             foreach (var alteration in Alterations)
             {
@@ -64,9 +62,7 @@ namespace Pliant.Builders
                     {
                         var productionReferenceModel = symbolModel as ProductionReferenceModel;
                         for (var p = 0; p < productionReferenceModel.Grammar.Productions.Count; p++)
-                        {
                             yield return productionReferenceModel.Grammar.Productions[p];
-                        }
                     }
                 }
                 yield return new Production(LeftHandSide.NonTerminal, symbols);
@@ -76,13 +72,9 @@ namespace Pliant.Builders
         public void AddWithAnd(SymbolModel model)
         {
             if (Alterations.Count == 0)
-            {
                 AddWithOr(model);
-            }
             else
-            {
                 Alterations[Alterations.Count - 1].Symbols.Add(model);
-            }
         }
 
         public void AddWithOr(SymbolModel model)

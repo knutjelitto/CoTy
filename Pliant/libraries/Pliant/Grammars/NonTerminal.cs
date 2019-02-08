@@ -37,15 +37,11 @@ namespace Pliant.Grammars
         public override bool Equals(object obj)
         {
             if (obj == null)
-            {
                 return false;
-            }
-
+            
             var nonTerminal = obj as INonTerminal;
             if (nonTerminal == null)
-            {
                 return false;
-            }
 
             return Value.Equals(nonTerminal.Value);
         }

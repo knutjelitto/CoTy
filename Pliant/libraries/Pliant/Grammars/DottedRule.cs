@@ -9,15 +9,15 @@ namespace Pliant.Grammars
     {
         private readonly int _hashCode;
         
-        public IProduction Production { get; }
+        public IProduction Production { get; private set; }
 
-        public int Position { get; }
+        public int Position { get; private set; }
 
-        public ISymbol PreDotSymbol { get; }
+        public ISymbol PreDotSymbol { get; private set; }
 
-        public ISymbol PostDotSymbol { get; }
+        public ISymbol PostDotSymbol { get; private set; }
 
-        public bool IsComplete { get; }
+        public bool IsComplete { get; private set; }
 
         public DottedRule(IProduction production, int position)
         {
@@ -26,7 +26,7 @@ namespace Pliant.Grammars
 
             Production = production;
             Position = position;
-            this._hashCode = ComputeHashCode(Production, Position);
+            _hashCode = ComputeHashCode(Production, Position);
             PostDotSymbol = GetPostDotSymbol(position, production);
             PreDotSymbol = GetPreDotSymbol(position, production);
             IsComplete = IsCompleted(position, production);
@@ -39,22 +39,16 @@ namespace Pliant.Grammars
 
         public override int GetHashCode()
         {
-            return this._hashCode;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
         {
             if (((object)obj) == null)
-            {
                 return false;
-            }
-
             var preComputedState = obj as DottedRule;
             if (((object)preComputedState) == null)
-            {
                 return false;
-            }
-
             return preComputedState.Production.Equals(Production)
                 && preComputedState.Position == Position;
         }
@@ -74,9 +68,7 @@ namespace Pliant.Grammars
             }
 
             if (Position == Production.RightHandSide.Count)
-            {
                 stringBuilder.Append(Dot);
-            }
 
             return stringBuilder.ToString();
         }
@@ -99,10 +91,7 @@ namespace Pliant.Grammars
         private static ISymbol GetPreDotSymbol(int position, IProduction production)
         {
             if (position == 0 || production.IsEmpty)
-            {
                 return null;
-            }
-
             return production.RightHandSide[position - 1];
         }
         
@@ -110,10 +99,7 @@ namespace Pliant.Grammars
         {
             var productionRighHandSide = production.RightHandSide;
             if (position >= productionRighHandSide.Count)
-            {
                 return null;
-            }
-
             return productionRighHandSide[position];
         }        
     }

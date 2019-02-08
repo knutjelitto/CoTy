@@ -1,23 +1,50 @@
-﻿namespace Pliant.Ebnf
+﻿using Pliant.Utilities;
+using System;
+
+namespace Pliant.Ebnf
 {
     public class EbnfTerm : EbnfNode
     {
         private readonly int _hashCode;
-        public EbnfFactor Factor { get; }
+
+        public EbnfFactor Factor { get; private set; }
         
         public EbnfTerm(EbnfFactor factor)
         {
             Factor = factor;
-            this._hashCode = Factor.GetHashCode();
+            _hashCode = ComputeHashCode();
+        }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfTerm;
+            }
+        }
+
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                NodeType.GetHashCode(),
+                Factor.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfTerm>(obj, out var other) &&
-                   Factor.Equals(other.Factor);
+            if ((object)obj == null)
+                return false;
+            var term = obj as EbnfTerm;
+            if ((object)term == null)
+                return false;
+            return term.NodeType == NodeType
+                && term.Factor.Equals(Factor);
         }
-
-        public override int GetHashCode() => this._hashCode;
 
         public override string ToString()
         {
@@ -28,22 +55,48 @@
     public class EbnfTermConcatenation : EbnfTerm
     {
         private readonly int _hashCode;
-        public EbnfTerm Term { get; }
+
+        public EbnfTerm Term { get; private set; }
 
         public EbnfTermConcatenation(EbnfFactor factor, EbnfTerm term)
             : base(factor)
         {
             Term = term;
-            this._hashCode = (Factor, Term).GetHashCode();
+            _hashCode = ComputeHashCode();
+        }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfTermConcatenation;
+            }
+        }
+
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                NodeType.GetHashCode(),
+                Factor.GetHashCode(),
+                Term.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfTermConcatenation>(obj, out var other) &&
-                   (Factor, Term).Equals((other.Factor, other.Term));
+            if ((object)obj == null)
+                return false;
+            var term = obj as EbnfTermConcatenation;
+            if ((object)term == null)
+                return false;
+            return term.NodeType == NodeType
+                && term.Factor.Equals(Factor)
+                && term.Term.Equals(Term);
         }
-
-        public override int GetHashCode() => this._hashCode;
 
         public override string ToString()
         {

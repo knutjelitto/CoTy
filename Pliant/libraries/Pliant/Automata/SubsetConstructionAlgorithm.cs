@@ -15,9 +15,7 @@ namespace Pliant.Automata
 
             var set = SharedPools.Default<SortedSet<INfaState>>().AllocateAndClear();
             foreach (var state in nfa.Start.Closure())
-            {
                 set.Add(state);
-            }
 
             var start = new NfaClosure(set, nfa.Start.Equals(nfa.End));
 
@@ -43,10 +41,7 @@ namespace Pliant.Automata
                                 var terminal = terminalTransition.Terminal;
 
                                 if (!transitions.ContainsKey(terminalTransition.Terminal))
-                                {
                                     transitions[terminal] = SharedPools.Default<SortedSet<INfaState>>().AllocateAndClear();
-                                }
-
                                 transitions[terminal].Add(transition.Target);
                                 break;
                         }
@@ -78,17 +73,12 @@ namespace Pliant.Automata
             var set = SharedPools.Default<SortedSet<INfaState>>().AllocateAndClear();
             var isFinal = false;
             foreach (var state in states)
-            {
                 foreach (var item in state.Closure())
                 {
                     if (item.Equals(endState))
-                    {
                         isFinal = true;
-                    }
-
                     set.Add(item);
                 }
-            }
 
             return new NfaClosure(set, isFinal);
         }
@@ -113,16 +103,10 @@ namespace Pliant.Automata
             public int CompareTo(object obj)
             {
                 if (obj == null)
-                {
                     throw new ArgumentNullException();
-                }
-
                 var nfaClosure = obj as NfaClosure;
                 if (nfaClosure == null)
-                {
                     throw new ArgumentException("instance of NfaClosure expected.", nameof(obj));
-                }
-
                 return CompareTo(nfaClosure);
             }
 
@@ -134,16 +118,10 @@ namespace Pliant.Automata
             public override bool Equals(object obj)
             {
                 if (obj == null)
-                {
                     return false;
-                }
-
                 var nfaClosure = obj as NfaClosure;
                 if (nfaClosure == null)
-                {
                     return false;
-                }
-
                 return nfaClosure._hashCode.Equals(_hashCode);
             }
 

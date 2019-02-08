@@ -39,16 +39,10 @@ namespace Pliant.Automata
         public override bool Equals(object obj)
         {
             if (((object)obj) == null)
-            {
                 return false;
-            }
-
             var dfaLexerRule = obj as DfaLexerRule;
             if (((object)dfaLexerRule) == null)
-            {
                 return false;
-            }
-
             return TokenType.Equals(dfaLexerRule.TokenType);
         }
 
@@ -63,9 +57,7 @@ namespace Pliant.Automata
             {
                 var transition = Start.Transitions[i];
                 if (transition.Terminal.IsMatch(c))
-                {
                     return true;
-                }
             }
             return false;
         }

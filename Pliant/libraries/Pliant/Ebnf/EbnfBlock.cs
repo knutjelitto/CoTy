@@ -1,67 +1,119 @@
-﻿namespace Pliant.Ebnf
+﻿using Pliant.Utilities;
+using System;
+
+namespace Pliant.Ebnf
 {
     public abstract class EbnfBlock : EbnfNode
     {
     }
 
-    public sealed class EbnfBlockRule : EbnfBlock
+    public class EbnfBlockRule : EbnfBlock
     {
         private readonly int _hashCode;
 
-        public EbnfRule Rule { get; }
+        public EbnfRule Rule { get; private set; }
+
+        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfBlockRule; } }
 
         public EbnfBlockRule(EbnfRule rule)
         {
             Rule = rule;
-            this._hashCode = Rule.GetHashCode();
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfBlockRule>(obj, out var other) &&
-                   Rule.Equals(other.Rule);
+            if ((object)obj == null)
+                return false;
+            var blockRule = obj as EbnfBlockRule;
+            if ((object)blockRule == null)
+                return false;
+            return blockRule.NodeType == NodeType
+                && blockRule.Rule.Equals(Rule);
+        }
+
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                Rule.GetHashCode(), 
+                NodeType.GetHashCode());
         }
                 
-        public override int GetHashCode() => this._hashCode;
+        public override int GetHashCode()
+        {
+            return _hashCode;
+        }
     }
 
-    public sealed class EbnfBlockSetting : EbnfBlock
+    public class EbnfBlockSetting : EbnfBlock
     {
         private readonly int _hashCode;
-        public EbnfSetting Setting { get; }
+        public EbnfSetting Setting { get; private set; }
+        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfBlockSetting; } }
 
         public EbnfBlockSetting(EbnfSetting setting)
         {
             Setting = setting;
-            this._hashCode = Setting.GetHashCode();
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfBlockSetting>(obj, out var other) && 
-                   Setting.Equals(other.Setting);
+            if ((object)obj == null)
+                return false;
+            var blockRule = obj as EbnfBlockSetting;
+            if ((object)blockRule == null)
+                return false;
+            return blockRule.NodeType == NodeType
+                && blockRule.Setting.Equals(Setting);
         }
 
-        public override int GetHashCode() => this._hashCode;
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                Setting.GetHashCode(),
+                NodeType.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
+        }
     }
 
-    public sealed class EbnfBlockLexerRule : EbnfBlock
+    public class EbnfBlockLexerRule : EbnfBlock
     {
         private readonly int _hashCode;
-        public EbnfLexerRule LexerRule { get; }
+        public EbnfLexerRule LexerRule { get; private set; }
+        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfBlockLexerRule; } }
 
         public EbnfBlockLexerRule(EbnfLexerRule lexerRule)
         {
             LexerRule = lexerRule;
-            this._hashCode = LexerRule.GetHashCode();
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfBlockLexerRule>(obj, out var other) &&
-                   LexerRule.Equals(other.LexerRule);
+            if ((object)obj == null)
+                return false;
+            var blockRule = obj as EbnfBlockLexerRule;
+            if ((object)blockRule == null)
+                return false;
+            return blockRule.NodeType == NodeType
+                && blockRule.LexerRule.Equals(LexerRule);
         }
 
-        public override int GetHashCode() => this._hashCode;
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                LexerRule.GetHashCode(),
+                NodeType.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
+        }
     }
 }

@@ -37,10 +37,7 @@ namespace Pliant.Charts
         {
             CachedDottedRuleSetTransition transition = null;
             if (_transitions.TryGetValue(searchSymbol, out transition))
-            {
                 return transition;
-            }
-
             return null;
         }
 

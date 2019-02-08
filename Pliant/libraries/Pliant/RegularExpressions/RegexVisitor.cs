@@ -10,9 +10,7 @@ namespace Pliant.RegularExpressions
         public override void Visit(IInternalTreeNode node)
         {
             if (RegexGrammar.Regex == node.Symbol.Value)
-            {
                 Regex = VisitRegexNode(node);
-            }
         }
 
         private Regex VisitRegexNode(IInternalTreeNode node)
@@ -31,10 +29,8 @@ namespace Pliant.RegularExpressions
                         var internalNode = child as IInternalTreeNode;
                         var internalNodeSymbolValue = internalNode.Symbol.Value;
                         if(RegexGrammar.Expression == internalNodeSymbolValue)
-                        {
                             expression = VisitRegexExpressionNode(internalNode);
-                        }
-
+                         
                         break;
 
                     case TreeNodeType.Token:
@@ -64,32 +60,22 @@ namespace Pliant.RegularExpressions
             {
                 var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
-                {
                     continue;
-                }
-
                 var childInternalNode = child as IInternalTreeNode;
                 var childInternalNodeSymbolValue = childInternalNode.Symbol.Value;
 
                 if (RegexGrammar.Expression == childInternalNodeSymbolValue)
-                {
                     expression = VisitRegexExpressionNode(childInternalNode);
-                }
+
                 else if (RegexGrammar.Term == childInternalNodeSymbolValue)
-                {
-                    term = VisitRegexTermNode(childInternalNode);
-                }
+                    term = VisitRegexTermNode(childInternalNode);                
             }
 
             if (expression != null && term != null)
-            {
                 return new RegexExpressionAlteration(term, expression);
-            }
 
             if (term != null)
-            {
                 return new RegexExpressionTerm(term);
-            }
 
             throw new InvalidOperationException("Unable to create null expression.");
         }
@@ -102,26 +88,17 @@ namespace Pliant.RegularExpressions
             {
                 var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
-                {
                     continue;
-                }
-
                 var childInternalNode = child as IInternalTreeNode;
                 var childInternalNodeSymbolValue = childInternalNode.Symbol.Value;
 
                 if (RegexGrammar.Factor == childInternalNodeSymbolValue)
-                {
                     factor = VisitRegexFactorNode(childInternalNode);
-                }
                 else if (RegexGrammar.Term == childInternalNodeSymbolValue)
-                {
                     term = VisitRegexTermNode(childInternalNode);
-                }
             }
             if (term == null)
-            {
                 return new RegexTerm(factor);
-            }
 
             return new RegexTermFactor(factor, term);
         }
@@ -135,29 +112,20 @@ namespace Pliant.RegularExpressions
             {
                 var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
-                {
                     continue;
-                }
-
                 var childInternalNode = child as IInternalTreeNode;
                 var childInternalNodeSymbolValue = childInternalNode.Symbol.Value;
 
                 if (RegexGrammar.Atom == childInternalNodeSymbolValue)
-                {
                     atom = VisitRegexAtomNode(childInternalNode);
-                }
                 else if(RegexGrammar.Iterator == childInternalNodeSymbolValue)
-                {
                     iterator = VisitRegexIteratorNode(childInternalNode);
-                }
             }
 
             if (iterator.HasValue)
-            {
                 return new RegexFactorIterator(
                     atom,
                     iterator.Value);
-            }
 
             return new RegexFactor(atom);
         }
@@ -207,10 +175,7 @@ namespace Pliant.RegularExpressions
             {
                 var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Token)
-                {
                     continue;
-                }
-
                 var tokenChildNode = child as ITokenTreeNode;
                 switch (tokenChildNode.Token.Value)
                 {
@@ -233,10 +198,7 @@ namespace Pliant.RegularExpressions
             {
                 var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Token)
-                {
                     continue;
-                }
-
                 var childTokenNode = child as ITokenTreeNode;
 
                 var isEscaped = childTokenNode.Token.Value.StartsWith(@"\", StringComparison.CurrentCulture);
@@ -255,21 +217,16 @@ namespace Pliant.RegularExpressions
             {
                 var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
-                {
                     continue;
-                }
 
                 var childInternalNode = child as IInternalTreeNode;
                 var childInternalNodeSymbolValue = childInternalNode.Symbol.Value;
 
-                if(RegexGrammar.PositiveSet == childInternalNodeSymbolValue)
-                {
+                if(RegexGrammar.PositiveSet == childInternalNodeSymbolValue)                
                     return VisitInnerSetNode(false, childInternalNode);
-                }
+
                 else if(RegexGrammar.NegativeSet == childInternalNodeSymbolValue)
-                {
                     return VisitInnerSetNode(true, childInternalNode);
-                }
             }
             throw new Exception("Invalid Set Detected.");
         }
@@ -280,10 +237,7 @@ namespace Pliant.RegularExpressions
             {
                 var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
-                {
                     continue;
-                }
-
                 var childInternalNode = child as IInternalTreeNode;
                 var childInternalNodeSymbolValue = childInternalNode.Symbol.Value;
                 if (RegexGrammar.CharacterClass == childInternalNodeSymbolValue)
@@ -304,28 +258,21 @@ namespace Pliant.RegularExpressions
             {
                 var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
-                {
                     continue;
-                }
-
                 var childInternalNode = child as IInternalTreeNode;
                 var childInternalNodeSymbolValue = childInternalNode.Symbol.Value;
 
                 if (RegexGrammar.CharacterRange == childInternalNodeSymbolValue)
-                {
                     characterRange = VisitCharacterRangeNode(childInternalNode);
-                }
+
                 else if (RegexGrammar.CharacterClass == childInternalNodeSymbolValue)
-                {
                     characterClass = VisitCharacterClassNode(childInternalNode);
-                }
+                                
             }
             if (characterClass != null)
-            {
                 return new RegexCharacterClassAlteration(
                     characterRange,
                     characterClass);
-            }
 
             return new RegexCharacterClass(characterRange);
         }
@@ -339,28 +286,20 @@ namespace Pliant.RegularExpressions
             {
                 var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
-                {
                     continue;
-                }
 
                 var childInternalNode = child as IInternalTreeNode;
                 var childInternalNodeSymbolValue = childInternalNode.Symbol.Value;
                 if (RegexGrammar.CharacterClassCharacter == childInternalNodeSymbolValue)
                 {
                     if (start == null)
-                    {
                         start = VisitCharacterClassCharacterNode(childInternalNode);
-                    }
                     else
-                    {
                         end = VisitCharacterClassCharacterNode(childInternalNode);
-                    }
                 }
             }
             if (end != null)
-            {
                 return new RegexCharacterRange(start, end);
-            }
 
             return new RegexCharacterUnitRange(start);
         }
@@ -371,9 +310,7 @@ namespace Pliant.RegularExpressions
             {
                 var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Token)
-                {
                     continue;
-                }
 
                 var childTokenNode = child as ITokenTreeNode;
 

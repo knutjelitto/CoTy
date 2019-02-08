@@ -16,10 +16,7 @@ namespace Pliant.Grammars
         {
             var anyTerminal = obj as AnyTerminal;
             if (anyTerminal != null)
-            {
                 return true;
-            }
-
             return false;
         }
 

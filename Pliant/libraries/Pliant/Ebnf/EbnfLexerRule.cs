@@ -1,24 +1,53 @@
-﻿namespace Pliant.Ebnf
+﻿using Pliant.Utilities;
+using System;
+
+namespace Pliant.Ebnf
 {
     public class EbnfLexerRule : EbnfNode
     {
+        public EbnfQualifiedIdentifier QualifiedIdentifier { get; private set; }
+        public EbnfLexerRuleExpression Expression { get; private set; }
+
         private readonly int _hashCode;
-        public EbnfQualifiedIdentifier QualifiedIdentifier { get; }
-        public EbnfLexerRuleExpression Expression { get; }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfLexerRule;
+            }
+        }
 
         public EbnfLexerRule(EbnfQualifiedIdentifier qualifiedIdentifier, EbnfLexerRuleExpression expression)
         {
             QualifiedIdentifier = qualifiedIdentifier;
             Expression = expression;
-            this._hashCode = (QualifiedIdentifier, Expression).GetHashCode();
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfLexerRule>(obj, out var other) &&
-                   (QualifiedIdentifier, Expression).Equals((other.QualifiedIdentifier, other.Expression));
+            if ((object)obj == null)
+                return false;
+            var ebnfLexerRule = obj as EbnfLexerRule;
+            if ((object)ebnfLexerRule == null)
+                return false;
+
+            return ebnfLexerRule.QualifiedIdentifier.Equals(QualifiedIdentifier)
+                && ebnfLexerRule.Expression.Equals(Expression);
         }
 
-        public override int GetHashCode() => this._hashCode;
+        private int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                NodeType.GetHashCode(),
+                QualifiedIdentifier.GetHashCode(),
+                Expression.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
+        }
     }
 }

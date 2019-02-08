@@ -28,15 +28,11 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
 
             var other = obj as Regex;
             if ((object)null == other)
-            {
                 return false;
-            }
 
             return other.EndsWith == EndsWith
                 && other.StartsWith == StartsWith

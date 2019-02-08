@@ -16,10 +16,7 @@ namespace Pliant.Forest
             get
             {
                 if (ShouldLoadChildren())
-                {
                     LazyLoadChildren();
-                }
-
                 return _children;
             }
         }
@@ -66,15 +63,10 @@ namespace Pliant.Forest
         public void AddUniquePath(VirtualForestNodePath path)
         {
             if (!IsUniquePath(path))
-            {
                 return;
-            }
-
             if (IsUniqueChildSubTree(path))
-            {
                 CloneUniqueChildSubTree(path.ForestNode as IInternalForestNode);
-            }
-
+        
             _paths.Add(path);
         }
 
@@ -84,9 +76,7 @@ namespace Pliant.Forest
             {
                 var otherPath = _paths[p];
                 if(path.Equals(otherPath))
-                {
                     return false;
-                }
             }
             return true;
         }
@@ -125,9 +115,7 @@ namespace Pliant.Forest
         private void LazyLoadChildren()
         {
             for (int i = 0; i < _paths.Count; i++)
-            {
                 LazyLoadPath(_paths[i]);
-            }
         }
 
         private void LazyLoadPath(VirtualForestNodePath path)
@@ -139,13 +127,9 @@ namespace Pliant.Forest
                 var virtualNode = new VirtualForestNode(Location, transitionState.NextTransition, completedParseNode);
 
                 if (transitionState.Reduction.ParseNode == null)
-                {
                     AddUniqueFamily(virtualNode);
-                }
                 else
-                {
                     AddUniqueFamily(transitionState.Reduction.ParseNode, virtualNode);
-                }
             }
             else if (transitionState.Reduction.ParseNode != null)
             {
@@ -160,15 +144,11 @@ namespace Pliant.Forest
         public override bool Equals(object obj)
         {
             if (obj == null)
-            {
                 return false;
-            }
 
             var symbolNode = obj as ISymbolForestNode;
             if (symbolNode == null)
-            {
                 return false;
-            }
 
             return Location == symbolNode.Location
                 && NodeType == symbolNode.NodeType

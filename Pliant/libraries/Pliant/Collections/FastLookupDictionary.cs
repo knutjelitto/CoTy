@@ -30,10 +30,7 @@ namespace Pliant.Collections
         private TValue Get(TKey key)
         {
             if (DictionaryIsMoreEfficient())
-            {
                 return GetValueFromDictionary(key);
-            }
-
             return GetValueFromList(key);
         }
 
@@ -51,10 +48,7 @@ namespace Pliant.Collections
         {
             var value = default(TValue);
             if (_innerDictionary.TryGetValue(key, out value))
-            {
                 return value;
-            }
-
             return default(TValue);
         }
 
@@ -66,10 +60,7 @@ namespace Pliant.Collections
             {
                 var keyValuePair = _innerList[i];
                 if (!hashCode.Equals(keyValuePair.Key.GetHashCode()))
-                {
                     continue;
-                }
-
                 value = keyValuePair.Value;
                 return true;
             }
@@ -83,9 +74,7 @@ namespace Pliant.Collections
             {
                 var keyValuePair = _innerList[i];
                 if (keyHashCode == keyValuePair.Key.GetHashCode())
-                {
                     return keyValuePair.Value;
-                }
             }
             return default(TValue);
         }
@@ -93,19 +82,11 @@ namespace Pliant.Collections
         private void Set(TKey key, TValue value)
         {
             if (DictionaryIsMoreEfficient())
-            {
                 SetValueInDictionary(key, value);
-            }
             else
-            {
                 SetValueInList(key, value);
-            }
-
             if (AtThreshold())
-            {
                 TransferItemsToDictionary();
-            }
-
             _count++;
         }
 
@@ -146,10 +127,7 @@ namespace Pliant.Collections
             get
             {
                 if (DictionaryIsMoreEfficient())
-                {
                     return _innerDictionary.Count;
-                }
-
                 return _innerList.Count;
             }
         }
@@ -161,10 +139,7 @@ namespace Pliant.Collections
             get
             {
                 if (DictionaryIsMoreEfficient())
-                {
                     return _innerDictionary.Keys;
-                }
-
                 var list = new List<TKey>();
                 for (int i = 0; i < _innerList.Count; i++)
                 {
@@ -180,10 +155,7 @@ namespace Pliant.Collections
             get
             {
                 if (DictionaryIsMoreEfficient())
-                {
                     return _innerDictionary.Values;
-                }
-
                 var list = new List<TValue>();
                 for (int i = 0; i < _innerList.Count; i++)
                 {
@@ -219,19 +191,11 @@ namespace Pliant.Collections
         public bool ContainsKey(TKey key)
         {
             if (DictionaryIsMoreEfficient())
-            {
                 return _innerDictionary.ContainsKey(key);
-            }
-
             var hashCode = key.GetHashCode();
             for (int i = 0; i < _innerList.Count; i++)
-            {
                 if (hashCode.Equals(_innerList[i].Key.GetHashCode()))
-                {
                     return true;
-                }
-            }
-
             return false;
         }
 
@@ -243,10 +207,7 @@ namespace Pliant.Collections
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             if (DictionaryIsMoreEfficient())
-            {
                 return _innerDictionary.GetEnumerator();
-            }
-
             return _innerList.GetEnumerator();
         }
 
@@ -263,20 +224,14 @@ namespace Pliant.Collections
         public bool TryGetValue(TKey key, out TValue value)
         {
             if (DictionaryIsMoreEfficient())
-            {
                 return TryGetValueFromDictionary(key, out value);
-            }
-
             return TryGetValueFromList(key, out value);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             if (DictionaryIsMoreEfficient())
-            {
                 return _innerDictionary.GetEnumerator();
-            }
-
             return _innerList.GetEnumerator();
         }
     }

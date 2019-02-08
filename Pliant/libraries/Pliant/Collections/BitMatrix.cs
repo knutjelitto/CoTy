@@ -1,22 +1,18 @@
 ﻿using Pliant.Utilities;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Pliant.Collections
 {
-    public class BitMatrix : IEnumerable<BitArray>
+    public class BitMatrix
     {
-        private readonly BitArray[] _matrix;
+        private BitArray[] _matrix;
 
         public BitMatrix(int count)
         {
             _matrix = new BitArray[count];
             for (int i = 0; i < count; i++)
-            {
                 _matrix[i] = new BitArray(count);
-            }
         }
 
         public BitArray this[int index]
@@ -29,9 +25,7 @@ namespace Pliant.Collections
         public void Clear()
         {
             for (int i = 0; i < _matrix.Length; i++)
-            {
                 _matrix[i].SetAll(false);
-            }
         }
 
         public BitMatrix TransitiveClosure()
@@ -70,65 +64,38 @@ namespace Pliant.Collections
             for (int i = 0; i < Length; i++)
             {
                 if (i > 0)
-                {
                     stringBuilder.AppendLine();
-                }
-
                 for (int j = 0; j < Length; j++)
                 {
                     if (j > 0)
-                    {
                         stringBuilder.Append(space);
-                    }
-
                     stringBuilder.Append(this[i][j] ? one : zero);
                 }
             }
             return stringBuilder.ToString();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public IEnumerator<BitArray> GetEnumerator()
-        {
-            return this._matrix.AsEnumerable().GetEnumerator();
-        }
-
         public override bool Equals(object obj)
         {
             if (((object)obj) == null)
-            {
                 return false;
-            }
-
             var bitMatrix = obj as BitMatrix;
             if (((object)bitMatrix) == null)
-            {
                 return false;
-            }
-
             if (bitMatrix.Length != Length)
-            {
                 return false;
-            }
-
             for (var i = 0; i < bitMatrix.Length; i++)
-            {
                 if (!bitMatrix[i].Equals(this[i]))
-                {
                     return false;
-                }
-            }
-
             return true;
         }
 
         public override int GetHashCode()
         {
-            return this.Aggregate(HashCode.InitIncrementalHash(), (accumulator, t) => HashCode.ComputeIncrementalHash(t.GetHashCode(), accumulator));
+            var hashCode = 0;
+            for (var i = 0; i < Length; i++)
+                hashCode = HashCode.ComputeIncrementalHash(this[i].GetHashCode(), hashCode, i == 0);            
+            return hashCode;
         }
     }
 }

@@ -39,10 +39,8 @@ namespace Pliant.Grammars
             var intervalList = intervalListPool.AllocateAndClear();
 
             // create a initial set of intervals
-            foreach (var character in characterSet)
-            {
+            foreach (var character in characterSet)            
                 intervalList.Add(new Interval(character, character));
-            }
 
             var groupedIntervals = Interval.Group(intervalList);
             intervalListPool.ClearAndFree(intervalList);
@@ -63,10 +61,7 @@ namespace Pliant.Grammars
         public override IReadOnlyList<Interval> GetIntervals()
         {
             if(_intervals == null)
-            {
-                _intervals = CreateIntervals(_characterSet);
-            }
-
+                _intervals = CreateIntervals(_characterSet); 
             return _intervals;
         }
     }

@@ -11,8 +11,8 @@ namespace Pliant.Ebnf
     public class EbnfGrammar : GrammarWrapper
     {
         private static readonly IGrammar _ebnfGrammar;
-        private static readonly string Namespace = "Ebnf";
 
+        public static readonly string Namespace = "Ebnf";
         public static readonly FullyQualifiedName Definition = new FullyQualifiedName(Namespace, nameof(Definition));
         public static readonly FullyQualifiedName Block = new FullyQualifiedName(Namespace, nameof(Block));
         public static readonly FullyQualifiedName Rule = new FullyQualifiedName(Namespace, nameof(Rule));
@@ -280,9 +280,7 @@ namespace Pliant.Ebnf
         {
             var states = new DfaState[5];
             for (int i = 0; i < states.Length; i++)
-            {
                 states[i] = new DfaState();
-            }
 
             var slash = new CharacterTerminal('/');
             var star = new CharacterTerminal('*');

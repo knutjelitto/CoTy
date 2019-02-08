@@ -40,17 +40,13 @@ namespace Pliant.Grammars
 
                 // if no predictions, continue
                 if (predictedStates.Count == 0)
-                {
                     continue;
-                }
 
                 // assign the null transition
                 // only process symbols on the null frame if it is new
                 DottedRuleSet nullDottedRuleSet;
                 if (!TryGetOrCreateDottedRuleSet(predictedStates, out nullDottedRuleSet))
-                {
                     ProcessSymbolTransitions(nullDottedRuleSet);
-                }
 
                 frame.NullTransition = nullDottedRuleSet;
             }
@@ -89,41 +85,29 @@ namespace Pliant.Grammars
             var closure = new SortedSet<IDottedRule>();
 
             foreach (var state in states)
-            {
                 if (closure.Add(state))
-                {
                     queue.Enqueue(state);
-                }
-            }
 
             while (queue.Count > 0)
             {
                 var state = queue.Dequeue();
                 if (IsComplete(state))
-                {
                     continue;
-                }
 
                 var production = state.Production;
                 for (var s = state.Position; s < state.Production.RightHandSide.Count; s++)
                 {
                     var postDotSymbol = production.RightHandSide[s];
                     if (postDotSymbol.SymbolType != SymbolType.NonTerminal)
-                    {
                         break;
-                    }
 
                     var nonTerminalPostDotSymbol = postDotSymbol as INonTerminal;
                     if (!Grammar.IsTransativeNullable(nonTerminalPostDotSymbol))
-                    {
                         break;
-                    }
 
                     var preComputedState = GetPreComputedState(production, s + 1);
                     if (closure.Add(preComputedState))
-                    {
                         queue.Enqueue(preComputedState);
-                    }
                 }
             }
             pool.ClearAndFree(queue);
@@ -141,39 +125,27 @@ namespace Pliant.Grammars
             {
                 var state = frame.Data[i];
                 if (!IsComplete(state))
-                {
                     queue.Enqueue(state);
-                }
             }
 
             while (queue.Count > 0)
             {
                 var state = queue.Dequeue();
                 if (IsComplete(state))
-                {
                     continue;
-                }
-
+                
                 var postDotSymbol = GetPostDotSymbol(state);
                 if (postDotSymbol.SymbolType != SymbolType.NonTerminal)
-                {
                     continue;
-                }
 
                 var nonTerminalPostDotSymbol = postDotSymbol as INonTerminal;
                 if (Grammar.IsTransativeNullable(nonTerminalPostDotSymbol))
                 {
                     var preComputedState = GetPreComputedState(state.Production, state.Position + 1);
                     if (!frame.Contains(preComputedState))
-                    {
                         if (closure.Add(preComputedState))
-                        {
                             if (!IsComplete(preComputedState))
-                            {
                                 queue.Enqueue(preComputedState);
-                            }
-                        }
-                    }
                 }
 
                 var predictions = Grammar.RulesFor(nonTerminalPostDotSymbol);
@@ -182,19 +154,11 @@ namespace Pliant.Grammars
                     var prediction = predictions[p];
                     var preComputedState = GetPreComputedState(prediction, 0);
                     if (frame.Contains(preComputedState))
-                    {
                         continue;
-                    }
-
                     if (!closure.Add(preComputedState))
-                    {
                         continue;
-                    }
-
                     if (!IsComplete(preComputedState))
-                    {
                         queue.Enqueue(preComputedState);
-                    }
                 }
             }
 
@@ -207,10 +171,7 @@ namespace Pliant.Grammars
             var dottedRuleSet = new DottedRuleSet(states);
             DottedRuleSet outDottedRuleSet;
             if (_dottedRuleSets.TryGetValue(dottedRuleSet, out outDottedRuleSet))
-            {
                 return outDottedRuleSet;
-            }
-
             outDottedRuleSet = dottedRuleSet;
             _dottedRuleSets[dottedRuleSet] = outDottedRuleSet;
             _dottedRuleSetQueue.Enqueue(outDottedRuleSet);
@@ -221,10 +182,7 @@ namespace Pliant.Grammars
         {
             var dottedRuleSet = new DottedRuleSet(states);
             if (_dottedRuleSets.TryGetValue(dottedRuleSet, out outDottedRuleSet))
-            {
                 return true;
-            }
-
             outDottedRuleSet = dottedRuleSet;
             _dottedRuleSets[dottedRuleSet] = outDottedRuleSet;
             _dottedRuleSetQueue.Enqueue(outDottedRuleSet);
@@ -240,10 +198,8 @@ namespace Pliant.Grammars
             {
                 var nfaState = frame.Data[i];                
                 if (IsComplete(nfaState))
-                {
                     continue;
-                }
-
+                
                 var postDotSymbol = GetPostDotSymbol(nfaState);
                 var targetStates = transitions.AddOrGetExisting(postDotSymbol);
                 var nextRule = GetPreComputedState(nfaState.Production, nfaState.Position + 1);

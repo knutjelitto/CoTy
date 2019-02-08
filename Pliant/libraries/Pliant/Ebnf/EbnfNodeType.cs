@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Pliant.Ebnf
 {
-#if false
     public enum EbnfNodeType
     {
         EbnfDefinition,
@@ -38,5 +37,4 @@ namespace Pliant.Ebnf
         EbnfLexerRuleExpressionAlteration,
         EbnfExpressionEmpty,
     }
-#endif
 }

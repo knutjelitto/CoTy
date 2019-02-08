@@ -11,76 +11,70 @@ namespace Pliant.Ebnf
 {
     public class EbnfGrammarGenerator
     {
-        private readonly INfaToDfa _nfaToDfaAlgorithm;
-        private readonly IRegexToNfa _regexToNfaAlgorithm;
+        readonly INfaToDfa _nfaToDfaAlgorithm;
+        readonly IRegexToNfa _regexToNfaAlgorithm;
 
         public EbnfGrammarGenerator()
         {
-            this._regexToNfaAlgorithm = new ThompsonConstructionAlgorithm();
-            this._nfaToDfaAlgorithm = new SubsetConstructionAlgorithm();
+            _regexToNfaAlgorithm = new ThompsonConstructionAlgorithm();
+            _nfaToDfaAlgorithm = new SubsetConstructionAlgorithm();
         }
 
         public IGrammar Generate(EbnfDefinition ebnf)
         {
             var grammarModel = new GrammarModel();
-            Definition(grammarModel, ebnf);
+            Definition(ebnf, grammarModel);
             return grammarModel.ToGrammar();
         }
 
-        private void Definition(GrammarModel grammarModel, EbnfDefinition definition)
+        private void Definition(EbnfDefinition definition, GrammarModel grammarModel)
         {
             Block(definition.Block, grammarModel);
 
-            if (definition is EbnfDefinitionConcatenation definitionConcatenation)
-            {
-                Definition(grammarModel, definitionConcatenation.Definition);
-            }
+            if (definition.NodeType != EbnfNodeType.EbnfDefinitionConcatenation)
+                return;
+
+            var definitionConcatenation = definition as EbnfDefinitionConcatenation;
+            Definition(definitionConcatenation.Definition, grammarModel);                
         }
 
-        private void Block(EbnfBlock block, GrammarModel grammarModel)
+        void Block(EbnfBlock block, GrammarModel grammarModel)
         {
-            if (block is EbnfBlockLexerRule lexerRule)
+            switch (block.NodeType)
             {
-                grammarModel.LexerRules.Add(LexerRule(lexerRule));
-            }
-            else if (block is EbnfBlockRule rule)
-            {
-                foreach (var production in Rule(rule.Rule))
-                {
-                    grammarModel.Productions.Add(production);
-                }
-            }
-            else if (block is EbnfBlockSetting setting)
-            {
-                switch (setting.Setting.SettingIdentifier.Value)
-                {
-                    case StartProductionSettingModel.SettingKey:
-                        grammarModel.StartSetting = StartSetting(setting);
-                        break;
+                case EbnfNodeType.EbnfBlockLexerRule:
+                    var blockLexerRule = block as EbnfBlockLexerRule;
+                    grammarModel.LexerRules.Add(LexerRule(blockLexerRule));
+                    break;
 
-                    case IgnoreSettingModel.SettingKey:
-                        var ignoreSettings = IgnoreSettings(setting);
-                        foreach (var ignore in ignoreSettings)
-                        {
-                            grammarModel.IgnoreSettings.Add(ignore);
-                        }
+                case EbnfNodeType.EbnfBlockRule:
+                    var blockRule = block as EbnfBlockRule;
+                    foreach (var production in Rule(blockRule.Rule))
+                        grammarModel.Productions.Add(production);
+                    break;
 
-                        break;
+                case EbnfNodeType.EbnfBlockSetting:
+                    var blockSetting = block as EbnfBlockSetting;
 
-                    case TriviaSettingModel.SettingKey:
-                        var triviaSettings = TriviaSettings(setting);
-                        foreach (var trivia in triviaSettings)
-                        {
-                            grammarModel.TriviaSettings.Add(trivia);
-                        }
+                    switch (blockSetting.Setting.SettingIdentifier.Value)
+                    {
+                        case StartProductionSettingModel.SettingKey:
+                            grammarModel.StartSetting = StartSetting(blockSetting);
+                            break;
 
-                        break;
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException(
-                    $"Invalid EbnfBlock node type detected. Found {block.GetType().Name}, expected EbnfBlockLexerRule or EbnfBlockRule or EbnfBlockSetting");
+                        case IgnoreSettingModel.SettingKey:
+                            var ignoreSettings = IgnoreSettings(blockSetting);
+                            for (var i = 0; i < ignoreSettings.Count; i++)
+                                grammarModel.IgnoreSettings.Add(ignoreSettings[i]);
+                            break;
+
+                        case TriviaSettingModel.SettingKey:
+                            var triviaSettings = TriviaSettings(blockSetting);
+                            for (var i = 0; i < triviaSettings.Count; i++)
+                                grammarModel.TriviaSettings.Add(triviaSettings[i]);
+                            break;
+                    }
+                    break;
             }
         }
 
@@ -102,13 +96,12 @@ namespace Pliant.Ebnf
             FullyQualifiedName fullyQualifiedName, 
             EbnfLexerRuleExpression ebnfLexerRule)
         {
-            if (TryRecognizeSimpleLiteralExpression(fullyQualifiedName, ebnfLexerRule, out var lexerRule))
-            {
+            ILexerRule lexerRule = null;
+            if (TryRecognizeSimpleLiteralExpression(fullyQualifiedName, ebnfLexerRule, out lexerRule))
                 return lexerRule;
-            }
 
             var nfa = LexerRuleExpression(ebnfLexerRule);
-            var dfa = this._nfaToDfaAlgorithm.Transform(nfa);
+            var dfa = _nfaToDfaAlgorithm.Transform(nfa);
 
             return new DfaLexerRule(dfa, fullyQualifiedName.FullName);
         }
@@ -120,62 +113,63 @@ namespace Pliant.Ebnf
         {
             lexerRule = null;
 
-            if (ebnfLexerRule.GetType() == typeof(EbnfLexerRuleExpression))
-            {
-                var term = ebnfLexerRule.Term;
-                if (term.GetType() == typeof(EbnfLexerRuleTerm))
-                {
-                    var factor = term.Factor;
-                    if (factor is EbnfLexerRuleFactorLiteral literal)
-                    {
-                        lexerRule = new StringLiteralLexerRule(
-                            literal.Value,
-                            new TokenType(fullyQualifiedName.FullName));
+            if (ebnfLexerRule.NodeType != EbnfNodeType.EbnfLexerRuleExpression)
+                return false;
 
-                        return true;
-                    }
-                }
-            }
+            var term = ebnfLexerRule.Term;
+            if (term.NodeType != EbnfNodeType.EbnfLexerRuleTerm)
+                return false;
 
-            return false;
-        }
+            var factor = term.Factor;
+            if (factor.NodeType != EbnfNodeType.EbnfLexerRuleFactorLiteral)
+                return false;
 
-        private INfa LexerRuleExpression(EbnfLexerRuleExpression expression)
+            var literal = factor as EbnfLexerRuleFactorLiteral;
+            lexerRule = new StringLiteralLexerRule(
+                literal.Value, 
+                new TokenType(fullyQualifiedName.FullName));
+
+            return true;
+        }        
+
+        INfa LexerRuleExpression(EbnfLexerRuleExpression expression)
         {
             var nfa = LexerRuleTerm(expression.Term);
-            if (expression is EbnfLexerRuleExpressionAlteration alteration)
+            if (expression.NodeType == EbnfNodeType.EbnfLexerRuleExpressionAlteration)
             {
+                var alteration = expression as EbnfLexerRuleExpressionAlteration;
                 var alterationNfa = LexerRuleExpression(alteration);
                 nfa = nfa.Union(alterationNfa);
             }
             return nfa;
         }
 
-        private INfa LexerRuleTerm(EbnfLexerRuleTerm term)
+        INfa LexerRuleTerm(EbnfLexerRuleTerm term)
         {
             var nfa = LexerRuleFactor(term.Factor);
-            if (term is EbnfLexerRuleTermConcatenation concatenation)
+            if (term.NodeType == EbnfNodeType.EbnfLexerRuleTermConcatenation)
             {
+                var concatenation = term as EbnfLexerRuleTermConcatenation;
                 var concatNfa = LexerRuleTerm(concatenation.Term);
                 nfa = nfa.Concatenation(concatNfa);
             }
             return nfa;
         }
 
-        private INfa LexerRuleFactor(EbnfLexerRuleFactor factor)
+        INfa LexerRuleFactor(EbnfLexerRuleFactor factor)
         {
-            if (factor is EbnfLexerRuleFactorLiteral literal)
+            switch (factor.NodeType)
             {
-                return LexerRuleFactorLiteral(literal);
-            }
+                case EbnfNodeType.EbnfLexerRuleFactorLiteral:
+                    return LexerRuleFactorLiteral(factor as EbnfLexerRuleFactorLiteral);                    
 
-            if (factor is EbnfLexerRuleFactorRegex regex)
-            {
-                return LexerRuleFactorRegex(regex);
-            }
+                case EbnfNodeType.EbnfLexerRuleFactorRegex:
+                    return LexerRuleFactorRegex(factor as EbnfLexerRuleFactorRegex);
 
-            throw new InvalidOperationException(
-                $"Invalid {nameof(EbnfLexerRuleFactor)} node type detected. Found {factor.GetType().Name}, expected {nameof(EbnfLexerRuleFactorLiteral)} or {nameof(EbnfLexerRuleFactorRegex)}");
+                default:
+                    throw new InvalidOperationException(
+                        $"Invalid EbnfLexerRuleFactor node type detected. Found {Enum.GetName(typeof(EbnfNodeType), factor.NodeType)}, expected EbnfLexerRuleFactorLiteral or EbnfLexerRuleFactorRegex");
+            }
         }
 
         private INfa LexerRuleFactorLiteral(EbnfLexerRuleFactorLiteral ebnfLexerRuleFactorLiteral)
@@ -188,9 +182,7 @@ namespace Pliant.Ebnf
                 states[i] = current;
 
                 if (i == 0)
-                {
                     continue;
-                }
 
                 var previous = states[i - 1];
                 previous.AddTransistion(
@@ -203,7 +195,7 @@ namespace Pliant.Ebnf
         private INfa LexerRuleFactorRegex(EbnfLexerRuleFactorRegex ebnfLexerRuleFactorRegex)
         {
             var regex = ebnfLexerRuleFactorRegex.Regex;
-            return this._regexToNfaAlgorithm.Transform(regex);
+            return _regexToNfaAlgorithm.Transform(regex);
         }
 
         private StartProductionSettingModel StartSetting(EbnfBlockSetting blockSetting)
@@ -227,37 +219,31 @@ namespace Pliant.Ebnf
             return new[] { ignoreSettingModel };
         }
 
-        private IEnumerable<ProductionModel> Rule(EbnfRule rule)
+        IEnumerable<ProductionModel> Rule(EbnfRule rule)
         {
             var nonTerminal = GetFullyQualifiedNameFromQualifiedIdentifier(rule.QualifiedIdentifier);
             var productionModel = new ProductionModel(nonTerminal);
             foreach(var production in Expression(rule.Expression, productionModel))
-            {
                 yield return production;
-            }
-
             yield return productionModel;           
         }
 
-        private IEnumerable<ProductionModel> Expression(EbnfExpression expression, ProductionModel currentProduction)
+        IEnumerable<ProductionModel> Expression(EbnfExpression expression, ProductionModel currentProduction)
         {
             foreach (var production in Term(expression.Term, currentProduction))
-            {
                 yield return production;
-            }
 
-            if (expression is EbnfExpressionAlteration expressionAlteration)
-            {
-                currentProduction.Lambda();
+            if (expression.NodeType != EbnfNodeType.EbnfExpressionAlteration)
+                yield break;
 
-                foreach (var production in Expression(expressionAlteration.Expression, currentProduction))
-                {
-                    yield return production;
-                }
-            }
+            var expressionAlteration = expression as EbnfExpressionAlteration;
+            currentProduction.Lambda();
+
+            foreach (var production in Expression(expressionAlteration.Expression, currentProduction))
+                yield return production;            
         }
 
-        private IEnumerable<ProductionModel> Grouping(EbnfFactorGrouping grouping, ProductionModel currentProduction)
+        IEnumerable<ProductionModel> Grouping(EbnfFactorGrouping grouping, ProductionModel currentProduction)
         {
             var name = grouping.ToString();
             var nonTerminal = new NonTerminal(name);
@@ -267,14 +253,12 @@ namespace Pliant.Ebnf
 
             var expression = grouping.Expression;           
             foreach (var production in Expression(expression, groupingProduction))
-            {
-                yield return production;
-            }
+                yield return production; 
 
             yield return groupingProduction;
         }
 
-        private IEnumerable<ProductionModel> Optional(EbnfFactorOptional optional, ProductionModel currentProduction)
+        IEnumerable<ProductionModel> Optional(EbnfFactorOptional optional, ProductionModel currentProduction)
         {
             var name = optional.ToString();
             var nonTerminal = new NonTerminal(name);
@@ -284,15 +268,13 @@ namespace Pliant.Ebnf
 
             var expression = optional.Expression;
             foreach (var production in Expression(expression, optionalProduction))
-            {
                 yield return production;
-            }
 
             optionalProduction.Lambda();
             yield return optionalProduction;
         }
 
-        private IEnumerable<ProductionModel> Repetition(EbnfFactorRepetition repetition, ProductionModel currentProduction)
+        IEnumerable<ProductionModel> Repetition(EbnfFactorRepetition repetition, ProductionModel currentProduction)
         {
             var name = repetition.ToString();
             var nonTerminal = new NonTerminal(name);
@@ -302,9 +284,7 @@ namespace Pliant.Ebnf
 
             var expression = repetition.Expression;
             foreach (var production in Expression(expression, repetitionProduction))
-            {
                 yield return production;
-            }
 
             repetitionProduction.AddWithAnd(new NonTerminalModel(nonTerminal));
             repetitionProduction.Lambda();
@@ -312,81 +292,76 @@ namespace Pliant.Ebnf
             yield return repetitionProduction;
         }
 
-        private IEnumerable<ProductionModel> Term(EbnfTerm term, ProductionModel currentProduction)
+        IEnumerable<ProductionModel> Term(EbnfTerm term, ProductionModel currentProduction)
         {
             foreach (var production in Factor(term.Factor, currentProduction))
-            {
                 yield return production;
-            }
 
-            if (term is EbnfTermConcatenation concatenation)
-            {
-                foreach (var production in Term(concatenation.Term, currentProduction))
-                {
-                    yield return production;
-                }
-            }
+            if (term.NodeType != EbnfNodeType.EbnfTermConcatenation)
+                yield break;
+
+            var concatenation = term as EbnfTermConcatenation;
+            foreach(var production in Term(concatenation.Term, currentProduction))
+                yield return production;                    
         }
 
-        private IEnumerable<ProductionModel> Factor(EbnfFactor factor, ProductionModel currentProduction)
+        IEnumerable<ProductionModel> Factor(EbnfFactor factor, ProductionModel currentProduction)
         {
-            switch (factor)
+            switch (factor.NodeType)
             {
-                case EbnfFactorGrouping grouping:
+                case EbnfNodeType.EbnfFactorGrouping:
+                    var grouping = factor as EbnfFactorGrouping;
                     foreach (var production in Grouping(grouping, currentProduction))
-                    {
                         yield return production;
-                    }
-
                     break;
-                case EbnfFactorOptional optional:
+
+                case EbnfNodeType.EbnfFactorOptional:
+                    var optional = factor as EbnfFactorOptional;
                     foreach (var production in Optional(optional, currentProduction))
-                    {
                         yield return production;
-                    }
-
                     break;
-                case EbnfFactorRepetition repetition:
+
+                case EbnfNodeType.EbnfFactorRepetition:
+                    var repetition = factor as EbnfFactorRepetition;
                     foreach (var production in Repetition(repetition, currentProduction))
-                    {
                         yield return production;
-                    }
-
                     break;
-                case EbnfFactorIdentifier identifier:
-                    var nonTerminal = GetFullyQualifiedNameFromQualifiedIdentifier(identifier.QualifiedIdentifier);
+
+                case EbnfNodeType.EbnfFactorIdentifier:
+                    var identifier = factor as EbnfFactorIdentifier;
+                    var nonTerminal = GetFullyQualifiedNameFromQualifiedIdentifier(identifier.QualifiedIdentifier);                   
                     currentProduction.AddWithAnd(new NonTerminalModel(nonTerminal));
                     break;
-                case EbnfFactorLiteral literal:
+
+                case EbnfNodeType.EbnfFactorLiteral:
+                    var literal = factor as EbnfFactorLiteral;
                     var stringLiteralRule = new StringLiteralLexerRule(literal.Value);
-                    currentProduction.AddWithAnd(new LexerRuleModel(stringLiteralRule));
+                    currentProduction.AddWithAnd( new LexerRuleModel(stringLiteralRule));
                     break;
-                case EbnfFactorRegex regex:
-                    var nfa = this._regexToNfaAlgorithm.Transform(regex.Regex);
-                    var dfa = this._nfaToDfaAlgorithm.Transform(nfa);
+
+                case EbnfNodeType.EbnfFactorRegex:
+                    var regex = factor as EbnfFactorRegex;
+                    var nfa = _regexToNfaAlgorithm.Transform(regex.Regex);
+                    var dfa = _nfaToDfaAlgorithm.Transform(nfa);
                     var dfaLexerRule = new DfaLexerRule(dfa, regex.Regex.ToString());
                     currentProduction.AddWithAnd(new LexerRuleModel(dfaLexerRule));
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
+                    break;                
+            }            
         }
                         
         private static FullyQualifiedName GetFullyQualifiedNameFromQualifiedIdentifier(EbnfQualifiedIdentifier qualifiedIdentifier)
         {
             var @namespace = new StringBuilder();
             var currentQualifiedIdentifier = qualifiedIdentifier;
-            while (currentQualifiedIdentifier is EbnfQualifiedIdentifierConcatenation)
+            var index = 0;
+            while (currentQualifiedIdentifier.NodeType == EbnfNodeType.EbnfQualifiedIdentifierConcatenation)
             {
-                if (@namespace.Length > 0)
-                {
+                if (index > 0)
                     @namespace.Append(".");
-                }
-
                 @namespace.Append(currentQualifiedIdentifier.Identifier);
                 currentQualifiedIdentifier = (currentQualifiedIdentifier as EbnfQualifiedIdentifierConcatenation).QualifiedIdentifier;
+                index++;
             }
-
             return new FullyQualifiedName(@namespace.ToString(), currentQualifiedIdentifier.Identifier);
         }   
     }

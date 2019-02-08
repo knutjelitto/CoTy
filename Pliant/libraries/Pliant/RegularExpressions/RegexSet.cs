@@ -24,15 +24,11 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
 
             var set = obj as RegexSet;
             if ((object)set == null)
-            {
                 return false;
-            }
 
             return CharacterClass.Equals(set.CharacterClass)
                 && Negate.Equals(set.Negate);

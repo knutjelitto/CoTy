@@ -1,22 +1,89 @@
-﻿namespace Pliant.Ebnf
+﻿using Pliant.Utilities;
+using System;
+
+namespace Pliant.Ebnf
 {
-    public class EbnfExpression : EbnfNode
+    public class EbnfExpressionEmpty: EbnfNode
     {
         private readonly int _hashCode;
-        public EbnfTerm Term { get; }
 
-        public EbnfExpression(EbnfTerm term)
+        public EbnfExpressionEmpty()
         {
-            Term = term;
-            this._hashCode = Term.GetHashCode();
+            _hashCode = ComputeHashCode();
+        }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfExpressionEmpty;
+            }
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfExpression>(obj, out var other) && Term.Equals(other.Term);
+            if ((object)obj == null)
+                return false;
+            var expression = obj as EbnfExpressionEmpty;
+            if ((object)expression == null)
+                return false;
+            return expression.NodeType == NodeType;
         }
 
-        public override int GetHashCode() => this._hashCode;
+        public override int GetHashCode()
+        {
+            return _hashCode;
+        }
+
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                NodeType.GetHashCode());
+        }
+    }
+
+    public class EbnfExpression : EbnfExpressionEmpty
+    {
+        private readonly int _hashCode;
+
+        public EbnfTerm Term { get; private set; }
+
+        public EbnfExpression(EbnfTerm term)
+        {
+            Term = term;
+            _hashCode = ComputeHashCode();
+        }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfExpression;
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if ((object)obj == null)
+                return false;
+            var expression = obj as EbnfExpression;
+            if ((object)expression == null)
+                return false;
+            return expression.NodeType == NodeType
+                && expression.Term.Equals(Term);
+        }
+
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                NodeType.GetHashCode(),
+                Term.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
+        }
 
         public override string ToString()
         {
@@ -24,10 +91,11 @@
         }
     }
 
-    public sealed class EbnfExpressionAlteration : EbnfExpression
+    public class EbnfExpressionAlteration : EbnfExpression
     {
         private readonly int _hashCode;
-        public EbnfExpression Expression { get; }
+
+        public EbnfExpression Expression { get; private set; }
 
         public EbnfExpressionAlteration(
             EbnfTerm term,
@@ -35,18 +103,40 @@
             : base(term)
         {
             Expression = expression;
-            this._hashCode = (Term, Expression).GetHashCode();
+            _hashCode = ComputeHashCode();
+        }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfExpressionAlteration;
+            }
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfExpressionAlteration>(obj, out var other) &&
-                   (Term, Expression).Equals((other.Term, other.Expression));
+            if ((object)obj == null)
+                return false;
+            var expression = obj as EbnfExpressionAlteration;
+            if ((object)expression == null)
+                return false;
+            return expression.NodeType == NodeType
+                && expression.Term.Equals(Term)
+                && expression.Expression.Equals(Expression);
+        }
+
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                NodeType.GetHashCode(),
+                Term.GetHashCode(),
+                Expression.GetHashCode());
         }
 
         public override int GetHashCode()
         {
-            return this._hashCode;
+            return _hashCode;
         }
 
         public override string ToString()

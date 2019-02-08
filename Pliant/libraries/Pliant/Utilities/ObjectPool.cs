@@ -24,10 +24,7 @@ namespace Pliant.Utilities
         internal T Allocate()
         {
             if (_queue.Count == 0)
-            {
                 return CreateInstance();
-            }
-
             return _queue.Dequeue();
         }
 
@@ -39,10 +36,7 @@ namespace Pliant.Utilities
         internal void Free(T value)
         {
             if (value == null)
-            {
                 throw new ArgumentNullException(nameof(value));
-            }
-
             _queue.Enqueue(value);
         }        
     }

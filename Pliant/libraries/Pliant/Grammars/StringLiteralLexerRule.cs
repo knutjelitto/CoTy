@@ -29,16 +29,10 @@ namespace Pliant.Grammars
         public override bool Equals(object obj)
         {
             if (((object)obj) == null)
-            {
                 return false;
-            }
-
             var terminalLexerRule = obj as StringLiteralLexerRule;
             if (((object)terminalLexerRule) == null)
-            {
                 return false;
-            }
-
             return LexerRuleType.Equals(terminalLexerRule.LexerRuleType)
                 && Literal.Equals(terminalLexerRule.Literal);
         }
@@ -62,10 +56,7 @@ namespace Pliant.Grammars
         public override bool CanApply(char c)
         {
             if (Literal.Length == 0)
-            {
                 return false;
-            }
-
             return Literal[0].Equals(c);
         }
     }

@@ -15,10 +15,7 @@ namespace Pliant.Tokens
             get
             {
                 if (!IsSubStringAllocated())
-                {
                     _capture = AllocateSubString();
-                }
-
                 return _capture;
             }
         }        
@@ -33,10 +30,7 @@ namespace Pliant.Tokens
         private bool IsSubStringAllocated()
         {
             if (_capture == null)
-            {
                 return false;
-            }
-
             return _index == _capture.Length;
         }
 
@@ -53,15 +47,9 @@ namespace Pliant.Tokens
         public override bool Scan(char c)
         {
             if (_index >= Literal.Length)
-            {
                 return false;
-            }
-
             if (Literal[_index] != c)
-            {
                 return false;
-            }
-
             _index++;
             return true;
         }

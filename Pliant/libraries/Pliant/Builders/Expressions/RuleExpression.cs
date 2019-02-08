@@ -22,10 +22,7 @@ namespace Pliant.Builders.Expressions
         private void AddWithAnd(BaseExpression baseExpression)
         {
             if (Alterations.Count == 0)
-            {
                 Alterations.Add(new List<BaseExpression>());
-            }
-
             Alterations[Alterations.Count - 1].Add(baseExpression);
         }
 

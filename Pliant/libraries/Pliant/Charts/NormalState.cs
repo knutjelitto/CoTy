@@ -27,25 +27,17 @@ namespace Pliant.Charts
         {
             var dottedRule = DottedRule;
             if (dottedRule.IsComplete)
-            {
                 return false;
-            }
-
             return dottedRule.PostDotSymbol.Equals(searchSymbol);
         }
 
         public override bool Equals(object obj)
         {
             if (obj == null)
-            {
                 return false;
-            }
-
             var state = obj as NormalState;
             if (state == null)
-            {
                 return false;
-            }
             // PERF: Hash Codes are Cached, so equality performance is cached as well
             return GetHashCode() == state.GetHashCode();
         }
@@ -78,9 +70,7 @@ namespace Pliant.Charts
             }
 
             if (DottedRule.Position == DottedRule.Production.RightHandSide.Count)
-            {
                 stringBuilder.Append(Dot);
-            }
 
             stringBuilder.Append($"\t\t({Origin})");
             return stringBuilder.ToString();

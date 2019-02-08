@@ -46,50 +46,34 @@ namespace Pliant.Runtime
         public bool Read()
         {
             if (EndOfStream())
-            {
                 return false;
-            }
 
             var character = ReadCharacter();
             UpdatePositionMetrics(character);
 
             if (MatchesExistingIncompleteIgnoreLexemes(character))
-            {
                 return true;
-            }
 
             if (MatchesExistingIncompleteTriviaLexemes(character))
-            {
                 return true;
-            }
 
             if (MatchExistingTokenLexemes(character))
             {
                 if (EndOfStream())
-                {
                     return TryParseExistingToken();
-                }
-
                 return true;
             }
 
             if (AnyExistingTokenLexemes())
-            {
                 if (!TryParseExistingToken())
-                {
                     return false;
-                }
-            }
 
             if (MatchesNewTokenLexemes(character))
             {
                 if (!EndOfStream())
                 {
                     if (AnyExistingTriviaLexemes())
-                    {
                         AccumulateAcceptedTrivia();
-                    }
-
                     return true;
                 }
                 return TryParseExistingToken();
@@ -106,14 +90,10 @@ namespace Pliant.Runtime
             }
 
             if (AnyExistingTriviaLexemes())
-            {
                 AccumulateAcceptedTrivia();
-            }
 
             if (MatchesExistingIgnoreLexemes(character))
-            {
                 return true;
-            }
 
             ClearExistingIgnoreLexemes();
 
@@ -139,17 +119,11 @@ namespace Pliant.Runtime
         {
             if (_previousTokenLexemes == null
                 || _previousTokenLexemes.Count == 0)
-            {
                 return;
-            }
 
             for (var a = 0; a < _triviaAccumulator.Count; a++)
-            {
                 for (var l = 0; l < _previousTokenLexemes.Count; l++)
-                {
                     _previousTokenLexemes[l].AddTrailingTrivia(_triviaAccumulator[a]);
-                }
-            }
 
             _triviaLexemes.Clear();
             _triviaAccumulator.Clear();
@@ -190,13 +164,8 @@ namespace Pliant.Runtime
         public bool RunToEnd()
         {
             while (!EndOfStream())
-            {
                 if (!Read())
-                {
                     return false;
-                }
-            }
-
             return ParseEngine.IsAccepted();
         }
 
@@ -227,9 +196,7 @@ namespace Pliant.Runtime
             {
                 var trivia = _triviaLexemes[i];
                 if (trivia.IsAccepted())
-                {
                     _triviaAccumulator.Add(trivia);
-                }
             }
             _triviaLexemes.Clear();
         }
@@ -248,9 +215,7 @@ namespace Pliant.Runtime
         {
             var anyLexemes = _tokenLexemes.Count > 0;
             if (!anyLexemes)
-            {
                 return false;
-            }
 
             var i = 0;
             var size = _tokenLexemes.Count;
@@ -259,9 +224,7 @@ namespace Pliant.Runtime
             {
                 var lexeme = _tokenLexemes[i];
                 if (lexeme.IsAccepted())
-                {
                     i++;
-                }
                 else
                 {
                     if (i < size - 1)
@@ -275,9 +238,7 @@ namespace Pliant.Runtime
 
             var anyMatches = size > 0;
             if (!anyMatches)
-            {
                 return false;
-            }
 
             i = _tokenLexemes.Count - 1;
             while (i >= size)
@@ -288,17 +249,11 @@ namespace Pliant.Runtime
             }
 
             if (!ParseEngine.Pulse(_tokenLexemes))
-            {
                 return false;
-            }
 
             for (i = 0; i < _triviaAccumulator.Count; i++)
-            {
                 for (var j = 0; j < _tokenLexemes.Count; j++)
-                {
                     _tokenLexemes[j].AddLeadingTrivia(_triviaAccumulator[i]);
-                }
-            }
 
             _triviaAccumulator.Clear();
             if (_previousTokenLexemes != null)
@@ -307,9 +262,7 @@ namespace Pliant.Runtime
                 _previousTokenLexemes.AddRange(_tokenLexemes);
             }
             else
-            {
                 _previousTokenLexemes = new List<ILexeme>(_tokenLexemes);
-            }
 
             _tokenLexemes.Clear();
 
@@ -343,10 +296,7 @@ namespace Pliant.Runtime
             {
                 var lexerRule = lexerRules[i];
                 if (!lexerRule.CanApply(character))
-                {
                     continue;
-                }
-
                 var factory = _lexemeFactoryRegistry.Get(lexerRule.LexerRuleType);
                 var lexeme = factory.Create(lexerRule, Position);
 
@@ -372,9 +322,7 @@ namespace Pliant.Runtime
         {
             var anyLexemes = lexemes != null && lexemes.Count > 0;
             if (!anyLexemes)
-            {
                 return false;
-            }
 
             var i = 0;
             var size = lexemes.Count;
@@ -383,9 +331,7 @@ namespace Pliant.Runtime
             {
                 var lexeme = lexemes[i];
                 if (lexeme.Scan(character))
-                {
                     i++;
-                }
                 else
                 {
                     if (i < size - 1)
@@ -399,9 +345,7 @@ namespace Pliant.Runtime
 
             var anyMatches = size > 0;
             if (!anyMatches)
-            {
                 return false;
-            }
 
             i = lexemes.Count - 1;
             while (i >= size)
@@ -417,9 +361,7 @@ namespace Pliant.Runtime
         {
             var anyLexemes = lexemes != null && lexemes.Count > 0;
             if (!anyLexemes)
-            {
                 return false;
-            }
 
             var i = 0;
             var size = lexemes.Count;
@@ -428,9 +370,7 @@ namespace Pliant.Runtime
             {
                 var lexeme = lexemes[i];
                 if (!lexeme.IsAccepted() && lexeme.Scan(character))
-                {
                     i++;
-                }
                 else
                 {
                     if (i < size - 1)
@@ -444,9 +384,7 @@ namespace Pliant.Runtime
 
             var anyMatches = size > 0;
             if (!anyMatches)
-            {
                 return false;
-            }
 
             i = lexemes.Count - 1;
             while (i >= size)
@@ -461,10 +399,7 @@ namespace Pliant.Runtime
         private void ClearLexemes(List<ILexeme> lexemes)
         {
             for (var i = 0; i < lexemes.Count; i++)
-            {
                 FreeLexeme(lexemes[i]);
-            }
-
             lexemes.Clear();
         }
 

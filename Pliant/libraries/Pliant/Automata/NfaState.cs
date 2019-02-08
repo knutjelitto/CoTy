@@ -40,9 +40,7 @@ namespace Pliant.Automata
                 {
                     var transition = state.Transitions[t];
                     if (transition.TransitionType == NfaTransitionType.Null)
-                    {
                         queue.Enqueue(transition.Target);
-                    }
                 }
             }
 
@@ -52,16 +50,10 @@ namespace Pliant.Automata
         public int CompareTo(object obj)
         {
             if (((object)obj) == null)
-            {
                 throw new NullReferenceException();
-            }
-
             var nfaState = obj as INfaState;
             if (((object)nfaState) == null)
-            {
                 throw new ArgumentException("parameter must be a INfaState", nameof(obj));
-            }
-
             return CompareTo(nfaState);
         }
 

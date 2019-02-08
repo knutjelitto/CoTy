@@ -21,15 +21,11 @@ namespace Pliant.Tokens
             get
             {
                 if (!_isAccepted)
-                {
                     return string.Empty;
-                }
 
                 if (_captureRendered)
-                {
                     return _stringCapture;
-                }
-
+                
                 _stringCapture = _capture.ToString();
                 _captureRendered = true;
 
@@ -73,15 +69,11 @@ namespace Pliant.Tokens
         public override bool Scan(char c)
         {
             if (IsAccepted())
-            {
                 return false;
-            }
 
             if (!Terminal.IsMatch(c))
-            {
                 return false;
-            }
-
+            
             SetCapture(c);
             SetAccepted(true);
             return true;

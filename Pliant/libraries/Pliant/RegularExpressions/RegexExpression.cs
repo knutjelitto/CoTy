@@ -8,16 +8,11 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
 
             var otherRegexExpression = obj as RegexExpression;
             if (otherRegexExpression != null)
-            {
                 return false;
-            }
-
             return otherRegexExpression.NodeType == RegexNodeType.RegexExpression;
         }
 
@@ -48,15 +43,11 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
 
             var otherRegexExpressionTerm = obj as RegexExpressionTerm;
             if ((object)otherRegexExpressionTerm == null)
-            {
                 return false;
-            }
 
             return Term.Equals(otherRegexExpressionTerm.Term);
         }
@@ -115,15 +106,11 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
 
             var otherAlteration = obj as RegexExpressionAlteration;
             if ((object)otherAlteration == null)
-            {
                 return false;
-            }
 
             return otherAlteration.Expression.Equals(Expression);
         }

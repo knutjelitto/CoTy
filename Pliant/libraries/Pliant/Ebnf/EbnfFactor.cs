@@ -1,27 +1,54 @@
-﻿namespace Pliant.Ebnf
+﻿using Pliant.Utilities;
+using System;
+
+namespace Pliant.Ebnf
 {
     public abstract class EbnfFactor : EbnfNode
     {
     }
 
-    public sealed class EbnfFactorIdentifier : EbnfFactor
+    public class EbnfFactorIdentifier : EbnfFactor
     {
         private readonly int _hashCode;
-        public EbnfQualifiedIdentifier QualifiedIdentifier { get; }
+
+        public EbnfQualifiedIdentifier QualifiedIdentifier { get; private set; }
 
         public EbnfFactorIdentifier(EbnfQualifiedIdentifier qualifiedIdentifier)
         {
             QualifiedIdentifier = qualifiedIdentifier;
-            this._hashCode = QualifiedIdentifier.GetHashCode();
+            _hashCode = ComputeHashCode();
+        }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfFactorIdentifier;
+            }
+        }
+
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                NodeType.GetHashCode(),
+                QualifiedIdentifier.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfFactorIdentifier>(obj, out var other) &&
-                   QualifiedIdentifier.Equals(other.QualifiedIdentifier);
+            if ((object)obj == null)
+                return false;
+            var factor = obj as EbnfFactorIdentifier;
+            if ((object)factor == null)
+                return false;
+            return factor.NodeType == NodeType
+                && factor.QualifiedIdentifier.Equals(QualifiedIdentifier);
         }
-
-        public override int GetHashCode() => this._hashCode;
 
         public override string ToString()
         {
@@ -29,25 +56,46 @@
         }
     }
 
-    public sealed class EbnfFactorLiteral : EbnfFactor
+    public class EbnfFactorLiteral : EbnfFactor
     {
         private readonly int _hashCode;
-        public string Value { get; }
+
+        public string Value { get; private set; }
 
         public EbnfFactorLiteral(string value)
         {
             Value = value;
-            this._hashCode = Value.GetHashCode();
+            _hashCode = ComputeHashCode();
         }
 
-        public override bool Equals(object obj)
+        public override EbnfNodeType NodeType
         {
-            return IsOfType<EbnfFactorLiteral>(obj, out var other) && Value.Equals(other.Value);
+            get
+            {
+                return EbnfNodeType.EbnfFactorLiteral;
+            }
+        }
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                NodeType.GetHashCode(),
+                Value.GetHashCode());
         }
 
         public override int GetHashCode()
         {
-            return this._hashCode;
+            return _hashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if ((object)obj == null)
+                return false;
+            var factor = obj as EbnfFactorLiteral;
+            if ((object)factor == null)
+                return false;
+            return factor.NodeType == NodeType
+                && factor.Value.Equals(Value);
         }
 
         public override string ToString()
@@ -56,23 +104,47 @@
         }
     }
 
-    public sealed class EbnfFactorRegex : EbnfFactor
+    public class EbnfFactorRegex : EbnfFactor
     {
         private readonly int _hashCode;
-        public RegularExpressions.Regex Regex { get; }
+
+        public RegularExpressions.Regex Regex { get; private set; }
 
         public EbnfFactorRegex(RegularExpressions.Regex regex)
         {
             Regex = regex;
-            this._hashCode = Regex.GetHashCode();
+            _hashCode = ComputeHashCode();
+        }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfFactorRegex;
+            }
+        }
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                NodeType.GetHashCode(),
+                Regex.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfFactorRegex>(obj, out var other) && Regex.Equals(other.Regex);
+            if ((object)obj == null)
+                return false;
+            var factor = obj as EbnfFactorRegex;
+            if ((object)factor == null)
+                return false;
+            return factor.NodeType == NodeType
+                && factor.Regex.Equals(Regex);
         }
-
-        public override int GetHashCode() => this._hashCode;
 
         public override string ToString()
         {
@@ -80,23 +152,47 @@
         }
     }
 
-    public sealed class EbnfFactorRepetition : EbnfFactor
+    public class EbnfFactorRepetition : EbnfFactor
     {
         private readonly int _hashCode;
-        public EbnfExpression Expression { get; }
+
+        public EbnfExpression Expression { get; private set; }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfFactorRepetition;
+            }
+        }
 
         public EbnfFactorRepetition(EbnfExpression expression)
         {
             Expression = expression;
-            this._hashCode = Expression.GetHashCode();
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfFactorRepetition>(obj, out var other) && Expression.Equals(other.Expression);
+            if ((object)obj == null)
+                return false;
+            var factor = obj as EbnfFactorRepetition;
+            if ((object)factor == null)
+                return false;
+            return factor.NodeType == NodeType
+                && factor.Expression.Equals(Expression);
         }
 
-        public override int GetHashCode() => this._hashCode;
+        public override int GetHashCode()
+        {
+            return _hashCode;
+        }
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                NodeType.GetHashCode(),
+                Expression.GetHashCode());
+        }
 
         public override string ToString()
         {
@@ -104,23 +200,47 @@
         }
     }
 
-    public sealed class EbnfFactorOptional : EbnfFactor
+    public class EbnfFactorOptional : EbnfFactor
     {
         private readonly int _hashCode;
-        public EbnfExpression Expression { get; }
+
+        public EbnfExpression Expression { get; private set; }
 
         public EbnfFactorOptional(EbnfExpression expression)
         {
             Expression = expression;
-            this._hashCode = Expression.GetHashCode();
+            _hashCode = ComputeHashCode();
+        }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfFactorOptional;
+            }
+        }
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                NodeType.GetHashCode(),
+                Expression.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfFactorOptional>(obj, out var other) && Expression.Equals(other.Expression);
+            if ((object)obj == null)
+                return false;
+            var factor = obj as EbnfFactorOptional;
+            if ((object)factor == null)
+                return false;
+            return factor.NodeType == NodeType
+                && factor.Expression.Equals(Expression);
         }
-
-        public override int GetHashCode() => this._hashCode;
 
         public override string ToString()
         {
@@ -128,23 +248,47 @@
         }
     }
 
-    public sealed class EbnfFactorGrouping : EbnfFactor
+    public class EbnfFactorGrouping : EbnfFactor
     {
         private readonly int _hashCode;
-        public EbnfExpression Expression { get; }
+
+        public EbnfExpression Expression { get; private set; }
 
         public EbnfFactorGrouping(EbnfExpression expression)
         {
             Expression = expression;
-            this._hashCode = Expression.GetHashCode();
+            _hashCode = ComputeHashCode();
+        }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfFactorGrouping;
+            }
+        }
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                NodeType.GetHashCode(),
+                Expression.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfFactorGrouping>(obj, out var other) && Expression.Equals(other.Expression);
+            if ((object)obj == null)
+                return false;
+            var factor = obj as EbnfFactorGrouping;
+            if ((object)factor == null)
+                return false;
+            return factor.NodeType == NodeType
+                && factor.Expression.Equals(Expression);
         }
-
-        public override int GetHashCode() => this._hashCode;
 
         public override string ToString()
         {

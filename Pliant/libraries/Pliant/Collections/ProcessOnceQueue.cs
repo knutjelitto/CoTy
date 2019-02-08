@@ -19,9 +19,7 @@ namespace Pliant.Collections
             : this()
         {
             foreach (var item in items)
-            {
                 Enqueue(item);
-            }
         }
 
         public void Clear()
@@ -33,9 +31,7 @@ namespace Pliant.Collections
         public void Enqueue(T item)
         {
             if (_visited.ContainsKey(item))
-            {
                 return;
-            }
 
             _visited[item] = item;
             _queue.Enqueue(item);            

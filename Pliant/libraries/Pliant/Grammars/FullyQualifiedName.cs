@@ -1,12 +1,12 @@
-﻿using System.Diagnostics;
+﻿using System;
 
 namespace Pliant.Grammars
 {
     public class FullyQualifiedName
     {
-        public string Name { get; }
-        public string Namespace { get; }
-        public string FullName { get; }
+        public string Name { get; private set; }
+        public string Namespace { get; private set; }
+        public string FullName { get; private set; }
 
         private readonly int _hashCode;
 
@@ -17,7 +17,12 @@ namespace Pliant.Grammars
             FullName = !string.IsNullOrWhiteSpace(@namespace)
                 ? $"{@namespace}.{name}"
                 : $"{name}";
-            this._hashCode = FullName.GetHashCode();
+            _hashCode = ComputeHashCode(FullName);
+        }
+
+        private static int ComputeHashCode(string fullName)
+        {
+            return fullName.GetHashCode();
         }
 
         public override string ToString()
@@ -37,12 +42,17 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            return obj is FullyQualifiedName other && FullName == other.FullName;
+            if (obj == null)
+                return false;
+            var otherFullyQualifiedName = obj as FullyQualifiedName;
+            if (otherFullyQualifiedName == null)
+                return false;
+            return otherFullyQualifiedName.FullName == FullName;
         }
 
         public override int GetHashCode()
         {
-            return this._hashCode;
+            return _hashCode;
         }
     }
 }

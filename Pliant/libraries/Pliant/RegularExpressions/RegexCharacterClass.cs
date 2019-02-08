@@ -29,16 +29,10 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
-
             var characterClass = obj as RegexCharacterClass;
             if ((object)characterClass == null)
-            {
                 return false;
-            }
-
             return characterClass.CharacterRange.Equals(CharacterRange);
         }
 
@@ -83,16 +77,10 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
-
             var characterClassList = obj as RegexCharacterClassAlteration;
             if ((object)characterClassList == null)
-            {
                 return false;
-            }
-
             return characterClassList.CharacterRange.Equals(CharacterRange)
                 && characterClassList.CharacterClass.Equals(CharacterClass);
         }

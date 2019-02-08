@@ -16,15 +16,11 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
 
             var characterRange = obj as RegexCharacterUnitRange;
             if ((object)characterRange == null)
-            {
                 return false;
-            }
 
             return characterRange.StartCharacter.Equals(StartCharacter);
         }
@@ -69,16 +65,10 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
-
             var characterRangeSet = obj as RegexCharacterRange;
             if ((object)characterRangeSet == null)
-            {
                 return false;
-            }
-
             return
                 StartCharacter.Equals(characterRangeSet.StartCharacter)
                 && EndCharacter.Equals(characterRangeSet.EndCharacter);

@@ -15,39 +15,27 @@ namespace Pliant
         public IDisposable Subscribe(IObserver<T> observer)
         {
             if (!_observers.Contains(observer))
-            {
                 _observers.Add(observer);
-            }
-
             return new Unsubscriber(_observers, observer);
         }
 
         protected virtual void OnNext(T value)
         {
             foreach (var observer in _observers)
-            {
                 observer.OnNext(value);
-            }
         }
 
         protected virtual void OnError(Exception exception)
         {
             foreach (var observer in _observers)
-            {
                 observer.OnError(exception);
-            }
         }
 
         protected virtual void Complete()
         {
             foreach (var observer in _observers)
-            {
                 if (_observers.Contains(observer))
-                {
                     observer.OnCompleted();
-                }
-            }
-
             _observers.Clear();
         }
 
@@ -65,9 +53,7 @@ namespace Pliant
             public void Dispose()
             {
                 if (_observer != null && _observers.Contains(_observer))
-                {
                     _observers.Remove(_observer);
-                }
             }
         }
     }

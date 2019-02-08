@@ -35,9 +35,7 @@ namespace Pliant.Collections
         {
             _innerList = new List<T>(list);
             if (HashSetIsMoreEfficient())
-            {
                 AllocateAndPopulateHashSet();
-            }
         }
 
         public int IndexOf(T item)
@@ -53,9 +51,7 @@ namespace Pliant.Collections
         public bool InsertUnique(int index, T item)
         {
             if (HashSetIsMoreEfficient())
-            {
                 return InsertUniqueUsingHashSet(index, item);
-            }
 
             return InsertUniqueUsingList(index, item);
         }
@@ -63,9 +59,7 @@ namespace Pliant.Collections
         private bool InsertUniqueUsingHashSet(int index, T item)
         {
             if (!_index.Add(item.GetHashCode()))
-            {
                 return false;
-            }
 
             _innerList.Insert(index, item);
             return false;
@@ -84,16 +78,11 @@ namespace Pliant.Collections
             {
                 var listItem = _innerList[i];
                 if (hashCode.Equals(listItem.GetHashCode()))
-                {
-                    return false;
-                }
+                    return false;                
             }
             _innerList.Insert(index, item);
             if (HashSetIsMoreEfficient())
-            {
                 AllocateAndPopulateHashSet();
-            }
-
             return true;
         }
 
@@ -115,20 +104,14 @@ namespace Pliant.Collections
         public bool AddUnique(T item)
         {
             if (HashSetIsMoreEfficient())
-            {
                 return AddUniqueUsingHashSet(item);
-            }
-
             return AddUniqueUsingList(item);
         }
 
         private bool AddUniqueUsingHashSet(T item)
         {
             if (!_index.Add(item.GetHashCode()))
-            {
                 return false;
-            }
-
             _innerList.Add(item);
             return true;
         }
@@ -145,60 +128,42 @@ namespace Pliant.Collections
             {
                 var listItem = _innerList[i];
                 if (hashCode.Equals(listItem.GetHashCode()))
-                {
                     return false;
-                }
             }
             _innerList.Add(item);
             if (HashSetIsMoreEfficient())
-            {
                 AllocateAndPopulateHashSet();
-            }
-
             return true;
         }
 
         private void AllocateAndPopulateHashSet()
         {
             if (_index == null)
-            {
                 _index = new HashSet<int>();
-            }
 
             if (_index.Count == _innerList.Count)
-            {
                 return;
-            }
 
             for (int i = 0; i < _innerList.Count; i++)
-            {
                 _index.Add(_innerList[i].GetHashCode());
-            }
         }
 
         public void Clear()
         {
             _innerList.Clear();
             if(_index != null)
-            {
                 _index.Clear();
-            }
         }
 
         public bool ContainsHash(int hashcode)
         {
             if (HashSetIsMoreEfficient())
-            {
                 return _index.Contains(hashcode);
-            }
-
             for (var i = 0; i < _innerList.Count; i++)
             {
                 var item = _innerList[i];
                 if (item.GetHashCode() == hashcode)
-                {
                     return true;
-                }
             }
             return false;
         }
@@ -206,10 +171,7 @@ namespace Pliant.Collections
         public bool Contains(T item)
         {
             if (HashSetIsMoreEfficient())
-            {
                 return _index.Contains(item.GetHashCode());
-            }
-
             return _innerList.Contains(item);
         }
 
@@ -250,16 +212,10 @@ namespace Pliant.Collections
         public override bool Equals(object obj)
         {
             if (((object)obj) == null)
-            {
                 return false;
-            }
-
             var uniqueList = obj as UniqueList<T>;
             if (((object)uniqueList) == null)
-            {
                 return false;
-            }
-
             return _innerList.Equals(uniqueList._innerList);
         }
 

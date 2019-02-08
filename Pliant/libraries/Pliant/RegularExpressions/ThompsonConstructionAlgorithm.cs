@@ -144,10 +144,7 @@ namespace Pliant.RegularExpressions
             var nfaStartState = new NfaState();
             var nfaEndState = new NfaState();
             if (negate)
-            {
                 terminal = new NegationTerminal(terminal);
-            }
-
             nfaStartState.AddTransistion(
                 new TerminalNfaTransition(terminal, nfaEndState));
             return new Nfa(nfaStartState, nfaEndState);
@@ -172,9 +169,7 @@ namespace Pliant.RegularExpressions
         {
             ITerminal terminal = null;
             if (!isEscaped)
-            {
                 terminal = new CharacterTerminal(value);
-            }
             else
             {
                 switch (value)
@@ -207,10 +202,7 @@ namespace Pliant.RegularExpressions
             }
 
             if (negate)
-            {
                 terminal = new NegationTerminal(terminal);
-            }
-
             return terminal;
         }
 

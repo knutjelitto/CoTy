@@ -15,17 +15,13 @@ namespace Pliant.RegularExpressions
             while (!parseRunner.EndOfStream())
             {
                 if (!parseRunner.Read())
-                {
                     throw new Exception(
                         $"Unable to parse regular expression. Error at position {parseRunner.Position}.");
-                }
             }
             if (!parseEngine.IsAccepted())
-            {
                 throw new Exception(
                     $"Error parsing regular expression. Error at position {parseRunner.Position}");
-            }
-
+            
             var parseForest = parseEngine.GetParseForestRootNode();
 
             var parseTree = new InternalTreeNode(

@@ -25,16 +25,10 @@ namespace Pliant.Grammars
         {
             Dictionary<int, IDottedRule> positionIndex;
             if (!_dottedRuleIndex.TryGetValue(production, out positionIndex))
-            {
                 return null;
-            }
-
             IDottedRule dottedRule;
             if (!positionIndex.TryGetValue(position, out dottedRule))
-            {
                 return null;
-            }
-
             return dottedRule;
         }
 

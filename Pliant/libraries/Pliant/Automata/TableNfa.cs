@@ -37,13 +37,9 @@ namespace Pliant.Automata
         public void SetFinal(int state, bool isFinal)
         {
             if (isFinal)
-            {
                 _finalStates.Add(state);
-            }
             else
-            {
                 _finalStates.Remove(state);
-            }
         }
 
         public bool IsFinal(int state)
@@ -78,9 +74,7 @@ namespace Pliant.Automata
                     var state = nfaClosure.States[i];
                     Dictionary<char, int> characterTransitions = null;
                     if (!_table.TryGetValue(state, out characterTransitions))
-                    {
                         continue;
-                    }
 
                     foreach (var characterTransition in characterTransitions)
                     {
@@ -134,10 +128,7 @@ namespace Pliant.Automata
                 _set = sources;
                 var queue = new ProcessOnceQueue<int>();
                 foreach (var item in sources)
-                {
                     queue.Enqueue(item);
-                }
-
                 CreateClosure(nullTransitions, finalStates, queue);
                 _hashCode = ComputeHashCode(States);
             }
@@ -161,27 +152,26 @@ namespace Pliant.Automata
                     var state = queue.Dequeue();
                     _set.Add(state);
                     if (finalStates.Contains(state))
-                    {
                         IsFinal = true;
-                    }
 
                     UniqueList<int> targetStates = null;
                     if (!nullTransitions.TryGetValue(state, out targetStates))
-                    {
                         continue;
-                    }
 
                     for (int i = 0; i < targetStates.Count; i++)
-                    {
                         queue.Enqueue(targetStates[i]);
-                    }
                 }
                 States = _set.ToArray();
             }
 
             private static int ComputeHashCode(int[] states)
             {
-                return states.Aggregate(HashCode.Incremental(), (hash, state) => hash.Add(state.GetHashCode()));
+                var hashCode = 0;
+                for (int i = 0; i < states.Length; i++)
+                {
+                    hashCode = HashCode.ComputeIncrementalHash(states[i].GetHashCode(), hashCode, i == 0);
+                }
+                return hashCode;
             }
 
             public override int GetHashCode()
@@ -192,22 +182,16 @@ namespace Pliant.Automata
             public override bool Equals(object obj)
             {
                 if (((object)obj) == null)
-                {
                     return false;
-                }
 
                 var closure = obj as Closure;
                 if (((object)closure) == null)
-                {
                     return false;
-                }
 
                 for (int i = 0; i < States.Length; i++)
                 {
                     if (!closure._set.Contains(States[i]))
-                    {
                         return false;
-                    }
                 }
                 return true;
             }

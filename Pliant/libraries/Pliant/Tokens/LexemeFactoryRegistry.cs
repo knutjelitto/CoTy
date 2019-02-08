@@ -19,10 +19,7 @@ namespace Pliant.Tokens
         {
             ILexemeFactory lexemeFactory = null;
             if (!_registry.TryGetValue(lexerRuleType, out lexemeFactory))
-            {
                 return null;
-            }
-
             return lexemeFactory;
         }
 

@@ -12,9 +12,7 @@ namespace Pliant.Ebnf
         public override void Visit(IInternalTreeNode node)
         {
             if (EbnfGrammar.Definition == node.Symbol.Value)
-            {
-                Definition = VisitDefinitionNode(node);
-            }
+                Definition = VisitDefinitionNode(node);            
         }
 
         private EbnfDefinition VisitDefinitionNode(IInternalTreeNode node)
@@ -32,22 +30,15 @@ namespace Pliant.Ebnf
                         var symbolValue = internalNode.Symbol.Value;
 
                         if (EbnfGrammar.Block == symbolValue)
-                        {
                             block = VisitBlockNode(internalNode);
-                        }
                         else if (EbnfGrammar.Definition == symbolValue)
-                        {
                             definition = VisitDefinitionNode(internalNode);
-                        }
-
                         break;
                 }
             }
 
             if (definition != null)
-            {
                 return new EbnfDefinitionConcatenation(block, definition);
-            }
 
             return new EbnfDefinition(block);
         }
@@ -64,20 +55,11 @@ namespace Pliant.Ebnf
                         var symbolValue = internalNode.Symbol.Value;
 
                         if (EbnfGrammar.Rule == symbolValue)
-                        {
                             return VisitRuleNode(internalNode);
-                        }
-
                         if (EbnfGrammar.Setting == symbolValue)
-                        {
                             return VisitSettingNode(internalNode);
-                        }
-
                         if (EbnfGrammar.LexerRule == symbolValue)
-                        {
                             return VisitLexerRuleNode(internalNode);
-                        }
-
                         break;                      
                 }
             }
@@ -99,14 +81,9 @@ namespace Pliant.Ebnf
                         var symbolValue = internalNode.Symbol.Value;
 
                         if (EbnfGrammar.QualifiedIdentifier == symbolValue)
-                        {
                             qualifiedIdentifier = VisitQualifiedIdentifierNode(internalNode);
-                        }
                         else if (EbnfGrammar.Expression == symbolValue)
-                        {
                             expression = VisitExpressionNode(internalNode);
-                        }
-
                         break;
 
                     case TreeNodeType.Token:
@@ -130,27 +107,19 @@ namespace Pliant.Ebnf
                         var internalNode = child as IInternalTreeNode;
                         var symbolValue = internalNode.Symbol.Value;
                         if (EbnfGrammar.QualifiedIdentifier == symbolValue)
-                        {
                             repetitionIdentifier = VisitQualifiedIdentifierNode(internalNode);
-                        }
-
                         break;
 
                     case TreeNodeType.Token:
                         var tokenNode = child as ITokenTreeNode;
                         var token = tokenNode.Token;
                         if (token.TokenType.Equals(EbnfGrammar.TokenTypes.Identifier))
-                        {
                             identifier = token.Value;
-                        }
-
                         break;
                 }
             }
             if (repetitionIdentifier == null)
-            {
                 return new EbnfQualifiedIdentifier(identifier);
-            }
 
             return new EbnfQualifiedIdentifierConcatenation(identifier, repetitionIdentifier);         
         }
@@ -169,14 +138,9 @@ namespace Pliant.Ebnf
                         var internalNode = child as IInternalTreeNode;
                         var symbolValue = internalNode.Symbol.Value;
                         if (EbnfGrammar.Term == symbolValue)
-                        {
                             term = VisitTermNode(internalNode);
-                        }
                         else if (EbnfGrammar.Expression == symbolValue)
-                        {
                             expression = VisitExpressionNode(internalNode);
-                        }
-
                         break;
 
                     case TreeNodeType.Token:
@@ -184,10 +148,7 @@ namespace Pliant.Ebnf
                 }
             }
             if (expression == null)
-            {
                 return new EbnfExpression(term);
-            }
-
             return new EbnfExpressionAlteration(term, expression);
         }
 
@@ -205,14 +166,9 @@ namespace Pliant.Ebnf
                         var internalNode = child as IInternalTreeNode;
                         var symbolValue = internalNode.Symbol.Value;
                         if (EbnfGrammar.Factor == symbolValue)
-                        {
                             factor = VisitFactorNode(internalNode);
-                        }
                         else if (EbnfGrammar.Term == symbolValue)
-                        {
                             term = VisitTermNode(internalNode);
-                        }
-
                         break;
 
                     case TreeNodeType.Token:
@@ -220,10 +176,7 @@ namespace Pliant.Ebnf
                 }
             }
             if (term == null)
-            {
                 return new EbnfTerm(factor);
-            }
-
             return new EbnfTermConcatenation(factor, term);
         }
 
@@ -239,31 +192,21 @@ namespace Pliant.Ebnf
                         var symbolValue = internalNode.Symbol.Value;
 
                         if (EbnfGrammar.QualifiedIdentifier == symbolValue)
-                        {
                             return new EbnfFactorIdentifier(
                                 VisitQualifiedIdentifierNode(internalNode));
-                        }
 
                         if (EbnfGrammar.Literal == symbolValue)
-                        {
                             return new EbnfFactorLiteral(
                                 VisitLiteralNode(internalNode));
-                        }
 
                         if (EbnfGrammar.Repetition == symbolValue)
-                        {
                             return VisitRepetitionNode(internalNode);
-                        }
 
                         if (EbnfGrammar.Optional == symbolValue)
-                        {
                             return VisitOptionalNode(internalNode);
-                        }
 
                         if (EbnfGrammar.Grouping == symbolValue)
-                        {
                             return VisitGroupingNode(internalNode);
-                        }
 
                         if (RegexGrammar.Regex == symbolValue)
                         {
@@ -355,15 +298,11 @@ namespace Pliant.Ebnf
                         // if token type is string token type remove surrounding quotes
                         if (tokenType.Equals(SingleQuoteStringLexerRule.TokenTypeDescriptor)
                             || tokenType.Equals(DoubleQuoteStringLexerRule.TokenTypeDescriptor))
-                        {
                             return token.Value.Substring(1, token.Value.Length - 2);
-                        }
 
                         // TODO: Find a better solution for identifing the lexer rule based on id
                         if (tokenNode.Token.TokenType.Id.Length > 5)
-                        {
                             return token.Value;
-                        }
 
                         break;
 
@@ -388,20 +327,14 @@ namespace Pliant.Ebnf
                         var tokenNode = child as ITokenTreeNode;
                         var token = tokenNode.Token;
                         if (token.TokenType.Equals(EbnfGrammar.TokenTypes.SettingIdentifier))
-                        {
                             settingIdentifier = new EbnfSettingIdentifier(token.Value);
-                        }
-
                         break;
 
                     case TreeNodeType.Internal:
                         var internalNode = child as IInternalTreeNode;
                         var symbolValue = internalNode.Symbol.Value;
                         if (EbnfGrammar.QualifiedIdentifier == symbolValue)
-                        {
                             qualifiedIdentifier = VisitQualifiedIdentifierNode(internalNode);
-                        }
-
                         break;
                 }
             }
@@ -418,20 +351,14 @@ namespace Pliant.Ebnf
             {
                 var child = node.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
-                {
                     continue;
-                }
-
                 var internalNode = child as IInternalTreeNode;
                 var symbolValue = internalNode.Symbol.Value;
                 if (EbnfGrammar.QualifiedIdentifier == symbolValue)
-                {
                     qualifiedIdentifier = VisitQualifiedIdentifierNode(internalNode);
-                }
                 else if (EbnfGrammar.LexerRuleExpression == symbolValue)
-                {
                     expression = VisitLexerRuleExpressionNode(internalNode);
-                }
+                
             }
             return new EbnfBlockLexerRule(
                 new EbnfLexerRule(qualifiedIdentifier, expression));
@@ -446,28 +373,17 @@ namespace Pliant.Ebnf
             {
                 var child = node.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
-                {
                     continue;
-                }
-
                 var internalNode = child as IInternalTreeNode;
                 var symbolValue = internalNode.Symbol.Value;
                 if (EbnfGrammar.LexerRuleTerm == symbolValue)
-                {
                     term = VisitLexerRuleTermNode(internalNode);
-                }
-
                 if (EbnfGrammar.LexerRuleExpression == symbolValue)
-                {
                     expression = VisitLexerRuleExpressionNode(internalNode);
-                }
             }
 
             if (expression == null)
-            {
                 return new EbnfLexerRuleExpression(term);
-            }
-
             return new EbnfLexerRuleExpressionAlteration(term, expression);
         }
 
@@ -480,27 +396,17 @@ namespace Pliant.Ebnf
             {
                 var child = node.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
-                {
                     continue;
-                }
-
                 var internalNode = child as IInternalTreeNode;
                 var symbolValue = internalNode.Symbol.Value;
                 if (EbnfGrammar.LexerRuleFactor == symbolValue)
-                {
                     factor = VisitLexerRuleFactorNode(internalNode);
-                }
-
                 if (EbnfGrammar.LexerRuleTerm == symbolValue)
-                {
                     term = VisitLexerRuleTermNode(internalNode);
-                }
             }
 
             if (term == null)
-            {
                 return new EbnfLexerRuleTerm(factor);
-            }
 
             return new EbnfLexerRuleTermConcatenation(factor, term);
         }
@@ -511,19 +417,14 @@ namespace Pliant.Ebnf
             {
                 var child = node.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
-                {
                     continue;
-                }
-
                 var internalNode = child as IInternalTreeNode;
                 var symbolValue = internalNode.Symbol.Value;
 
-                if (EbnfGrammar.Literal == symbolValue)
-                {
+                if (EbnfGrammar.Literal == symbolValue)                
                     return new EbnfLexerRuleFactorLiteral(
                         VisitLiteralNode(internalNode));
-                }
-
+                
                 if (RegexGrammar.Regex == symbolValue)
                 {
                     var regexVisitor = new RegexVisitor();

@@ -28,16 +28,10 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
-
             var any = obj as RegexAtomAny;
             if ((object)any == null)
-            {
                 return false;
-            }
-
             return true;
         }
 
@@ -60,16 +54,10 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
-
             var atomCharacter = obj as RegexAtomCharacter;
             if ((object)atomCharacter == null)
-            {
                 return false;
-            }
-
             return Character.Equals(atomCharacter.Character);
         }
         
@@ -109,16 +97,10 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
-
             var atomExpression = obj as RegexAtomExpression;
             if ((object)atomExpression == null)
-            {
                 return false;
-            }
-
             return Expression.Equals(atomExpression.Expression);
         }
         
@@ -158,16 +140,10 @@ namespace Pliant.RegularExpressions
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
-            {
                 return false;
-            }
-
             var atomSet = obj as RegexAtomSet;
             if ((object)atomSet == null)
-            {
                 return false;
-            }
-
             return Set.Equals(atomSet.Set);
         }
         

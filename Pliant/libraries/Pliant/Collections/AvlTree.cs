@@ -34,19 +34,13 @@ namespace Pliant.Collections
         {
             var isLeaf = node == null;
             if (isLeaf)
-            {
                 return new AvlNode(key);
-            }
 
             // do a binary search tree insertion recursively
             if (key.CompareTo(node.Key) < 0)
-            {
                 node.Left = Insert(node.Left, key);
-            }
             else
-            {
                 node.Right = Insert(node.Right, key);
-            }
 
             // update height
             node.Height = Math.Max(
@@ -57,21 +51,15 @@ namespace Pliant.Collections
             var balanceFactor = GetBalanceFactor(node);
 
             if (-1 <= balanceFactor && balanceFactor <= 1)
-            {
                 return node;
-            }
 
             // Left Left
             if (balanceFactor > 1 && key.CompareTo(node.Left.Key) < 0)
-            {
                 return RotateRight(node);
-            }
 
             // Right Right
             if (balanceFactor < -1 && key.CompareTo(node.Right.Key) > 0)
-            {
                 return RotateLeft(node);
-            }
 
             // Left Right
             if (balanceFactor > 1 && key.CompareTo(node.Left.Key) > 0)
@@ -127,20 +115,14 @@ namespace Pliant.Collections
         private static int Height(AvlNode node)
         {
             if (node == null)
-            {
                 return 0;
-            }
-
             return node.Height;
         }
 
         private static int GetBalanceFactor(AvlNode node)
         {
             if (node == null)
-            {
                 return 0;
-            }
-
             return Height(node.Left) - Height(node.Right);
         }
 
@@ -152,23 +134,17 @@ namespace Pliant.Collections
         private IEnumerator<T> GetEnumerator(AvlNode node)
         {
             if (node == null)
-            {
                 yield break;
-            }
 
             var leftTree = GetEnumerator(node.Left);
             while (leftTree.MoveNext())
-            {
                 yield return leftTree.Current;
-            }
 
             yield return node.Key;
 
             var rightTree = GetEnumerator(node.Right);
             while (rightTree.MoveNext())
-            {
                 yield return rightTree.Current;
-            }
         }
     }    
 }

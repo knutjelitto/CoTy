@@ -9,21 +9,18 @@ namespace Pliant.Charts
     {
         private static readonly INormalState[] EmptyNormalStates = { };
         private static readonly ITransitionState[] EmptyTransitionStates = { };
-        private UniqueList<INormalState> predictions;
-        private UniqueList<INormalState> scans;
-        private UniqueList<INormalState> completions;
-        private UniqueList<ITransitionState> transitions;
+        private UniqueList<INormalState> _predictions;
+        private UniqueList<INormalState> _scans;
+        private UniqueList<INormalState> _completions;
+        private UniqueList<ITransitionState> _transitions;
 
         public IReadOnlyList<INormalState> Predictions
         {
             get
             {
-                if (this.predictions == null)
-                {
+                if (_predictions == null)
                     return EmptyNormalStates;
-                }
-
-                return this.predictions;
+                return _predictions;
             } 
         }
 
@@ -31,12 +28,9 @@ namespace Pliant.Charts
         {
             get
             {
-                if (this.scans == null)
-                {
+                if (_scans == null)
                     return EmptyNormalStates;
-                }
-
-                return this.scans;
+                return _scans;
             }
         }
 
@@ -44,12 +38,9 @@ namespace Pliant.Charts
         {
             get
             {
-                if (this.completions == null)
-                {
+                if (_completions == null)
                     return EmptyNormalStates;
-                }
-
-                return this.completions;
+                return _completions;
             }
         }
 
@@ -57,16 +48,13 @@ namespace Pliant.Charts
         {
             get
             {
-                if (this.transitions == null)
-                {
+                if (_transitions == null)
                     return EmptyTransitionStates;
-                }
-
-                return this.transitions;
+                return _transitions;
             }
         }
 
-        public int Location { get; }
+        public int Location { get; private set; }
 
         public EarleySet(int location)
         {
@@ -76,62 +64,45 @@ namespace Pliant.Charts
         public bool Contains(StateType stateType, IDottedRule dottedRule, int origin)
         {
             if (stateType != StateType.Normal)
-            {
                 return false;
-            }
 
             var hashCode = NormalStateHashCodeAlgorithm.Compute(dottedRule, origin);
             if (dottedRule.IsComplete)
-            {
                 return CompletionsContainsHash(hashCode);
-            }
 
             var currentSymbol = dottedRule.PostDotSymbol;
             if (currentSymbol.SymbolType == SymbolType.NonTerminal)
-            {
                 return PredictionsContainsHash(hashCode);
-            }
 
             return ScansContainsHash(hashCode);
         }
 
         private bool CompletionsContainsHash(int hashCode)
         {
-            if (this.completions == null)
-            {
+            if (_completions == null)
                 return false;
-            }
-
-            return this.completions.ContainsHash(hashCode);
+            return _completions.ContainsHash(hashCode);
         }
 
         private bool PredictionsContainsHash(int hashCode)
         {
-            if (this.predictions == null)
-            {
+            if (_predictions == null)
                 return false;
-            }
-
-            return this.predictions.ContainsHash(hashCode);
+            return _predictions.ContainsHash(hashCode);
         }
 
         private bool ScansContainsHash(int hashCode)
         {
-            if (this.scans == null)
-            {
+            if (_scans == null)
                 return false;
-            }
-
-            return this.scans.ContainsHash(hashCode);
+            return _scans.ContainsHash(hashCode);
         }
 
         public bool Enqueue(IState state)
         {
             if (state.StateType == StateType.Transitive)
-            {
                 return EnqueueTransition(state as ITransitionState);
-            }
-
+            
             return EnqueueNormal(state, state as INormalState);
         }
 
@@ -142,10 +113,7 @@ namespace Pliant.Charts
             {
                 var currentSymbol = dottedRule.PostDotSymbol;
                 if (currentSymbol.SymbolType == SymbolType.NonTerminal)
-                {
                     return AddUniquePrediction(normalState);
-                }
-
                 return AddUniqueScan(normalState);
             }
 
@@ -154,55 +122,40 @@ namespace Pliant.Charts
 
         private bool AddUniqueCompletion(INormalState normalState)
         {
-            if (this.completions == null)
-            {
-                this.completions = new UniqueList<INormalState>();
-            }
-
-            return this.completions.AddUnique(normalState);
+            if (_completions == null)
+                _completions = new UniqueList<INormalState>();
+            return _completions.AddUnique(normalState);
         }
 
         private bool AddUniqueScan(INormalState normalState)
         {
-            if (this.scans == null)
-            {
-                this.scans = new UniqueList<INormalState>();
-            }
-
-            return this.scans.AddUnique(normalState);
+            if (_scans == null)
+                _scans = new UniqueList<INormalState>();
+            return _scans.AddUnique(normalState);
         }
 
         private bool AddUniquePrediction(INormalState normalState)
         {
-            if (this.predictions == null)
-            {
-                this.predictions = new UniqueList<INormalState>();
-            }
-
-            return this.predictions.AddUnique(normalState);
+            if (_predictions == null)
+                _predictions = new UniqueList<INormalState>();
+            return _predictions.AddUnique(normalState);
         }
 
         private bool EnqueueTransition(ITransitionState transitionState)
         {
-            if (this.transitions == null)
-            {
-                this.transitions = new UniqueList<ITransitionState>();
-            }
-
-            return this.transitions.AddUnique(transitionState);
+            if (_transitions == null)
+                _transitions = new UniqueList<ITransitionState>();
+            return _transitions.AddUnique(transitionState);
         }
 
         public ITransitionState FindTransitionState(ISymbol searchSymbol)
         {
-            foreach (var transition in Transitions)
+            for (int t = 0; t < Transitions.Count; t++)
             {
-                var transitionState = transition as TransitionState;
+                var transitionState = Transitions[t] as TransitionState;
                 if (transitionState.Recognized.Equals(searchSymbol))
-                {
                     return transitionState;
-                }
             }
-
             return null;
         }
 
@@ -218,10 +171,7 @@ namespace Pliant.Charts
                 {
                     var moreThanOneSourceItemExists = sourceItemCount > 0;
                     if (moreThanOneSourceItemExists)
-                    {
                         return null;
-                    }
-
                     sourceItemCount++;
                     sourceItem = state;
                 }

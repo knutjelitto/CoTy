@@ -22,16 +22,10 @@ namespace Pliant.Charts
         public override bool Equals(object obj)
         {
             if (((object)obj) == null)
-            {
                 return false;
-            }
-
             var deterministicState = obj as DeterministicState;
             if (((object)deterministicState) == null)
-            {
                 return false;
-            }
-
             return deterministicState.Origin == Origin && DottedRuleSet.Equals(deterministicState.DottedRuleSet);
         }
 

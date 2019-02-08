@@ -23,14 +23,10 @@ namespace Pliant.Automata
 
         public void SetFinal(int state, bool isFinal)
         {
-            if (isFinal)
-            {
-                _finalStates.Add(state);
-            }
+            if (isFinal)            
+                _finalStates.Add(state);            
             else
-            {
                 _finalStates.Remove(state);
-            }
         }
 
         public bool IsFinal(int state)
@@ -44,16 +40,10 @@ namespace Pliant.Automata
         {
             Dictionary<char, int> sourceTransitions = null;
             if (!_table.TryGetValue(source, out sourceTransitions))
-            {
                 return null;
-            }
-
             var target = default(int);
             if (sourceTransitions.TryGetValue(character, out target))
-            {
                 return target;
-            }
-
             return null;
         }
     }

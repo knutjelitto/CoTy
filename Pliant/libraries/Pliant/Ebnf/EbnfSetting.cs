@@ -7,25 +7,48 @@ namespace Pliant.Ebnf
     {
         private readonly int _hashCode;
 
-        public EbnfSettingIdentifier SettingIdentifier { get; }
-        public EbnfQualifiedIdentifier QualifiedIdentifier { get; }
+        public EbnfSettingIdentifier SettingIdentifier { get; private set; }
+        public EbnfQualifiedIdentifier QualifiedIdentifier { get; private set; }
+        
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfSetting;
+            }
+        }
 
         public EbnfSetting(EbnfSettingIdentifier settingIdentifier, EbnfQualifiedIdentifier qualifiedIdentifier)
         {
             SettingIdentifier = settingIdentifier;
             QualifiedIdentifier = qualifiedIdentifier;
-            this._hashCode = (SettingIdentifier, QualifiedIdentifier).GetHashCode();
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
         {
-            return IsOfType<EbnfSetting>(obj, out var other) &&
-                   (SettingIdentifier, QualifiedIdentifier).Equals((other.SettingIdentifier, other.QualifiedIdentifier));
+            if ((object)obj == null)
+                return false;
+            var qualifiedIdentifier = obj as EbnfSetting;
+            if ((object)qualifiedIdentifier == null)
+                return false;
+            return qualifiedIdentifier.NodeType == NodeType
+                && qualifiedIdentifier.SettingIdentifier.Equals(SettingIdentifier)
+                && qualifiedIdentifier.QualifiedIdentifier.Equals(QualifiedIdentifier);
+        }
+
+        int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                ((int)NodeType).GetHashCode(),
+                SettingIdentifier.GetHashCode(),
+                QualifiedIdentifier.GetHashCode());
         }
 
         public override int GetHashCode()
         {
-            return this._hashCode;
+            return _hashCode;
         }
+
     }
 }

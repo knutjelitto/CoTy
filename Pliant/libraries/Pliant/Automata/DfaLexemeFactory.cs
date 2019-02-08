@@ -19,11 +19,8 @@ namespace Pliant.Automata
         public ILexeme Create(ILexerRule lexerRule, int position)
         {
             if (lexerRule.LexerRuleType != LexerRuleType)
-            {
                 throw new Exception(
                     $"Unable to create DfaLexeme from type {lexerRule.GetType().FullName}. Expected DfaLexerRule");
-            }
-
             var dfaLexerRule = lexerRule as IDfaLexerRule;
             if (_queue.Count > 0)
             {
@@ -39,10 +36,7 @@ namespace Pliant.Automata
         {
             var dfaLexeme = lexeme as DfaLexeme;
             if (dfaLexeme == null)
-            {
                 throw new Exception($"Unable to free lexeme of type {lexeme.GetType()} with DfaLexemeFactory");
-            }
-
             _queue.Enqueue(dfaLexeme);
         }
     }

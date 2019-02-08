@@ -28,16 +28,10 @@ namespace Pliant.Builders
         public override bool Equals(object obj)
         {
             if (null == obj)
-            {
                 return false;
-            }
-
             var lexerRuleModel = obj as LexerRuleModel;
             if (null == lexerRuleModel)
-            {
                 return false;
-            }
-
             return Value.Equals(lexerRuleModel.Value);
         }
     }
